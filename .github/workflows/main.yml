@@ -1,0 +1,47 @@
+name: CI/CD Pipeline
+
+on: 
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: |
+        docker build -t burlive .
+        
+    - name: Push Docker image to Docker Hub
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        docker tag burlive:latest ${{ secrets.DOCKER_USERNAME }}/burlive:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/burlive:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to remote server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/burlive:latest
+          
+          # Создание пользовательской сети
+          docker network create mynetwork || true
+          
+          # Запуск контейнера burlive в пользовательской сети
+          docker run -d --name burlive --network mynetwork --env-file /opt/burlive/.env ${{ secrets.DOCKER_USERNAME }}/burlive:latest
+
+          # Запуск контейнера nginx-container с примонтированной конфигурацией и общей папкой letsencrypt
+          docker run -d --name nginx-container --network mynetwork -p 80:80 -v /etc/nginx/sites-available/nodejs:/etc/nginx/sites-available/nodejs \ -v /etc/letsencrypt:/etc/letsencrypt -v /var/run/docker.sock:/var/run/docker.sock nginx:latest
