@@ -39,6 +39,20 @@ const sentenceController = {
                 return res.status(400).json({ message: 'Пожалуйста, предоставьте текст, язык и автора' });
             }
 
+            const isExists = await Sentence.findOne({ text: text })
+
+            if (isExists) {
+
+                await Sentence.findOneAndUpdate({ text: text }, {
+                    $addToSet: {
+                        contributors: author
+                    }
+                }).then(() => { console.log('автор записан') }).catch(error => console.log(error))
+
+                return res.status(200).json({ message: 'Такое предложение существует, вы добавлены в контрибьютеры', isExists })
+
+            }
+
             const newSentence = await new Sentence({ text, language, author }).save();
 
             await User.findByIdAndUpdate({ _id: author }, { $push: { suggestedSentences: newSentence._id } })

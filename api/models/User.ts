@@ -77,7 +77,7 @@ const UserSchema = new Schema({
   },
   telegramUsername: { type: String },
   telegramChatId: { type: Number },
-  suggestedSentences: [{ type: Schema.Types.ObjectId, ref: 'Sentences' }],
+  suggestedSentences: [{ type: Schema.Types.ObjectId, ref: 'Sentence' }],
   suggestedTranslations: [{ type: Schema.Types.ObjectId, ref: 'Translation' }],
   reports: [{ type: Schema.Types.ObjectId, ref: 'Report' }],
   referrals: [{ type: Schema.Types.ObjectId, ref: 'Referral' }],
