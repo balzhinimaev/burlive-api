@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import JwtTokenModel from '../models/Token'; // Путь к вашей модели JwtToken
+import logger from '../utils/logger';
+import mongoose from 'mongoose';
 
 interface AuthRequestBody {
     password: string;
@@ -8,7 +10,9 @@ interface AuthRequestBody {
 }
 
 export interface AuthRequest extends Request {
-    userId: string
+    user: {
+        userId?: string
+    }
 }
 
 const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -28,12 +32,21 @@ const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunc
             return res.status(401).json({ message: 'Неверный токен аутентификации' });
         }
 
-        req.userId = decoded.userId; // Добавляем userId в объект запроса для последующих обработчиков
+        // Инициализация req.user, если еще не инициализирован
+        if (!req.user) {
+            req.user = {};
+        }
+
+        // Установка userId в объект запроса для последующих обработчиков
+        req.user.userId = decoded.userId;
+
+        logger.info(`Токен верифицирован для ${existingToken.userId}`);
         next();
     } catch (error) {
         console.error(error);
         return res.status(401).json({ message: 'Неверный токен аутентификации' });
     }
 };
+
 
 export default authenticateToken;

@@ -28,21 +28,25 @@ const userController = {
 
             // Валидация длины email и пароля
             if (email.length > maxEmailLength) {
+                logger.error(`Длина email превышает максимально допустимую: ${ email }`);
                 return res.status(400).json({ message: 'Длина email превышает максимально допустимую' });
             }
 
             if (password.length < minPasswordLength) {
+                logger.error(`Длина пароля меньше минимально допустимой: ${ password }`);
                 return res.status(400).json({ message: 'Длина пароля меньше минимально допустимой' });
             }
 
             // Валидация почты
             if (!validator.isEmail(email)) {
+                logger.error(`Некорректный формат email: ${ email }`);
                 return res.status(400).json({ message: 'Некорректный формат email' });
             }
 
             // Проверка наличия пользователя с таким email
             const existingUser = await User.findOne({ email });
             if (existingUser) {
+                logger.error(`Пользователь с таким email уже существует: ${ email }`);
                 return res.status(400).json({ message: 'Пользователь с таким email уже существует' });
             }
 
@@ -77,14 +81,14 @@ const userController = {
             // Проверка наличия пользователя и сравнение пароля
             if (user && (await bcrypt.compare(password, user.password))) {
                 // Создание JWT токена
-                const token = jwt.sign({ userId: user._id }, process.env.jwt_secret, { expiresIn: '1h' });
+                const token = jwt.sign({ userId: user._id.toString() }, process.env.jwt_secret, { expiresIn: '1h' });
 
                 // Сохранение токена в MongoDB
                 const expiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 час
                 await Token.create({ userId: user._id, token, expiresAt });
+                logger.info(`Токен создан для пользователя: ${ user._id }`);
 
-                logger.info(`Успешный вход пользователя: ${user._id}`);
-                return res.status(200).json({ token, userId: user._id });
+                return res.status(200).json({ token, userId: user._id.toString() });
             }
 
             res.status(401).json({ message: 'Неверное имя пользователя или пароль' });

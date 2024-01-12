@@ -28,11 +28,15 @@ interface IUser extends Document {
   telegramUsername?: string;
   telegramChatId?: number;
 
+  suggestedSentences?: Types.ObjectId[];
   suggestedTranslations?: Types.ObjectId[];
+
   reports?: Types.ObjectId[];
   referrals?: Types.ObjectId[];
   translations?: Types.ObjectId[];
   votes?: Types.ObjectId[];
+
+  rating: number,
 
   lastActivity?: Date;
   activeSockets?: string[]; // Идентификаторы активных сокетов
@@ -50,6 +54,7 @@ const UserSchema = new Schema({
   birthdate: { type: Date },
   avatar: { type: String },
   phoneNumber: { type: String },
+  rating: { type: Number, default: 100 },
   address: {
     street: { type: String },
     city: { type: String },
@@ -72,7 +77,7 @@ const UserSchema = new Schema({
   },
   telegramUsername: { type: String },
   telegramChatId: { type: Number },
-  
+  suggestedSentences: [{ type: Schema.Types.ObjectId, ref: 'Sentences' }],
   suggestedTranslations: [{ type: Schema.Types.ObjectId, ref: 'Translation' }],
   reports: [{ type: Schema.Types.ObjectId, ref: 'Report' }],
   referrals: [{ type: Schema.Types.ObjectId, ref: 'Referral' }],
