@@ -1,6 +1,6 @@
 // translationController.ts
 import { Request, Response } from 'express';
-import Translation from '../models/Translation';
+import Translation, { ITranslation } from '../models/Translation';
 import { AuthRequest } from '../middleware/authenticateToken';
 import { ObjectId } from 'mongodb';
 import { isValidObjectId } from 'mongoose';
@@ -8,7 +8,8 @@ import logger from '../utils/logger';
 import isValidObjectIdString from '../utils/isValidObjectIdString';
 import User from '../models/User';
 import updateRating from '../utils/updateRating';
-
+import { Document, Schema, Types, model } from 'mongoose';
+import Sentence from '../models/Sentence';
 const translationController = {
     getAllTranslations: async (req: Request, res: Response) => {
         try {
@@ -32,7 +33,6 @@ const translationController = {
         try {
 
             const { text, language, sentenceId } = req.body;
-            console.log(req.body)
             const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
 
             if (!text || !language || !author || !sentenceId) {
@@ -51,15 +51,42 @@ const translationController = {
 
             }
 
-            const newTranslation = await new Translation({ text, language, author, sentenceId: new ObjectId(sentenceId) }).save();
+            const sentence = await Sentence.findById({ _id: sentenceId })
 
-            await User.findByIdAndUpdate({ _id: author }, { $push: { suggestedTranslations: newTranslation._id } })
-            logger.info(`Перевод успешно создан: ${newTranslation}`);
+            if (!sentence) {
+                return res.status(404).json({ message: `Предложение не существует` })
+            }
 
-            // Вызываем метод обновления рейтинга пользователя
-            const updateR = await updateRating(author);
+            const sentenceTranslations = sentence.translations
             
-            res.status(201).json({ message: 'Перевод успешно создан', translationId: newTranslation._id });
+            // existsing translations
+
+            let existsingTranslations = []
+
+            if (sentenceTranslations && (sentence.translations.length)) {
+
+                
+                console.log('is running')
+
+                for (let i = 0; i < sentenceTranslations.length; i++) {
+
+                    const translation = await Translation.findById(sentenceTranslations[i])
+
+                    existsingTranslations.push(translation.text)
+
+                }
+
+            }
+            
+            console.log(existsingTranslations)
+
+            if (existsingTranslations.indexOf(text) !== -1) {
+
+                return res.status(409).json({ message: 'Такой перевод уже существует' });
+
+            }
+
+            await new Translation({ text, language, author, sentenceId: new ObjectId(sentenceId) }).save()     
 
         } catch (error) {
             console.error(error);

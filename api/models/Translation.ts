@@ -1,6 +1,6 @@
 import { Document, Schema, Types, model } from 'mongoose';
 
-interface ITranslation extends Document {
+export interface ITranslation extends Document {
   text: string;
   sentenceId: Types.ObjectId;
   language: string;
@@ -15,7 +15,7 @@ interface ITranslation extends Document {
 }
 
 const TranslationSchema = new Schema({
-  text: { type: String, required: true },
+  text: { type: String, required: true, unique: true },
   language: { type: String, required: true },
   sentenceId: { type: Schema.Types.ObjectId, required: true, ref: 'Sentence' },
 

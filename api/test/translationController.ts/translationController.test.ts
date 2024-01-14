@@ -24,7 +24,7 @@ describe('Sentence Controller Tests', () => {
 
     beforeEach(async () => {
         // Очистка коллекции предложений и выполнение необходимой настройки
-        await Translation.deleteMany({});
+        // await Translation.deleteMany({});
         await User.deleteMany({});
         // По желанию, вы можете зарегистрировать пользователя и получить токен для тестирования
         const userCredentials = {
@@ -64,7 +64,7 @@ describe('Sentence Controller Tests', () => {
             });
         
         const sentence = await Sentence.find()
-        await request(app)
+        const createTranslation = await request(app)
             .post('/api/translations')
             .set('Authorization', `Bearer ${authToken}`)
             .send({
@@ -73,6 +73,8 @@ describe('Sentence Controller Tests', () => {
                 author: userId,
                 sentenceId: sentence[0]._id.toString()
             })
+
+        expect(createTranslation.status).toBe(409)
 
         // Отправка запроса на получение всех предложений с использованием токена пользователя
         const response = await request(app)
