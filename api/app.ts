@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config(); // Загружаем переменные окружения из файла .env
 
+const PORT = process.env.port
+
 import userRouter from './routes/userRouter';
 import authenticateToken from './middleware/authenticateToken';
 import sentencesRouter from './routes/sentenceRouter';
@@ -16,8 +18,8 @@ app.use('/api/users', userRouter);
 app.use('/api/sentences', authenticateToken, sentencesRouter);
 app.use('/api/translations', authenticateToken, translationsRouter);
 
-app.listen(5050, () => {
-  console.log(`Сервер запущен на порту 5050`);
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на порту ${PORT}`);
 });
 // Подключение к базе данных
 // mongoose.connect(process.env.DB_CONNECTION_STRING)

@@ -3,13 +3,19 @@ import request from 'supertest';
 import app from '../../app'; // Предполагаем, что ваш файл app.ts находится в корне проекта
 // setup.ts
 import User from '../../models/User';
+import mongoose from 'mongoose';
 
 describe('User Registration Tests', () => {
 
     // Перед каждым тестом, давайте очищать данные в базе данных
-    beforeAll(async () => {
+    beforeEach(async () => {
+        await mongoose.connect('mongodb://localhost:27017/burlang_test');
         await User.deleteMany({});
     });
+
+    afterEach(async () => {
+        mongoose.disconnect()
+    })
 
     // Тест для успешной регистрации нового пользователя
     it('should authenticate a user with valid credentials', async () => {
@@ -23,7 +29,7 @@ describe('User Registration Tests', () => {
             .post('/api/users/register')
             .send(userData);
 
-        // Аутентификация пользователя
+            // Аутентификация пользователя
         const response = await request(app)
             .post('/api/users/login')
             .send(userData);

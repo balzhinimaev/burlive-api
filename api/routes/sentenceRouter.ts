@@ -10,6 +10,9 @@ sentencesRouter.get('/', sentencesController.getAllSentences);
 // Маршрут для создания нового предложения
 sentencesRouter.post('/', sentencesController.createSentence);
 
+// Маршрут для получения предложения
+sentencesRouter.get('/:id', sentencesController.getSentence);
+
 // Маршрут для обновления статуса предложения
 sentencesRouter.put('/:id/status', sentencesController.updateStatus);
 

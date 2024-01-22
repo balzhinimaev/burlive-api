@@ -7,7 +7,7 @@ import User from '../../models/User';
 import { ObjectId } from 'mongodb';
 import Translation from '../../models/Translation';
 
-describe('Sentence Controller Tests', () => {
+describe('Sentence Controller Post methods Tests', () => {
 
     let authToken: string;
     let userId: mongoose.Types.ObjectId
@@ -26,7 +26,7 @@ describe('Sentence Controller Tests', () => {
         const userCredentials = {
             password: 'testpassword',
             email: 'test@example.com',
-            username: 'testusername'
+            username: 'test'
         };
 
         const registrationResponse = await request(app)
@@ -60,7 +60,7 @@ describe('Sentence Controller Tests', () => {
         expect(userId).toBeDefined();
 
         // Создание тестового предложения
-        const createSentence = await request(app)
+        const response = await request(app)
             .post('/api/sentences')
             .set('Authorization', `Bearer ${authToken}`)
             .send({
@@ -70,73 +70,31 @@ describe('Sentence Controller Tests', () => {
             });
 
         // Проверки
-        expect(createSentence.status).toBe(201);
-        expect(createSentence.body.message).toBe("Предложение успешно создано");
+        expect(response.status).toBe(201);
+        expect(response.body.message).toBe("Предложение успешно создано");
 
         // Получение обновленной информации о пользователе
         const updatedUser = await User.findById({ _id: new ObjectId(userId) });
 
         // Проверка, что у пользователя теперь есть одно предложение
         expect(updatedUser.suggestedSentences).toHaveLength(1);
-        expect(updatedUser.suggestedSentences[0].toString()).toBe(createSentence.body.sentenceId);
+        expect(updatedUser.suggestedSentences[0].toString()).toBe(response.body.sentenceId);
         expect(updatedUser.rating).toBe(200);
-
-        const getSentence = await request(app)
-            .get(`/api/sentences/${createSentence.body.sentenceId}`)
-            .set('Authorization', `Bearer ${authToken}`)
-        
-        expect(getSentence.status).toBe(200)
-        expect(getSentence.body._id).toBe(createSentence.body.sentenceId)
 
     });
 
-    it('should create one translation', async () => {
-
-        // Проверка, что токен и userId установлены
-        expect(authToken).toBeDefined();
-        expect(userId).toBeDefined();
-
-        // Создание тестового предложения
-        await request(app)
+    it('should return 400 if required data is missing', async () => {
+        // Make a request to create a new sentence with missing data
+        const response = await request(app)
             .post('/api/sentences')
             .set('Authorization', `Bearer ${authToken}`)
             .send({
-                text: 'Test sentence',
-                language: 'en',
-                author: userId,
+                // Omitting required fields
             });
 
-        // Отправка запроса на получение всех предложений с использованием токена пользователя
-        const response = await request(app)
-            .get('/api/sentences')
-            .set('Authorization', `Bearer ${authToken}`);
-
-        // Проверки
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveLength(1);
-        expect(response.body[0].text).toBe('Test sentence');
-
-        // Получение обновленной информации о пользователе
-        const updatedUser = await User.findById({ _id: new ObjectId(userId) });
-
-        // Проверка, что у пользователя теперь есть одно предложение
-        expect(updatedUser.suggestedSentences).toHaveLength(1);
-        expect(updatedUser.suggestedSentences[0].toString()).toBe(response.body[0]._id);
-        expect(updatedUser.rating).toBe(200);
-
-        const translationData = {
-            text: 'Translation Text',
-            language: 'bur',
-            sentenceId: response.body[0]._id
-        }
-
-        const createTranslation = await request(app)
-            .post(`/api/translations`)
-            .send(translationData)
-            .set('Authorization', `Bearer ${authToken}`)
-
-        expect(createTranslation.status).toBe(201)
-
+        // Assertions
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Пожалуйста, предоставьте текст, язык и автора');
     });
 
 });

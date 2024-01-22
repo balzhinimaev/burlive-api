@@ -9,6 +9,7 @@ import Token from '../models/Token';
 interface RegisterRequestBody {
     password: string;
     email: string;
+    username: string
 }
 
 interface RegisterRequest extends Request {
@@ -22,6 +23,8 @@ const userController = {
         try {
 
             const { password, email } = req.body;
+
+            let { username } = req.body
 
             const maxEmailLength = 255;
             const minPasswordLength = 8;
@@ -50,9 +53,21 @@ const userController = {
                 return res.status(400).json({ message: 'Пользователь с таким email уже существует' });
             }
 
+
+            if (username) {
+                
+                const existingUserByUsername = await User.findOne({ username })
+                
+                if (existingUserByUsername) {
+                    logger.error(`Пользователь с таким username уже существует: ${username}`);
+                    return res.status(400).json({ message: `Пользователь с таким username уже существует` })
+                }
+                
+            }
+
             // Хеширование пароля и создание нового пользователя
             const hashedPassword = await bcrypt.hash(password, saltRounds);
-            const newUser = new User({ password: hashedPassword, email });
+            const newUser = new User({ password: hashedPassword, email, username });
             await newUser.save();
 
             res.status(201).json({ message: 'Пользователь успешно зарегистрирован' });
@@ -69,9 +84,9 @@ const userController = {
         try {
             const { email, username, password } = req.body;
 
-            if ((username && email) || (!username && !email)) {
-                return res.status(400).json({ message: 'Укажите username или email' });
-            }
+            // if ((username && email) || (!username && !email)) {
+            //     return res.status(400).json({ message: 'Укажите username или email' });
+            // }
 
             // Формируем запрос на основе указанного email или username
             const query = username ? { $or: [{ email }, { username }] } : { email };
@@ -99,5 +114,61 @@ const userController = {
         }
     },
 };
+
+async function usernameChecker (username: string, index: number) {
+    try {
+        
+        
+        
+        if (index == 0) {
+            
+            const user = await User.findOne({ username: username })
+
+            if (user) {
+
+                return usernameChecker(username, index++)
+
+            } else {
+
+                return username
+
+            }
+
+        } else {
+
+            const user = await User.findOne({ username: username + index })
+
+            if (user) {
+
+                return usernameChecker(username, index++)
+
+            } else {
+
+                return `${username}${index}`
+
+            }
+
+        }
+
+
+    } catch (error) {
+        console.log(error)
+        logger.error("Ошибка в функции usernameChecker")
+    }
+}
+
+async function generateUniqueUsername(email, suffix = 0) {
+    let username = email.split('@', 1)[0];
+    if (suffix > 0) {
+        username += suffix;
+    }
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+        return generateUniqueUsername(email, suffix + 1);
+    } else {
+        return username;
+    }
+}
 
 export default userController;

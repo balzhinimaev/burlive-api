@@ -7,7 +7,7 @@ import User from '../../models/User';
 import { ObjectId } from 'mongodb';
 import Translation from '../../models/Translation';
 
-describe('Sentence Controller Tests', () => {
+describe('Sentence Controller Put methods Tests', () => {
 
     let authToken: string;
     let userId: mongoose.Types.ObjectId
@@ -26,6 +26,7 @@ describe('Sentence Controller Tests', () => {
         const userCredentials = {
             password: 'testpassword',
             email: 'test@example.com',
+            username: 'test'
         };
 
         const registrationResponse = await request(app)
@@ -50,66 +51,6 @@ describe('Sentence Controller Tests', () => {
         // Отключение от базы данных после завершения всех тестов
         await mongoose.disconnect();
 
-    });
-
-    it('should get all sentences with authentication', async () => {
-
-        // Проверка, что токен и userId установлены
-        expect(authToken).toBeDefined();
-        expect(userId).toBeDefined();
-
-        // Создание тестового предложения
-        await request(app)
-            .post('/api/sentences')
-            .set('Authorization', `Bearer ${authToken}`)
-            .send({
-                text: 'Test sentence',
-                language: 'en',
-                author: userId,
-            });
-
-        // Отправка запроса на получение всех предложений с использованием токена пользователя
-        const response = await request(app)
-            .get('/api/sentences')
-            .set('Authorization', `Bearer ${authToken}`);
-
-        // Проверки
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveLength(1);
-        expect(response.body[0].text).toBe('Test sentence');
-
-        // Получение обновленной информации о пользователе
-        const updatedUser = await User.findById({ _id: new ObjectId(userId) });
-        
-        // Проверка, что у пользователя теперь есть одно предложение
-        expect(updatedUser.suggestedSentences).toHaveLength(1);
-        expect(updatedUser.suggestedSentences[0].toString()).toBe(response.body[0]._id);
-        expect(updatedUser.rating).toBe(200);
-    });
-
-    it('should return 404 if no sentences found', async () => {
-        // Make a request to get all sentences with the user's token
-        const response = await request(app)
-            .get('/api/sentences')
-            .set('Authorization', `Bearer ${authToken}`);
-
-        // Assertions
-        expect(response.status).toBe(404);
-        expect(response.body).toHaveProperty('message', 'Предложения не найдены');
-    });
-
-    it('should return 400 if required data is missing', async () => {
-        // Make a request to create a new sentence with missing data
-        const response = await request(app)
-            .post('/api/sentences')
-            .set('Authorization', `Bearer ${authToken}`)
-            .send({
-                // Omitting required fields
-            });
-
-        // Assertions
-        expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty('message', 'Пожалуйста, предоставьте текст, язык и автора');
     });
 
     it('should update sentence status with valid data', async () => {
@@ -188,5 +129,6 @@ describe('Sentence Controller Tests', () => {
         expect(response.status).toBe(404);
         expect(response.body).toHaveProperty('message', 'Контрибьютора не существует');
     });
+
 
 });

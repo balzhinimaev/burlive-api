@@ -86,7 +86,16 @@ const translationController = {
 
             }
 
-            await new Translation({ text, language, author, sentenceId: new ObjectId(sentenceId) }).save()     
+            const translation = await new Translation({ text, language, author, sentenceId: new ObjectId(sentenceId) }).save().then(async (document) => {
+
+                logger.info(`Перевод успешно добавлен. translationId: ${document._id}`)
+
+                await updateRating(author)
+                                
+                return document
+            })
+
+            return res.status(201).json({ message: 'Перевод успешно добавлен', translationId: translation._id })
 
         } catch (error) {
             console.error(error);

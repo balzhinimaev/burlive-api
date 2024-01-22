@@ -5,7 +5,7 @@ import logger from "./logger";
 // В том же файле или в файле, где вы храните свои функции утилит
 const updateRating = async (userId: any) => {
     try {
-        const result = await User.findByIdAndUpdate({ _id: userId }, {
+        const result = await User.findByIdAndUpdate(userId, {
             $inc: {
                 rating: 100
             }
@@ -14,7 +14,10 @@ const updateRating = async (userId: any) => {
         if (!result) {
             return null
         } else {
+            
+            logger.info(`Рейтинг пользователя обновлён!, ${result.rating}`)
             return result.rating
+        
         }
     } catch (error) {
         logger.error(`Ошибка при обновлении рейтинга пользователя, ${error}`)

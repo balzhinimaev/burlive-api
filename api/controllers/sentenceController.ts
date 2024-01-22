@@ -31,6 +31,41 @@ const sentenceController = {
         }
     },
 
+    getSentence: async (req: Request, res: Response) => {
+        try {
+
+            const { id } = req.params
+
+            if (!isValidObjectId(id)) {
+                // return res.status(400).json({ message: 'Неверные входные данные' });
+
+                if (!isValidObjectIdString(id)) {
+
+                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
+
+                }
+
+            }
+
+            const sentence = await Sentence.findById(new ObjectId(id))
+            
+            if (sentence) {
+
+                return res.status(200).json(sentence)
+
+            }
+
+            return res.status(404).json({ message: 'Предложение не найдено' })
+
+        } catch (error) {
+            
+            console.error(error);
+            logger.error(`Ошибка при получении предложения: ${ req.params.id }`)
+            res.status(500).json({ message: `Ошибка при получении предложения` })
+
+        }
+    },
+
     createSentence: async (req: AuthRequest, res: Response) => {
         try {
 
@@ -59,7 +94,7 @@ const sentenceController = {
             const newSentence = await new Sentence({ text, language, author }).save();
 
             await User.findByIdAndUpdate({ _id: author }, { $push: { suggestedSentences: newSentence._id } })
-            logger.info(`Предложение успешно создано: ${newSentence}`);
+            logger.info(`Предложение успешно создано: ${newSentence._id}`);
 
             // Вызываем метод обновления рейтинга пользователя
             const updateR = await updateRating(author);
