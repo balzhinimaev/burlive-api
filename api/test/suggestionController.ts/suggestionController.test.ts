@@ -11,20 +11,22 @@ describe('Sentence Controller Tests', () => {
     let authToken: string;
     let userId: mongoose.Types.ObjectId
 
-    beforeAll(async () => {
-        // Подключение к тестовой базе данных перед запуском тестов
-        await mongoose.connect('mongodb://localhost:27017/test');
-    });
+    afterEach(async () => {
 
-    afterAll(async () => {
         // Отключение от базы данных после завершения всех тестов
         await mongoose.disconnect();
+
     });
 
     beforeEach(async () => {
+
+        await mongoose.connect('mongodb://localhost:27017/burlang_test');
+
         // Очистка коллекции предложений и выполнение необходимой настройки
+        
         await Sentence.deleteMany({});
         await User.deleteMany({});
+
         // По желанию, вы можете зарегистрировать пользователя и получить токен для тестирования
         const userCredentials = {
             password: 'testpassword',
@@ -42,8 +44,10 @@ describe('Sentence Controller Tests', () => {
             .send(userCredentials);
 
         expect(loginResponse.status).toBe(200);
+
         authToken = loginResponse.body.token;
         userId = loginResponse.body.userId;
+        
     });
 
     it('should get all sentences with authentication', async () => {

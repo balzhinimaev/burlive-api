@@ -1,0 +1,85 @@
+{"level":"info","message":"Успешная регистрация пользователя: 65accb425a6ad36923f43a86","timestamp":"2024-01-21T07:44:02.476Z"}
+{"level":"error","message":"Ошибка при регистрации пользователя: E11000 duplicate key error collection: test.users index: username_1 dup key: { username: null }","timestamp":"2024-01-21T07:44:02.504Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accb42419cb55faf914238","timestamp":"2024-01-21T07:44:02.609Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accb425a6ad36923f43a86","timestamp":"2024-01-21T07:44:02.612Z"}
+{"level":"info","message":"Токен верифицирован для 65accb425a6ad36923f43a86","timestamp":"2024-01-21T07:44:02.631Z"}
+{"level":"info","message":"Предложение успешно создано: {\n  text: 'Test sentence',\n  language: 'en',\n  translations: [],\n  author: new ObjectId('65accb425a6ad36923f43a86'),\n  contributors: [],\n  status: 'new',\n  _id: new ObjectId('65accb425a6ad36923f43a8d'),\n  createdAt: 2024-01-21T07:44:02.638Z,\n  __v: 0\n}","timestamp":"2024-01-21T07:44:02.660Z"}
+{"level":"info","message":"typeof(updateR) object","timestamp":"2024-01-21T07:44:02.671Z"}
+{"level":"info","message":"Токен верифицирован для 65accb425a6ad36923f43a86","timestamp":"2024-01-21T07:44:02.684Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accb42419cb55faf914238","timestamp":"2024-01-21T07:44:02.692Z"}
+{"level":"info","message":"Токен верифицирован для 65accb42419cb55faf914238","timestamp":"2024-01-21T07:44:02.703Z"}
+{"level":"error","message":"Предложения получены: 1","timestamp":"2024-01-21T07:44:02.709Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accb42419cb55faf914242","timestamp":"2024-01-21T07:44:02.792Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accb42419cb55faf914242","timestamp":"2024-01-21T07:44:02.870Z"}
+{"level":"info","message":"Токен верифицирован для 65accb42419cb55faf914242","timestamp":"2024-01-21T07:44:02.882Z"}
+{"level":"error","message":"Пожалуйста, предоставьте текст, язык и автора","timestamp":"2024-01-21T07:44:02.883Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accb42419cb55faf91424b","timestamp":"2024-01-21T07:44:02.971Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accb42419cb55faf91424b","timestamp":"2024-01-21T07:44:03.043Z"}
+{"level":"info","message":"Токен верифицирован для 65accb42419cb55faf91424b","timestamp":"2024-01-21T07:44:03.055Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accb43419cb55faf914258","timestamp":"2024-01-21T07:44:03.149Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accb43419cb55faf914258","timestamp":"2024-01-21T07:44:03.218Z"}
+{"level":"info","message":"Токен верифицирован для 65accb43419cb55faf914258","timestamp":"2024-01-21T07:44:03.230Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accb43419cb55faf914261","timestamp":"2024-01-21T07:44:03.306Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accb43419cb55faf914261","timestamp":"2024-01-21T07:44:03.373Z"}
+{"level":"info","message":"Токен верифицирован для 65accb43419cb55faf914261","timestamp":"2024-01-21T07:44:03.381Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accb43419cb55faf91426c","timestamp":"2024-01-21T07:44:03.455Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accb43419cb55faf91426c","timestamp":"2024-01-21T07:44:03.522Z"}
+{"level":"info","message":"Токен верифицирован для 65accb43419cb55faf91426c","timestamp":"2024-01-21T07:44:03.534Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accd8bba52cb0ab45fd9a7","timestamp":"2024-01-21T07:53:47.326Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accd8bba52cb0ab45fd9a7","timestamp":"2024-01-21T07:53:47.423Z"}
+{"level":"info","message":"Токен верифицирован для 65accd8bba52cb0ab45fd9a7","timestamp":"2024-01-21T07:53:47.435Z"}
+{"level":"info","message":"Предложение успешно создано: {\n  text: 'Test sentence',\n  language: 'en',\n  translations: [],\n  author: new ObjectId('65accd8bba52cb0ab45fd9a7'),\n  contributors: [],\n  status: 'new',\n  _id: new ObjectId('65accd8bba52cb0ab45fd9ae'),\n  createdAt: 2024-01-21T07:53:47.439Z,\n  __v: 0\n}","timestamp":"2024-01-21T07:53:47.459Z"}
+{"level":"info","message":"typeof(updateR) number","timestamp":"2024-01-21T07:53:47.468Z"}
+{"level":"info","message":"Токен верифицирован для 65accd8bba52cb0ab45fd9a7","timestamp":"2024-01-21T07:53:47.479Z"}
+{"level":"error","message":"Предложения получены: 1","timestamp":"2024-01-21T07:53:47.485Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accd8bba52cb0ab45fd9bd","timestamp":"2024-01-21T07:53:47.632Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accd8bba52cb0ab45fd9bd","timestamp":"2024-01-21T07:53:47.701Z"}
+{"level":"info","message":"Токен верифицирован для 65accd8bba52cb0ab45fd9bd","timestamp":"2024-01-21T07:53:47.710Z"}
+{"level":"error","message":"Предложений не найдено","timestamp":"2024-01-21T07:53:47.715Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accd8bba52cb0ab45fd9cc","timestamp":"2024-01-21T07:53:47.840Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accd8bba52cb0ab45fd9cc","timestamp":"2024-01-21T07:53:47.909Z"}
+{"level":"info","message":"Токен верифицирован для 65accd8bba52cb0ab45fd9cc","timestamp":"2024-01-21T07:53:47.919Z"}
+{"level":"error","message":"Пожалуйста, предоставьте текст, язык и автора","timestamp":"2024-01-21T07:53:47.920Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accd8cba52cb0ab45fd9da","timestamp":"2024-01-21T07:53:48.030Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accd8cba52cb0ab45fd9da","timestamp":"2024-01-21T07:53:48.099Z"}
+{"level":"info","message":"Токен верифицирован для 65accd8cba52cb0ab45fd9da","timestamp":"2024-01-21T07:53:48.112Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accd8cba52cb0ab45fd9ec","timestamp":"2024-01-21T07:53:48.228Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accd8cba52cb0ab45fd9ec","timestamp":"2024-01-21T07:53:48.299Z"}
+{"level":"info","message":"Токен верифицирован для 65accd8cba52cb0ab45fd9ec","timestamp":"2024-01-21T07:53:48.308Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accd8cba52cb0ab45fd9fa","timestamp":"2024-01-21T07:53:48.424Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accd8cba52cb0ab45fd9fa","timestamp":"2024-01-21T07:53:48.492Z"}
+{"level":"info","message":"Токен верифицирован для 65accd8cba52cb0ab45fd9fa","timestamp":"2024-01-21T07:53:48.501Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accd8cba52cb0ab45fda0a","timestamp":"2024-01-21T07:53:48.613Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accd8cba52cb0ab45fda0a","timestamp":"2024-01-21T07:53:48.679Z"}
+{"level":"info","message":"Токен верифицирован для 65accd8cba52cb0ab45fda0a","timestamp":"2024-01-21T07:53:48.690Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65accede5fb181382d9ecc0a","timestamp":"2024-01-21T07:59:26.941Z"}
+{"level":"info","message":"Токен создан для пользователя: 65accede5fb181382d9ecc0a","timestamp":"2024-01-21T07:59:27.024Z"}
+{"level":"info","message":"Токен верифицирован для 65accede5fb181382d9ecc0a","timestamp":"2024-01-21T07:59:27.038Z"}
+{"level":"info","message":"Токен верифицирован для 65accede5fb181382d9ecc0a","timestamp":"2024-01-21T07:59:27.074Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65acd0923ecafc7fbc357041","timestamp":"2024-01-21T08:06:42.046Z"}
+{"level":"info","message":"Токен создан для пользователя: 65acd0923ecafc7fbc357041","timestamp":"2024-01-21T08:06:42.125Z"}
+{"level":"info","message":"Токен верифицирован для 65acd0923ecafc7fbc357041","timestamp":"2024-01-21T08:06:42.136Z"}
+{"level":"info","message":"Предложение успешно создано: {\n  text: 'Test sentence',\n  language: 'en',\n  translations: [],\n  author: new ObjectId('65acd0923ecafc7fbc357041'),\n  contributors: [],\n  status: 'new',\n  _id: new ObjectId('65acd0923ecafc7fbc357048'),\n  createdAt: 2024-01-21T08:06:42.142Z,\n  __v: 0\n}","timestamp":"2024-01-21T08:06:42.154Z"}
+{"level":"info","message":"typeof(updateR) number","timestamp":"2024-01-21T08:06:42.163Z"}
+{"level":"info","message":"Токен верифицирован для 65acd0923ecafc7fbc357041","timestamp":"2024-01-21T08:06:42.172Z"}
+{"level":"error","message":"Предложения получены: 1","timestamp":"2024-01-21T08:06:42.180Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65acd0923ecafc7fbc357057","timestamp":"2024-01-21T08:06:42.320Z"}
+{"level":"info","message":"Токен создан для пользователя: 65acd0923ecafc7fbc357057","timestamp":"2024-01-21T08:06:42.389Z"}
+{"level":"info","message":"Токен верифицирован для 65acd0923ecafc7fbc357057","timestamp":"2024-01-21T08:06:42.399Z"}
+{"level":"error","message":"Предложений не найдено","timestamp":"2024-01-21T08:06:42.404Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65acd0923ecafc7fbc357066","timestamp":"2024-01-21T08:06:42.525Z"}
+{"level":"info","message":"Токен создан для пользователя: 65acd0923ecafc7fbc357066","timestamp":"2024-01-21T08:06:42.593Z"}
+{"level":"info","message":"Токен верифицирован для 65acd0923ecafc7fbc357066","timestamp":"2024-01-21T08:06:42.602Z"}
+{"level":"error","message":"Пожалуйста, предоставьте текст, язык и автора","timestamp":"2024-01-21T08:06:42.602Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65acd0923ecafc7fbc357074","timestamp":"2024-01-21T08:06:42.710Z"}
+{"level":"info","message":"Токен создан для пользователя: 65acd0923ecafc7fbc357074","timestamp":"2024-01-21T08:06:42.777Z"}
+{"level":"info","message":"Токен верифицирован для 65acd0923ecafc7fbc357074","timestamp":"2024-01-21T08:06:42.792Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65acd0923ecafc7fbc357086","timestamp":"2024-01-21T08:06:42.915Z"}
+{"level":"info","message":"Токен создан для пользователя: 65acd0923ecafc7fbc357086","timestamp":"2024-01-21T08:06:42.982Z"}
+{"level":"info","message":"Токен верифицирован для 65acd0923ecafc7fbc357086","timestamp":"2024-01-21T08:06:42.993Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65acd0933ecafc7fbc357094","timestamp":"2024-01-21T08:06:43.142Z"}
+{"level":"info","message":"Токен создан для пользователя: 65acd0933ecafc7fbc357094","timestamp":"2024-01-21T08:06:43.212Z"}
+{"level":"info","message":"Токен верифицирован для 65acd0933ecafc7fbc357094","timestamp":"2024-01-21T08:06:43.220Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65acd0933ecafc7fbc3570a4","timestamp":"2024-01-21T08:06:43.334Z"}
+{"level":"info","message":"Токен создан для пользователя: 65acd0933ecafc7fbc3570a4","timestamp":"2024-01-21T08:06:43.400Z"}
+{"level":"info","message":"Токен верифицирован для 65acd0933ecafc7fbc3570a4","timestamp":"2024-01-21T08:06:43.413Z"}

@@ -15,18 +15,21 @@ const sentenceController = {
             const sentence = await Sentence.find();
 
             if (sentence.length === 0) {
+                
                 logger.error(`Предложений не найдено`);
                 res.status(404).json({ message: 'Предложения не найдены' });
+
             } else {
+
                 logger.error(`Предложения получены: ${sentence.length}`);
                 res.status(200).json(sentence);
             }
+
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Error retrieving sentence' });
         }
     },
-
 
     createSentence: async (req: AuthRequest, res: Response) => {
         try {

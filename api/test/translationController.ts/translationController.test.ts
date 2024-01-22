@@ -2,30 +2,31 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import app from '../../app'; // Укажите путь к вашему основному файлу приложения
-import Translation from '../../models/Translation';
+import Sentence from '../../models/Sentence';
 import User from '../../models/User';
 import { ObjectId } from 'mongodb';
-import Sentence from '../../models/Sentence';
 
 describe('Sentence Controller Tests', () => {
 
     let authToken: string;
     let userId: mongoose.Types.ObjectId
 
-    beforeAll(async () => {
-        // Подключение к тестовой базе данных перед запуском тестов
-        await mongoose.connect('mongodb://localhost:27017/test');
-    });
+    afterEach(async () => {
 
-    afterAll(async () => {
         // Отключение от базы данных после завершения всех тестов
         await mongoose.disconnect();
+
     });
 
     beforeEach(async () => {
+
+        await mongoose.connect('mongodb://localhost:27017/burlang_test');
+
         // Очистка коллекции предложений и выполнение необходимой настройки
-        // await Translation.deleteMany({});
+
+        await Sentence.deleteMany({});
         await User.deleteMany({});
+
         // По желанию, вы можете зарегистрировать пользователя и получить токен для тестирования
         const userCredentials = {
             password: 'testpassword',
@@ -43,11 +44,13 @@ describe('Sentence Controller Tests', () => {
             .send(userCredentials);
 
         expect(loginResponse.status).toBe(200);
+
         authToken = loginResponse.body.token;
         userId = loginResponse.body.userId;
+
     });
 
-    it('should get all translations with authentication', async () => {
+    it('should get all sentences with authentication', async () => {
 
         // Проверка, что токен и userId установлены
         expect(authToken).toBeDefined();
@@ -62,139 +65,126 @@ describe('Sentence Controller Tests', () => {
                 language: 'en',
                 author: userId,
             });
-        
-        const sentence = await Sentence.find()
-        const createTranslation = await request(app)
-            .post('/api/translations')
-            .set('Authorization', `Bearer ${authToken}`)
-            .send({
-                text: 'Translation for test sentence',
-                language: 'ru',
-                author: userId,
-                sentenceId: sentence[0]._id.toString()
-            })
-
-        expect(createTranslation.status).toBe(409)
 
         // Отправка запроса на получение всех предложений с использованием токена пользователя
         const response = await request(app)
-            .get('/api/translations')
+            .get('/api/sentences')
             .set('Authorization', `Bearer ${authToken}`);
 
         // Проверки
         expect(response.status).toBe(200);
         expect(response.body).toHaveLength(1);
-        expect(response.body[0]).toHaveProperty('text', 'Translation for test sentence');
+        expect(response.body[0].text).toBe('Test sentence');
 
-        // // Получение обновленной информации о пользователе
-        // const updatedUser = await User.findById({ _id: new ObjectId(userId) });
-        
-        // // Проверка, что у пользователя теперь есть одно предложение
-        // expect(updatedUser.suggestedSentences).toHaveLength(1);
-        // expect(updatedUser.suggestedSentences[0].toString()).toBe(response.body[0]._id);
-        // expect(updatedUser.rating).toBe(200);
+        // Получение обновленной информации о пользователе
+        const updatedUser = await User.findById({ _id: new ObjectId(userId) });
+
+        // Проверка, что у пользователя теперь есть одно предложение
+        expect(updatedUser.suggestedSentences).toHaveLength(1);
+        expect(updatedUser.suggestedSentences[0].toString()).toBe(response.body[0]._id);
+        expect(updatedUser.rating).toBe(200);
     });
 
-    // it('should return 404 if no sentences found', async () => {
-    //     // Make a request to get all sentences with the user's token
-    //     const response = await request(app)
-    //         .get('/api/sentences')
-    //         .set('Authorization', `Bearer ${authToken}`);
+    it('should return 404 if no sentences found', async () => {
+        // Make a request to get all sentences with the user's token
+        const response = await request(app)
+            .get('/api/sentences')
+            .set('Authorization', `Bearer ${authToken}`);
 
-    //     // Assertions
-    //     expect(response.status).toBe(404);
-    //     expect(response.body).toHaveProperty('message', 'Предложения не найдены');
-    // });
+        // Assertions
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty('message', 'Предложения не найдены');
+    });
 
-    // it('should return 400 if required data is missing', async () => {
-    //     // Make a request to create a new sentence with missing data
-    //     const response = await request(app)
-    //         .post('/api/sentences')
-    //         .set('Authorization', `Bearer ${authToken}`)
-    //         .send({
-    //             // Omitting required fields
-    //         });
+    it('should return 400 if required data is missing', async () => {
+        // Make a request to create a new sentence with missing data
+        const response = await request(app)
+            .post('/api/sentences')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+                // Omitting required fields
+            });
 
-    //     // Assertions
-    //     expect(response.status).toBe(400);
-    //     expect(response.body).toHaveProperty('message', 'Пожалуйста, предоставьте текст, язык и автора');
-    // });
+        // Assertions
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Пожалуйста, предоставьте текст, язык и автора');
+    });
 
-    // it('should update sentence status with valid data', async () => {
-    //     // Create a test sentence
-    //     const createdSentence = await Sentence.create({
-    //         text: 'Test sentence',
-    //         language: 'en',
-    //         author: userId,
-    //     });
+    it('should update sentence status with valid data', async () => {
+        // Create a test sentence
+        const createdSentence = await Sentence.create({
+            text: 'Test sentence',
+            language: 'en',
+            author: userId,
+        });
 
-    //     // Make a request to update the status of the created sentence
-    //     const response = await request(app)
-    //         .put(`/api/sentences/${createdSentence._id}/status`)
-    //         .set('Authorization', `Bearer ${authToken}`)
-    //         .send({
-    //             status: 'accepted',
-    //         });
+        // Make a request to update the status of the created sentence
+        const response = await request(app)
+            .put(`/api/sentences/${createdSentence._id}/status`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+                status: 'accepted',
+            });
 
-    //     // Assertions
-    //     expect(response.status).toBe(200);
-    //     expect(response.body).toHaveProperty('message', 'Статус предложения успешно обновлен');
-    //     expect(response.body.sentence).toHaveProperty('status', 'accepted');
-    // });
+        // Assertions
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('message', 'Статус предложения успешно обновлен');
+        expect(response.body.sentence).toHaveProperty('status', 'accepted');
+    });
 
-    // it('should return 400 if unset "author" value', async () => {
+    it('should return 400 if unset "author" value', async () => {
 
-    //     const response = await request(app)
-    //         .put('/api/sentences/invalidid/status') // Используем пустой author
-    //         .set('Authorization', `Bearer ${authToken}`)
-    //         .send({
-    //             status: 'accepted',
-    //         });
+        const response = await request(app)
+            .put('/api/sentences/invalidid/status') // Используем пустой author
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+                status: 'accepted',
+            });
 
-    //     // Ensure a 400 status code is returned
-    //     expect(response.status).toBe(400);
-    //     expect(response.body).toHaveProperty('message', 'Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId');
-    // });
+        // Ensure a 400 status code is returned
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty('message', 'Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId');
+    });
 
-    // it('should return 404 if sentence is not found', async () => {
-    //     // Make a request to update the status of a non-existent sentence
-    //     const response = await request(app)
-    //         .put(`/api/sentences/${new mongoose.Types.ObjectId()}/status`) // Используем неверный формат id
-    //         .set('Authorization', `Bearer ${authToken}`)
-    //         .send({
-    //             status: 'accepted',
-    //         });
+    it('should return 404 if sentence is not found', async () => {
+        // Make a request to update the status of a non-existent sentence
+        const response = await request(app)
+            .put(`/api/sentences/${new mongoose.Types.ObjectId()}/status`) // Используем неверный формат id
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+                status: 'accepted',
+            });
 
-    //     // Ensure sentence is not found
-    //     expect(response.status).toBe(404);
-    //     expect(response.body).toHaveProperty('message', 'Предложение не найдено');
+        // Ensure sentence is not found
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty('message', 'Предложение не найдено');
 
-    //     // Check that sentence is null
-    //     expect(response.body.sentence).toBeNull();
-    // });
+        // Check that sentence is null
+        expect(response.body.sentence).toBeNull();
+    });
 
-    // it('should return 400 if invalid contributorId is provided', async () => {
-    //     const invalidContributorId = 'invalid_id';
+    it('should return 400 if invalid contributorId is provided', async () => {
+        const invalidContributorId = 'invalid_id';
 
-    //     // Create a test sentence
-    //     const createdSentence = await Sentence.create({
-    //         text: 'Test sentence',
-    //         language: 'en',
-    //         author: userId,
-    //     });
+        // Create a test sentence
+        const createdSentence = await Sentence.create({
+            text: 'Test sentence',
+            language: 'en',
+            author: userId,
+        });
 
-    //     // Make a request to update the status with an non-exists contributorId
-    //     const response = await request(app)
-    //         .put(`/api/sentences/${createdSentence._id}/status`)
-    //         .set('Authorization', `Bearer ${authToken}`)
-    //         .send({
-    //             status: 'accepted',
-    //             contributorId: new mongoose.Types.ObjectId(),
-    //         });
+        // Make a request to update the status with an non-exists contributorId
+        const response = await request(app)
+            .put(`/api/sentences/${createdSentence._id}/status`)
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+                status: 'accepted',
+                contributorId: new mongoose.Types.ObjectId(),
+            });
 
-    //     // Assertions
-    //     expect(response.status).toBe(404);
-    //     expect(response.body).toHaveProperty('message', 'Контрибьютора не существует');
-    // });
+        // Assertions
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty('message', 'Контрибьютора не существует');
+    });
 
 });
