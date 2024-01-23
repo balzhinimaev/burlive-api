@@ -137,6 +137,17 @@ describe('Sentence Controller Tests', () => {
 
         expect(createTranslation.status).toBe(201)
 
+        const voteData = {
+            isUpvote: true
+        }
+
+        const voteForTranslation = await request(app)
+            .post(`/api/translations/${createTranslation.body.translationId}/vote`)
+            .send(voteData)
+            .set('Authorization', `Bearer ${authToken}`)
+        
+        expect(voteForTranslation.status).toBe(201)
+
     });
 
 });

@@ -10,6 +10,7 @@ import User from '../models/User';
 import updateRating from '../utils/updateRating';
 import { Document, Schema, Types, model } from 'mongoose';
 import Sentence from '../models/Sentence';
+import Vote from '../models/Vote';
 const translationController = {
     getAllTranslations: async (req: Request, res: Response) => {
         try {
@@ -27,7 +28,6 @@ const translationController = {
             res.status(500).json({ message: 'Error retrieving translation' });
         }
     },
-
 
     createTranslation: async (req: AuthRequest, res: Response) => {
         try {
@@ -91,7 +91,13 @@ const translationController = {
                 logger.info(`Перевод успешно добавлен. translationId: ${document._id}`)
 
                 await updateRating(author)
-                                
+                
+                await User.findByIdAndUpdate(author, {
+                    $addToSet: {
+                        suggestedTranslations: document._id
+                    }
+                })
+
                 return document
             })
 
@@ -194,7 +200,72 @@ const translationController = {
             console.error(error);
             res.status(500).json({ message: 'Ошибка при отклонении перевода' });
         }
-    }
+    },
+
+    vote: async (req: AuthRequest, res: Response) => {
+        try {
+
+            const { id } = req.params;
+            const { isUpvote } = req.body;
+
+            if (typeof(isUpvote) !== 'boolean') {
+                
+                return res.status(400).json({ message: `Параметр isUpvote является обязательным и тип Boolean` })
+
+            }
+
+            const userId = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
+
+            if (!isValidObjectId(id)) {
+                // return res.status(400).json({ message: 'Неверные входные данные' });
+
+                if (!isValidObjectIdString(id)) {
+
+                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
+
+                }
+
+            }
+
+            const translationId = new ObjectId(id)
+            
+            const vote = await new Vote({
+                userId,
+                translationId,
+                isUpvote
+            }).save()
+
+            await Translation.findByIdAndUpdate(translationId, {
+                $push: {
+                    votes: vote._id
+                }
+            }).then(async (document) => {
+
+                logger.info(`Голос успешно добавлен, к переводу ${document._id}`)
+
+                await User.findByIdAndUpdate(userId, {
+                    $push: {
+                        votes: vote._id
+                    }
+                }).then(() => { logger.info(`Голос записан в документ пользователя ${ userId }`) })
+
+                await updateRating(userId)
+
+                return res.status(201).json({ message: 'Голос успешно добавлен', translationId: document._id })
+
+            }).catch(async (error) => {
+
+                logger.error(`Ошибка при добавлении голоса к переводу: ${error}`)
+
+            })
+
+            return true
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Ошибка при добавлении голоса к переводу' });
+        }
+    },
 };
 
 export default translationController;

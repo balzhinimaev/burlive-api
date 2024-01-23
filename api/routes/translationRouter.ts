@@ -19,4 +19,7 @@ translationsRouter.put('/:id/accept', translationController.acceptTranslation);
 // Маршрут для отклонения предложения
 translationsRouter.put('/:id/reject', translationController.rejectTranslation);
 
+// Маршрут для голосования за перевод
+translationsRouter.post('/:id/vote', translationController.vote);
+
 export default translationsRouter;

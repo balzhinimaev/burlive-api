@@ -21,6 +21,7 @@ app.use('/api/translations', authenticateToken, translationsRouter);
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
 });
+
 // Подключение к базе данных
 // mongoose.connect(process.env.DB_CONNECTION_STRING)
 //   .then(() => {
@@ -30,6 +31,5 @@ app.listen(PORT, () => {
 //   .catch((error) => {
 //     console.error('Ошибка при подключении к базе данных:', error);
 //   });
-
 
 export default app
