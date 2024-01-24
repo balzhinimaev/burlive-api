@@ -2243,3 +2243,7 @@
 {"level":"info","message":"Голос успешно добавлен, к переводу 65af8076d272baa1b2c6d7e2","timestamp":"2024-01-23T09:01:42.165Z"}
 {"level":"info","message":"Голос записан в документ пользователя 65af8075d272baa1b2c6d7d2","timestamp":"2024-01-23T09:01:42.172Z"}
 {"level":"info","message":"Рейтинг пользователя обновлён!, 400","timestamp":"2024-01-23T09:01:42.176Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 65b0d7d2ac4dfdda24256e4b","timestamp":"2024-01-24T09:26:42.991Z"}
+{"level":"info","message":"Токен создан для пользователя: 65b0d7d2ac4dfdda24256e4b","timestamp":"2024-01-24T09:26:43.132Z"}
+{"level":"info","message":"Токен верифицирован для 65b0d7d2ac4dfdda24256e4b","timestamp":"2024-01-24T09:26:43.146Z"}
+{"level":"info","message":"Новый диалект сохранён 65b0d7d3ac4dfdda24256e51","timestamp":"2024-01-24T09:26:43.155Z"}
