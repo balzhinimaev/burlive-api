@@ -14,10 +14,12 @@ import translationsRouter from './routes/translationRouter';
 import dialectRouter from './routes/dialectRouter';
 
 const app = express();
+
 app.use(bodyParser.json());
 app.use('/api/users', userRouter);
 app.use('/api/dialect', authenticateToken, dialectRouter);
 app.use('/api/sentences', authenticateToken, sentencesRouter);
+app.use('/api/vocabulary', authenticateToken, sentencesRouter);
 app.use('/api/translations', authenticateToken, translationsRouter);
 
 app.listen(PORT, () => {
