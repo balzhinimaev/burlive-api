@@ -1,4 +1,4 @@
-// sentenceController.ts
+// vocabularyController.ts
 import { Request, Response } from 'express';
 import Sentence from '../models/Sentence';
 import { AuthRequest } from '../middleware/authenticateToken';
@@ -9,7 +9,7 @@ import isValidObjectIdString from '../utils/isValidObjectIdString';
 import User from '../models/User';
 import updateRating from '../utils/updateRating';
 
-const sentenceController = {
+const vocabularyController = {
     getAllSentences: async (req: Request, res: Response) => {
         try {
             const sentence = await Sentence.find();
@@ -214,4 +214,4 @@ const sentenceController = {
     }
 };
 
-export default sentenceController;
+export default vocabularyController;

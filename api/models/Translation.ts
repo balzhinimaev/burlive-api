@@ -7,6 +7,8 @@ export interface ITranslation extends Document {
   createdAt: Date;
   updatedAt: Date;
 
+  dialect?: Types.ObjectId;
+
   author: Types.ObjectId;
   contributors: Types.ObjectId[];
 
@@ -19,11 +21,14 @@ const TranslationSchema = new Schema({
   language: { type: String, required: true },
   sentenceId: { type: Schema.Types.ObjectId, required: true, ref: 'Sentence' },
 
+  dialect: { type: Schema.Types.ObjectId, ref: 'Dialect' },
+
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   contributors: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 
   votes: [{ type: Schema.Types.ObjectId, ref: 'Vote' }],
   status: { type: String, enum: ['new', 'processing', 'accepted', 'rejected'], default: 'new' },
+
 }, {
     timestamps: true
 });

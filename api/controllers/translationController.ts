@@ -32,7 +32,7 @@ const translationController = {
     createTranslation: async (req: AuthRequest, res: Response) => {
         try {
 
-            const { text, language, sentenceId } = req.body;
+            const { text, language, sentenceId, dialect } = req.body;
             const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
 
             if (!text || !language || !author || !sentenceId) {
@@ -86,7 +86,7 @@ const translationController = {
 
             }
 
-            const translation = await new Translation({ text, language, author, sentenceId: new ObjectId(sentenceId) }).save().then(async (document) => {
+            const translation = await new Translation({ text, language, dialect, author, sentenceId: new ObjectId(sentenceId) }).save().then(async (document) => {
 
                 logger.info(`Перевод успешно добавлен. translationId: ${document._id}`)
 
@@ -95,6 +95,12 @@ const translationController = {
                 await User.findByIdAndUpdate(author, {
                     $addToSet: {
                         suggestedTranslations: document._id
+                    }
+                })
+
+                await Sentence.findByIdAndUpdate(new ObjectId(sentenceId), {
+                    $addToSet: {
+                        translations: document._id
                     }
                 })
 
