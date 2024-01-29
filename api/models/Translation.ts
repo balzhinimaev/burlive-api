@@ -33,6 +33,6 @@ const TranslationSchema = new Schema({
     timestamps: true
 });
 
-const Translation = model<ITranslation>('Translation', TranslationSchema);
+const Translation = model<ITranslation>('Suggested_translation', TranslationSchema);
 
 export default Translation;

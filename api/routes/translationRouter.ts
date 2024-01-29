@@ -7,6 +7,9 @@ const translationsRouter = express.Router();
 // Маршрут для получения всех предложений
 translationsRouter.get('/', translationController.getAllTranslations);
 
+// Маршрут для получения предложенного перевода
+translationsRouter.get('/get-suggested-translation', translationController.getSuggestedTranslation);
+
 // Маршрут для создания нового предложения
 translationsRouter.post('/', translationController.createTranslation);
 

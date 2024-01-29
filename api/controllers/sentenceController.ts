@@ -12,18 +12,68 @@ import updateRating from '../utils/updateRating';
 const sentenceController = {
     getAllSentences: async (req: Request, res: Response) => {
         try {
-            const sentence = await Sentence.find();
+            const sentences = await Sentence.find();
 
-            if (sentence.length === 0) {
+            if (sentences.length === 0) {
                 
                 logger.error(`Предложений не найдено`);
-                res.status(404).json({ message: 'Предложения не найдены' });
+                res.status(404).json({ message: 'Предложения не найдены', sentences });
 
             } else {
 
-                logger.info(`Предложения получены: ${sentence.length}`);
-                res.status(200).json(sentence);
+                logger.info(`Предложения получены!`);
+                res.status(200).json({ message: `Предложения получены`, sentences });
             }
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error retrieving sentence' });
+        }
+    },
+
+    getAcceptedSentence: async (req: AuthRequest, res: Response) => {
+        try {
+            
+            const sentence = await Sentence.findOne({
+                status: 'accepted'
+            });
+
+            if (sentence) {
+                return res.status(200).json({ message: 'Предложение для перевода получено', sentence })
+            }
+
+            return res.status(404).json({ message: `Предложение для перевода не найдено`, sentence })
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error retrieving sentence' });
+        }
+    },
+
+    getNewSentence: async (req: AuthRequest, res: Response) => {
+        try {
+
+            const sentence = await Sentence.findOne({
+                status: 'new'
+            });
+
+            if (sentence) {
+
+                // Проверяем, есть ли пользователь уже в массиве watchers
+                const isWatching = sentence.watchers.some((watcherId) => watcherId.equals(new ObjectId(req.user.userId)));
+
+                if (!isWatching) {
+                    // Добавляем пользователя в массив watchers
+                    await Sentence.findByIdAndUpdate(sentence._id, {
+                        $addToSet: { watchers: new ObjectId(req.user.userId) }
+                    });
+
+                }
+
+                return res.status(200).json({ message: 'Предложение для рассмотрения получено', sentence })
+            }
+
+            return res.status(404).json({ message: `Предложения для рассмотрения не найдены` })
 
         } catch (error) {
             console.error(error);

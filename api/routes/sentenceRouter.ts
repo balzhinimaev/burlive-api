@@ -7,6 +7,11 @@ const sentencesRouter = express.Router();
 // Маршрут для получения всех предложений
 sentencesRouter.get('/', sentencesController.getAllSentences);
 
+// Маршрут для получения предложения для перевода
+sentencesRouter.get('/get-accepted-sentence', sentencesController.getAcceptedSentence);
+
+sentencesRouter.get('/get-new-sentence', sentencesController.getNewSentence);
+
 // Маршрут для создания нового предложения
 sentencesRouter.post('/', sentencesController.createSentence);
 

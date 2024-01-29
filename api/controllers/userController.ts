@@ -106,6 +106,8 @@ const userController = {
                 return res.status(200).json({ token, userId: user._id.toString() });
             }
 
+            console.log(req.body)
+
             res.status(401).json({ message: 'Неверное имя пользователя или пароль' });
         } catch (error) {
             console.error(error);

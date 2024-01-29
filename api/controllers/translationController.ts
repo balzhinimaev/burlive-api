@@ -14,18 +14,47 @@ import Vote from '../models/Vote';
 const translationController = {
     getAllTranslations: async (req: Request, res: Response) => {
         try {
-            const translation = await Translation.find();
+            
+            const translations = await Translation.find();
 
-            if (translation.length === 0) {
-                logger.error(`Переводов не найдено`);
-                res.status(404).json({ message: 'Переводы не найдены' });
-            } else {
-                logger.error(`Переводы получены: ${translation.length}`);
-                res.status(200).json(translation);
+            if (!translations.length) {
+
+                return res.status(404).json({ message: 'Переводов не найдено', translations });
+
             }
+
+            res.status(200).json({ message: `Переводы получены`, translations });
+
         } catch (error) {
+
+            logger.error(`Ошибка при получении переводов: ${error}`)
             console.error(error);
             res.status(500).json({ message: 'Error retrieving translation' });
+
+        }
+    },
+
+    getSuggestedTranslation: async (req: Request, res: Response) => {
+        try {
+            
+            const suggestedTranslation = await Translation.findOne();
+
+            if (suggestedTranslation) {
+
+                return res.status(200).json({ message: 'Перевод получен', suggestedTranslation })
+
+            } else {
+
+                return res.status(404).json({ message: `Предложенные переводы не найдены` })
+
+            }
+            
+        } catch (error) {
+        
+            console.error(error);
+            logger.error(`Error retrieving suggestedTranslation, ${error}`)
+            res.status(500).json({ message: 'Error retrieving suggestedTranslation' });
+        
         }
     },
 
@@ -96,6 +125,10 @@ const translationController = {
                     $addToSet: {
                         suggestedTranslations: document._id
                     }
+                }).then(() => {
+                    
+                    logger.info(`Поле suggestedTranslations у пользователя обновлён. ${document._id}`)
+                
                 })
 
                 await Sentence.findByIdAndUpdate(new ObjectId(sentenceId), {

@@ -82,11 +82,11 @@ describe('Sentence Controller Tests', () => {
         expect(updatedUser.rating).toBe(200);
 
         const getSentence = await request(app)
-            .get(`/api/sentences/${createSentence.body.sentenceId}`)
+            .get(`/api/sentences/get-new-sentence`)
             .set('Authorization', `Bearer ${authToken}`)
         
         expect(getSentence.status).toBe(200)
-        expect(getSentence.body._id).toBe(createSentence.body.sentenceId)
+        expect(getSentence.body.sentence._id).toBe(createSentence.body.sentenceId)
 
     });
 
@@ -147,6 +147,60 @@ describe('Sentence Controller Tests', () => {
             .set('Authorization', `Bearer ${authToken}`)
         
         expect(voteForTranslation.status).toBe(201)
+
+    });
+
+    it('should get one translation', async () => {
+
+        // Проверка, что токен и userId установлены
+        expect(authToken).toBeDefined();
+        expect(userId).toBeDefined();
+
+        // Создание тестового предложения
+        await request(app)
+            .post('/api/sentences')
+            .set('Authorization', `Bearer ${authToken}`)
+            .send({
+                text: 'Test sentence',
+                language: 'en',
+                author: userId,
+            });
+
+        // Отправка запроса на получение всех предложений с использованием токена пользователя
+        const createdSentence = await request(app)
+            .get('/api/sentences/get-new-sentence')
+            .set('Authorization', `Bearer ${authToken}`);
+
+        const translationData = {
+            text: 'Translation Text',
+            language: 'bur',
+            sentenceId: createdSentence.body.sentence._id
+        }
+
+        const createdTranslation = await request(app)
+            .post(`/api/translations`)
+            .send(translationData)
+            .set('Authorization', `Bearer ${authToken}`)
+
+        const voteData = {
+            isUpvote: true
+        }
+
+        const voteForTranslation = await request(app)
+            .post(`/api/translations/${createdTranslation.body.translationId}/vote`)
+            .send(voteData)
+            .set('Authorization', `Bearer ${authToken}`)
+
+        expect(voteForTranslation.status).toBe(201)
+
+        // Запрос на получение предложенного перевода
+        const response = await request(app)
+            .get('/api/translations/get-suggested-translation')
+            .set('Authorization', `Bearer ${authToken}`)
+
+        // Проверки
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Перевод получен');
 
     });
 

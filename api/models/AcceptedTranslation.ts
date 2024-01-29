@@ -37,6 +37,6 @@ const TranslationAcceptedSchema = new Schema({
   timestamps: true
 });
 
-const AcceptedTranslation = model<ITranslationAccepted>('translations_accepted', TranslationAcceptedSchema);
+const AcceptedTranslation = model<ITranslationAccepted>('translation', TranslationAcceptedSchema);
 
 export default AcceptedTranslation;
