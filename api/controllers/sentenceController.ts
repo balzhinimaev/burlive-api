@@ -22,12 +22,13 @@ const sentenceController = {
             } else {
 
                 logger.info(`Предложения получены!`);
-                res.status(200).json({ message: `Предложения получены`, sentences });
+                res.status(200).json({ message: `Предложения найдены`, sentences, count: sentences.length });
+
             }
 
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error retrieving sentence' });
+            res.status(500).json({ message: 'Ошибка при получении предложений!' });
         }
     },
 
@@ -59,16 +60,16 @@ const sentenceController = {
 
             if (sentence) {
 
-                // Проверяем, есть ли пользователь уже в массиве watchers
-                const isWatching = sentence.watchers.some((watcherId) => watcherId.equals(new ObjectId(req.user.userId)));
+                // // Проверяем, есть ли пользователь уже в массиве watchers
+                // const isWatching = sentence.watchers.some((watcherId) => watcherId.equals(new ObjectId(req.user.userId)));
 
-                if (!isWatching) {
-                    // Добавляем пользователя в массив watchers
-                    await Sentence.findByIdAndUpdate(sentence._id, {
-                        $addToSet: { watchers: new ObjectId(req.user.userId) }
-                    });
+                // if (!isWatching) {
+                //     // Добавляем пользователя в массив watchers
+                //     await Sentence.findByIdAndUpdate(sentence._id, {
+                //         $addToSet: { watchers: new ObjectId(req.user.userId) }
+                //     });
 
-                }
+                // }
 
                 return res.status(200).json({ message: 'Предложение для рассмотрения получено', sentence })
             }

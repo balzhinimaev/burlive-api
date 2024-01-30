@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
+import { createServer } from 'node:http';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import http from 'http'; // Импортируем модуль http
-import socketIO from 'socket.io'; // Импортируем модуль socket.io
-
+import { Server } from "socket.io";
+import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config(); // Загружаем переменные окружения из файла .env
 
@@ -16,8 +17,10 @@ import translationsRouter from './routes/translationRouter';
 import dialectRouter from './routes/dialectRouter';
 
 const app = express();
-const server = http.createServer(app); // Создаем сервер с помощью модуля http
+const server = createServer(app);
+const io = new Server(server);
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/users', userRouter);
 app.use('/api/dialect', authenticateToken, dialectRouter);
@@ -27,6 +30,10 @@ app.use('/api/translations', authenticateToken, translationsRouter);
 
 server.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
+});
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
 });
 
 // Подключение к базе данных
