@@ -8,21 +8,19 @@ export interface ISentence extends Document {
   contributors: Types.ObjectId[];
   translations: Types.ObjectId[];
   watchers: Types.ObjectId[];
-  status: 'new' | 'processing' | 'accepted' | 'rejected'; // Added field for status
-  createdAt: Date;
   // Additional fields, if needed
 }
 
 const SentenceSchema = new Schema({
   text: { type: String, required: true, unique: true },
   language: { type: String },
-  translations: [{ type: Schema.Types.ObjectId, ref: 'Translation' }],
-  watchers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  translations: [{ type: Schema.Types.ObjectId, ref: 'Translation', default: [] }],
+  watchers: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  contributors: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  status: { type: String, enum: ['new', 'processing', 'accepted', 'rejected'], default: 'new' },
-  createdAt: { type: Date, default: Date.now },
+  contributors: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
   // Additional fields, if needed
+}, {
+  timestamps: true
 });
 
 const Sentence = model<ISentence>('Sentence', SentenceSchema);

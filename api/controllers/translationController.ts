@@ -9,7 +9,7 @@ import isValidObjectIdString from '../utils/isValidObjectIdString';
 import User from '../models/User';
 import updateRating from '../utils/updateRating';
 import { Document, Schema, Types, model } from 'mongoose';
-import Sentence from '../models/Sentence';
+import Sentence from '../models/SuggestedSentence';
 import Vote from '../models/Vote';
 const translationController = {
     getAllTranslations: async (req: Request, res: Response) => {
@@ -23,7 +23,7 @@ const translationController = {
 
             }
 
-            res.status(200).json({ message: `Переводы получены`, translations });
+            res.status(200).json({ message: `Переводы получены`, translations, count: translations.length });
 
         } catch (error) {
 

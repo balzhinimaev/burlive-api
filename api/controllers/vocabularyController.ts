@@ -1,6 +1,6 @@
 // vocabularyController.ts
 import { Request, Response } from 'express';
-import Sentence from '../models/Sentence';
+import Sentence from '../models/SuggestedSentence';
 import { AuthRequest } from '../middleware/authenticateToken';
 import { ObjectId } from 'mongodb';
 import { isValidObjectId } from 'mongoose';

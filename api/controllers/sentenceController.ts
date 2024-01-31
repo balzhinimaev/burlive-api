@@ -1,6 +1,7 @@
 // sentenceController.ts
 import { Request, Response } from 'express';
-import Sentence from '../models/Sentence';
+import SuggestedSentence from '../models/SuggestedSentence';
+import AcceptedSentence from '../models/AcceptedSentences';
 import { AuthRequest } from '../middleware/authenticateToken';
 import { ObjectId } from 'mongodb';
 import { isValidObjectId } from 'mongoose';
@@ -12,7 +13,7 @@ import updateRating from '../utils/updateRating';
 const sentenceController = {
     getAllSentences: async (req: Request, res: Response) => {
         try {
-            const sentences = await Sentence.find();
+            const sentences = await SuggestedSentence.find();
 
             if (sentences.length === 0) {
                 
@@ -35,7 +36,7 @@ const sentenceController = {
     getAcceptedSentence: async (req: AuthRequest, res: Response) => {
         try {
             
-            const sentence = await Sentence.findOne({
+            const sentence = await SuggestedSentence.findOne({
                 status: 'accepted'
             });
 
@@ -54,7 +55,7 @@ const sentenceController = {
     getNewSentence: async (req: AuthRequest, res: Response) => {
         try {
 
-            const sentence = await Sentence.findOne({
+            const sentence = await SuggestedSentence.findOne({
                 status: 'new'
             });
 
@@ -65,7 +66,7 @@ const sentenceController = {
 
                 // if (!isWatching) {
                 //     // Добавляем пользователя в массив watchers
-                //     await Sentence.findByIdAndUpdate(sentence._id, {
+                //     await SuggestedSentence.findByIdAndUpdate(sentence._id, {
                 //         $addToSet: { watchers: new ObjectId(req.user.userId) }
                 //     });
 
@@ -98,7 +99,7 @@ const sentenceController = {
 
             }
 
-            const sentence = await Sentence.findById(new ObjectId(id))
+            const sentence = await SuggestedSentence.findById(new ObjectId(id))
             
             if (sentence) {
 
@@ -140,11 +141,11 @@ const sentenceController = {
                 return res.status(400).json({ message: 'Неверный формат языка' });
             }
 
-            const isExists = await Sentence.findOne({ text })
+            const isExists = await SuggestedSentence.findOne({ text })
 
             if (isExists) {
 
-                await Sentence.updateOne({ text }, {
+                await SuggestedSentence.updateOne({ text }, {
                     $addToSet: {
                         contributors: author
                     }
@@ -154,9 +155,9 @@ const sentenceController = {
 
             }
 
-            const newSentence = await new Sentence({ text, language, author }).save();
+            const newSentence = await new SuggestedSentence({ text, language, author }).save();
 
-            await User.findByIdAndUpdate({ _id: author }, { $push: { suggestedSentences: newSentence._id } })
+            await User.findByIdAndUpdate(author, { $push: { suggestedSentences: newSentence._id } })
             logger.info(`Предложение успешно создано: ${newSentence._id}`);
 
             // Вызываем метод обновления рейтинга пользователя
@@ -171,70 +172,176 @@ const sentenceController = {
         }
     },
 
-    updateStatus: async (req: Request, res: Response) => {
+    createSentenceMultiple: async (req: AuthRequest, res: Response) => {
         try {
-            const { id } = req.params;
-            const { status, contributorId } = req.body;
 
-            const validStatuses: ('processing' | 'accepted' | 'rejected')[] = ['processing', 'accepted', 'rejected'];
+            const { sentences, language } = req.body;
+            const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
 
-            if (!isValidObjectId(id)) {
-                // return res.status(400).json({ message: 'Неверные входные данные' });
+            if (!sentences || !Array.isArray(sentences) || sentences.length === 0) {
+                return res.status(400).json({ message: 'Поле sentences должно быть непустым массивом!' });
+            }
 
-                if (!isValidObjectIdString(id)) {
+            if (!language || !author) {
+                logger.error(`Пожалуйста, предоставьте текст, язык и автора`);
+                return res.status(400).json({ message: 'Пожалуйста, предоставьте текст, язык и автора' });
+            }
 
-                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
+            // Валидация языка
+            if (!language || typeof language !== 'string' || language.trim().length === 0) {
+                logger.error(`Неверный формат языка`);
+                return res.status(400).json({ message: 'Неверный формат языка' });
+            }
+
+            let addedSentences: any[] = []
+            let existsSentences: any[] = []
+            let authorIsAuthor: any[] = []
+            let existsTranslations: any[] = []
+
+            for (let i = 0; i < sentences.length; i++) {
+
+                const sentence: {
+                    text: string
+                } = sentences[i]
+
+                // Валидация текста
+                if (!sentence.text || typeof sentence.text !== 'string' || sentence.text.trim().length === 0) {
+                
+                    logger.error(`Неверный формат текста`);
+                    return res.status(400).json({ message: 'Неверный формат текста' });
+                
+                }
+
+                const isExists = await SuggestedSentence.findOne({ text: sentence.text })
+                const isExistsInAcceptedSentences = await AcceptedSentence.findOne({ text: sentence.text })
+                
+                if (isExistsInAcceptedSentences) {
+                    
+                    existsTranslations.push(isExistsInAcceptedSentences)
+                    continue
+
+                }
+
+                if (isExists) {
+
+                    if (isExists.author.toString() == author.toString()) {
+                        
+                        authorIsAuthor.push(isExists)
+                        continue
+
+                    } else {
+                        await SuggestedSentence.updateOne({ text: sentence.text }, {
+                            $addToSet: {
+                                contributors: author
+                            }
+                        }).then((document) => { logger.info(`Автор записан в контрибьюторы при добавлении предложения`); existsSentences.push(document); }).catch(error => {
+                            logger.error(`Ошибка при записи автора в контрибюторы при добавлении предложения: ${error}`)
+
+                        })
+                    }
+
+                    // return res.status(200).json({ message: 'Такое предложение существует, вы добавлены в контрибьютеры', isExists })
+
+                } else {
+
+                    const newSentence = await new SuggestedSentence({ text: sentence.text, language, author }).save();
+
+                    await User.findByIdAndUpdate(author, { $push: { suggestedSentences: newSentence._id } })
+
+                    logger.info(`Предложение успешно создано: ${newSentence._id}`);
+                    
+                    addedSentences.push(newSentence)
+
+                    // Вызываем метод обновления рейтинга пользователя
+                    await updateRating(author);
 
                 }
 
             }
 
-            if (contributorId && (!isValidObjectId(contributorId))) {
-
-                return res.status(400).json({ message: `Неверный contributorId` })
-
-            } else if (contributorId) {
-
-                const contributorIsExists = await User.findOne({ _id: contributorId })
-
-                if (!contributorIsExists) {
-
-                    return res.status(404).json({ message: `Контрибьютора не существует` })
-
-                }
-
-            }
-
-            if (!validStatuses.includes(status)) {
-                return res.status(400).json({ message: 'Неверный статус' });
-            }
-
-            const sentence = await Sentence.findById({ _id: new ObjectId(id) });
-
-            if (sentence === null) {
-                return res.status(404).json({ message: 'Предложение не найдено', sentence });
-            }
-
-            // Добавление нового участника, если статус 'accepted' и передан contributorId
-            if (status === 'accepted' && contributorId) {
-                sentence.contributors.push(contributorId);
-            }
-
-            sentence.status = status;
-            await sentence.save();
-
-            res.status(200).json({ message: 'Статус предложения успешно обновлен', sentence });
+            return res.status(200).json({ message: `Предложения успешно добавлены!`, existsTranslations, addedSentences, existsSentences, authorIsAuthor })
+        
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Ошибка при обновлении статуса предложения' });
+            logger.error(error);
+            res.status(500).json({ message: 'Ошибка при создании предложения' });
         }
     },
+
+    // updateStatus: async (req: Request, res: Response) => {
+    //     try {
+    //         const { id } = req.params;
+    //         const { status, contributorId } = req.body;
+
+    //         const validStatuses: ('processing' | 'accepted' | 'rejected')[] = ['processing', 'accepted', 'rejected'];
+
+    //         if (!isValidObjectId(id)) {
+    //             // return res.status(400).json({ message: 'Неверные входные данные' });
+
+    //             if (!isValidObjectIdString(id)) {
+
+    //                 return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
+
+    //             }
+
+    //         }
+
+    //         if (contributorId && (!isValidObjectId(contributorId))) {
+
+    //             return res.status(400).json({ message: `Неверный contributorId` })
+
+    //         } else if (contributorId) {
+
+    //             const contributorIsExists = await User.findOne({ _id: contributorId })
+
+    //             if (!contributorIsExists) {
+
+    //                 return res.status(404).json({ message: `Контрибьютора не существует` })
+
+    //             }
+
+    //         }
+
+    //         if (!validStatuses.includes(status)) {
+    //             return res.status(400).json({ message: 'Неверный статус' });
+    //         }
+
+    //         const sentence = await SuggestedSentence.findById({ _id: new ObjectId(id) });
+
+    //         if (sentence === null) {
+    //             return res.status(404).json({ message: 'Предложение не найдено', sentence });
+    //         }
+
+    //         // Добавление нового участника, если статус 'accepted' и передан contributorId
+    //         if (status === 'accepted' && contributorId) {
+    //             sentence.contributors.push(contributorId);
+    //         }
+
+    //         sentence.status = status;
+    //         await sentence.save();
+
+    //         res.status(200).json({ message: 'Статус предложения успешно обновлен', sentence });
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ message: 'Ошибка при обновлении статуса предложения' });
+    //     }
+    // },
 
     acceptSentence: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
 
-            const sentence = await Sentence.findByIdAndUpdate(id, { status: 'accepted' }, { new: true });
+            const sentence = await SuggestedSentence.findById(new ObjectId(id));
+            new AcceptedSentence({
+                _id: sentence._id,
+                text: sentence.text,
+                language: sentence.language,
+                author: sentence.author
+            }).save().then(async () => {
+                await SuggestedSentence.findByIdAndDelete(new ObjectId(id)).then(() => {
+                    logger.info(`Предложенное предложение удалено! ${id}`)
+                })
+            })
 
             if (!sentence) {
                 return res.status(404).json({ message: 'Предложение не найдено' });
@@ -251,7 +358,7 @@ const sentenceController = {
         try {
             const { id } = req.params;
 
-            const sentence = await Sentence.findByIdAndUpdate(id, { status: 'rejected' }, { new: true });
+            const sentence = await SuggestedSentence.findByIdAndUpdate(id, { status: 'rejected' }, { new: true });
 
             if (!sentence) {
                 return res.status(404).json({ message: 'Предложение не найдено' });

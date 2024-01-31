@@ -2,7 +2,7 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
 import app from '../../app'; // Укажите путь к вашему основному файлу приложения
-import Sentence from '../../models/Sentence';
+import Sentence from '../../models/SuggestedSentence';
 import User from '../../models/User';
 import { ObjectId } from 'mongodb';
 import Translation from '../../models/Translation';
