@@ -29,6 +29,11 @@ body {
   opacity: 0;
   filter: blur(1rem);
 }
+@media screen and (max-width: 1400px) {
+  html {
+    font-size: 80%;
+  }
+}
 </style>
 
 <script lang="ts" setup>

@@ -40,7 +40,6 @@ io.on('connection', (socket) => {
 mongoose.connect(process.env.DB_CONNECTION_STRING)
   .then(() => {
     console.log('Подключено к базе данных');
-
   })
   .catch((error) => {
     console.error('Ошибка при подключении к базе данных:', error);

@@ -9,24 +9,27 @@ import logger from '../utils/logger';
 import isValidObjectIdString from '../utils/isValidObjectIdString';
 import User from '../models/User';
 import updateRating from '../utils/updateRating';
+import Sentence from '../models/AcceptedSentences';
 
 const sentenceController = {
     getAllSentences: async (req: Request, res: Response) => {
         try {
-            const sentences = await SuggestedSentence.find();
+            const { notAccepted } = req.query;
+            let sentences;
 
-            if (sentences.length === 0) {
-                
-                logger.error(`Предложений не найдено`);
-                res.status(404).json({ message: 'Предложения не найдены', sentences });
-
+            if (notAccepted) {
+                sentences = await SuggestedSentence.find();
             } else {
-
-                logger.info(`Предложения получены!`);
-                res.status(200).json({ message: `Предложения найдены`, sentences, count: sentences.length });
-
+                sentences = await Sentence.find();
             }
 
+            if (sentences.length === 0) {
+                logger.error(`Предложений не найдено`);
+                res.status(404).json({ message: 'Предложения не найдены', sentences });
+            } else {
+                logger.info(`Предложения получены!`);
+                res.status(200).json({ message: `Предложения найдены`, sentences, count: sentences.length });
+            }
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Ошибка при получении предложений!' });

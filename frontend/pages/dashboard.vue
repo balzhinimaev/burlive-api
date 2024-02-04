@@ -2,42 +2,34 @@
   <div class="page dashboard-page">
     <div class="container">
       <div class="row">
-        <div class="col-lg-3">
-          <div class="sidebar-component">
-            <div class="user-info">
-              <h6>Личный кабинет</h6>
-              <p class="small text-muted">
-                BurLive<span class="status"></span>
-              </p>
-              <ul></ul>
+        <div class="col-md-2">
+          <article class="sidebar-wrapper">
+            <div class="sidebar-component">
+              <div class="user-info">
+                <h6>Личный кабинет</h6>
+                <p class="small text-muted">
+                  BurLive<span class="status"></span>
+                </p>
+                <ul></ul>
+              </div>
             </div>
-          </div>
-          <div class="sidebar-component menu">
-            <ul>
-              <li>
-                <NuxtLink to="/dashboard"
-                  >Аналитика</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/dashboard/promts"
-                  >Промты</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/dashboard/dialogs"
-                  >Диалоги</NuxtLink
-                >
-              </li>
-              <li>
-                <NuxtLink to="/dashboard/statistical-data">Статистические данные</NuxtLink>
-              </li>
-            </ul>
-          </div>
-          <div class="sidebar-component sidebar-footer">
-            <NuxtLink to="/dashboard/settings">Настройки</NuxtLink>
-          </div>
-          <button @click="logout" class="btn btn-sm btn-primary mt-2">Выйти</button>
+            <div class="sidebar-component menu">
+              <ul>
+                <li>
+                  <NuxtLink to="/dashboard">Мой профиль</NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink to="/dashboard">Статистика</NuxtLink>
+                </li>
+              </ul>
+            </div>
+            <div class="sidebar-component sidebar-footer">
+              <NuxtLink to="/dashboard/settings">Настройки</NuxtLink>
+            </div>
+            <button @click="logout" class="btn btn-sm btn-primary mt-2">
+              Выйти
+            </button>
+          </article>
         </div>
         <main class="col">
           <NuxtPage />
@@ -106,6 +98,13 @@ $primary: #050505;
     }
   }
 }
+
+.sidebar-wrapper {
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 5px;
+}
+
 .user-info {
   //   text-align: center;
   h6 {

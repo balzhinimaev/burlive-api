@@ -1,7 +1,7 @@
 <template>
   <div class="page-heading">
     <h4>{{ title }}</h4>
-    <BreadcrumbComponent />
+    <!-- <BreadcrumbComponent /> -->
   </div>
 </template>
 
