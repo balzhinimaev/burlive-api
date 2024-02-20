@@ -2,6 +2,13 @@
 
 <script lang="ts" setup>
 const index = ref(0);
+const selectedLanguage = ref('ru')
+
+const options = ref([
+  { text: 'Русский', value: 'ru' },
+  { text: 'Бурятский', value: 'bur' },
+  { text: 'Английский', value: 'en' }
+])
 const {
   data: result,
   pending,
@@ -28,7 +35,7 @@ const {
 const sentenceText = ref("");
 const sentenceLanguage = ref("");
 
-function formatTimeString(timeString) {
+function formatTimeString(timeString: any) {
   const dateObject = new Date(timeString);
 
   const year = dateObject.getFullYear();
@@ -59,7 +66,7 @@ async function addSentence() {
     method: "post",
     body: {
       text: sentenceText.value,
-      language: "ru",
+      language: selectedLanguage.value,
     },
     headers: {
       Authorization: `Bearer ${useCookie("token").value}`,
@@ -77,7 +84,7 @@ async function addSentence() {
   });
 }
 
-async function checked(event, index) {
+async function checked(event: any, index: number) {
   // Проверяем, была ли нажата клавиша Shift
   console.log(event)
   const shiftKey = event.shiftKey;
@@ -109,11 +116,9 @@ async function checked(event, index) {
               class="form-select"
               aria-label="Default select example"
               id="sentenceLanguage"
+              v-model="selectedLanguage"
             >
-              <option selected>Укажите язык</option>
-              <option value="1">Английский</option>
-              <option value="2">Бурятский</option>
-              <option value="3">Русский</option>
+              <option v-for="option in options" :value="option.value">{{ option.text }}</option>
             </select>
           </div>
           <label for="sentence" class="form-label">Предложение</label>
@@ -140,11 +145,11 @@ async function checked(event, index) {
         <i>{{ result.message }}: {{ result.count }}</i>
       </p>
       <div class="table-responsive">
-        <table class="table table-borderless" v-if="result">
+        <table class="table table-bordered" v-if="result">
           <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">#</th>
+              <th scope="col" style="text-align: center;">#</th>
+              <!-- <th scope="col" style="text-align: center;">#</th> -->
               <th scope="col">Текст</th>
               <th scope="col">Автор</th>
               <th scope="col">Переводы</th>
@@ -154,7 +159,7 @@ async function checked(event, index) {
           </thead>
           <tbody>
             <tr v-for="(sentence, index) in result.sentences" :key="index">
-              <td>
+              <td style="width: 5px">
                 <input
                   class="form-check-input"
                   type="checkbox"
@@ -162,9 +167,10 @@ async function checked(event, index) {
                   :id="'table-item-' + index"
                   v-model="sentence.checkStatus"
                   @change.passive="checked($event, index)"
+                  style="cursor: pointer;"
                 />
               </td>
-              <th scope="row">{{ index + 1 }}</th>
+              <!-- <th scope="row" style="width: 5px; text-align: center;">{{ index + 1 }}</th> -->
               <td class="sentenceText">{{ sentence.text }}</td>
               <td>
                 <NuxtLink :to="'users/' + sentence.author">{{
@@ -185,7 +191,9 @@ async function checked(event, index) {
                 <p v-else>Переводов нет</p>
               </td>
               <td>
-                {{ sentence.language === "ru" ? "Русский" : sentence.language }}
+                {{ sentence.language === "ru" ? "Русский" : null }}
+                {{ sentence.language === "en" ? "Английский" : null }}
+                {{ sentence.language === "bur" ? "Бурятский" : null }}
               </td>
               <!-- <td class="createdAt"><span>{{ formatTimeString(sentence.createdAt).date }}<br>{{ formatTimeString(sentence.createdAt).time }}</span></td> -->
             </tr>

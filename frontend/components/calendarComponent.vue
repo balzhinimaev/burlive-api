@@ -68,22 +68,24 @@ const props = defineProps({
     <!-- {{ formattedDate }} -->
     <div class="calendar-heading">
       <!-- <h6>Календарь</h6> -->
-      <p class="month-name">
+      <div class="month-name">
         <div class="month" @click="selectMonthToggler">
-            <span>{{ selectedMonth }}</span>
-            <div :class="monthPicker ? 'months' : 'months collapsed'">
-                <ul>
-                <li
-                    v-for="(month, index) in months"
-                    :key="month"
-                    :data-month-index="index"
-                    @click="selectMonth(index)"
-                >
-                    {{ month }}
-                </li>
-                </ul>
-            </div>
-        </div>, {{ year }}</p>
+          <span>{{ selectedMonth }}</span>
+          <div :class="monthPicker ? 'months' : 'months collapsed'">
+            <ul>
+              <li
+                v-for="(month, index) in months"
+                :key="month"
+                :data-month-index="index"
+                @click="selectMonth(index)"
+              >
+                {{ month }}
+              </li>
+            </ul>
+          </div>
+        </div>
+        , <p>{{ year }}</p>
+      </div>
 
       <!-- <div class="years">
         <ul>
@@ -138,7 +140,7 @@ const props = defineProps({
     margin: auto;
     display: flex;
     .month {
-        width: 100px;
+      width: 100px;
     }
   }
   .months {
