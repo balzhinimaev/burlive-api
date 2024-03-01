@@ -1,146 +1,180 @@
 <template>
   <div>
-    <DashboardHeadingComponent title="Статистика" />
-
-    <DashboardSentencesComponent />
-    <DashboardTranslationComponent />
+    <DashboardHeadingComponent title="Мой профиль" />
+    <!-- <button class="mt-2 btn btn-primary btn-sm">Редактировать профиль</button> -->
+    <div class="col-lg-12 m-auto">
+      <div class="profile-edit-wrapper">
+        <div class="row">
+          <div class="col-lg-2">
+            <div class="avatar">
+              <img
+                id="preview"
+                alt="Предпросмотр изображения"
+                :src="imageSrc"
+                v-if="imageSrc"
+              />
+              <img
+                id="preview"
+                alt="Предпросмотр изображения"
+                :src="avatar"
+                v-if="avatar"
+              />
+              <button
+                class="btn btn-success mt-3"
+                @click="saveProfilePhoto"
+                v-if="imageSrc"
+              >
+                Сохранить
+              </button>
+              <label for="file-upload" class="custom-file-upload">
+                Загрузить изображение
+              </label>
+            </div>
+            <input
+              type="file"
+              id="file-upload"
+              accept="image/*"
+              style="display: none"
+              @change="previewFile"
+            />
+          </div>
+          <div class="col-lg-8">
+            <form @submit.prevent="">
+              <div class="row">
+                <div class="col-lg-6">
+                  <label for="firstName" class="form-label">Имя</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    class="form-control"
+                    v-model="firstName"
+                  />
+                </div>
+                <div class="col-lg-6">
+                  <label for="lastName" class="form-label">Фамилия</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    class="form-control"
+                    v-model="lastName"
+                  />
+                </div>
+              </div>
+              <button class="btn btn-primary my-3" @click="saveUserData()">
+                Сохранить
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from "vue";
-const calendarDate = ref("");
-const calendarDateTo = ref("");
-const day = ref("");
-const dateFillFrom = ref(false);
-const dateFillTo = ref(false);
-
-const customData = ref({
-  "referral_links": [
+const avatar = ref("");
+const firstName = ref();
+const lastName = ref();
+onBeforeMount(() => {
+  const { data, pending, error } = useFetch(
+    () => `http://localhost:5555/api/users/getMe`,
     {
-      "purpose": "Invite friends to the chat",
-      "link": "https://t.me/your_bot?start=invite123",
-      "click_count": 25
-    },
-    {
-      "purpose": "Get a discount on subscription",
-      "link": "https://t.me/your_bot?start=discount456",
-      "click_count": 12
-    },
-    {
-      "purpose": "Join beta testing",
-      "link": "https://t.me/your_bot?start=beta789",
-      "click_count": 8
-    },
-    {
-      "purpose": "Share on social media",
-      "link": "https://t.me/your_bot?start=share567",
-      "click_count": 5
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${useCookie("token").value}`,
+        "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
+      },
+      onResponse({ request, response, options }) {
+        // Process the response data
+        avatar.value = response._data.user.avatar;
+        firstName.value = response._data.user.firstName;
+        lastName.value = response._data.user.lastName;
+      },
     }
-  ]
+  );
+});
+const myFile: any = ref();
+const imageSrc = ref();
+async function previewFile(event: any) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e: any) {
+      const base64String = e.target.result;
+      imageSrc.value = base64String;
+    };
+    reader.readAsDataURL(file);
+    // console.log(reader)
+  }
 }
-)
+async function uploadFile() {
+  let formData = new FormData();
+  console.log(myFile);
+  // formData.append("files", myFile, myFile.name);
+  console.log(formData);
+}
+async function saveProfilePhoto() {
+  const { data, pending, error } = useFetch(
+    () => `http://localhost:5555/api/users/set-profile-photo`,
+    {
+      method: "put",
+      headers: {
+        Authorization: `Bearer ${useCookie("token").value}`,
+        "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
+      },
+      body: {
+        userProfilePhoto: imageSrc.value,
+      },
+    }
+  );
+}
 
-async function calendarPicker(e: any) {
+async function saveUserData() {
   try {
-    console.log(e);
+    const { data, pending, error } = useFetch(
+      () => `http://localhost:5555/api/users/update-user-data`,
+      {
+        method: "put",
+        headers: {
+          Authorization: `Bearer ${useCookie("token").value}`,
+          "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
+        },
+        body: {
+          firstName: firstName.value,
+          lastName: lastName.value
+        },
+      }
+    );
   } catch (error) {
     console.log(error);
   }
 }
-
-async function dateMask(e: any) {
-  const strinData: string = e.data;
-
-  if (e.inputType === "deleteContentBackward") {
-    dateFillFrom.value = false;
-    return false;
-  }
-
-  await maskNucleus(calendarDate, strinData, 1);
-}
-async function dateMask2(e: any) {
-  const strinData: string = e.data;
-
-  if (e.inputType === "deleteContentBackward") {
-    dateFillTo.value = false;
-    return false;
-  }
-
-  await maskNucleus(calendarDateTo, strinData, 2);
-}
-
-async function maskNucleus(data: any, strinData: any, dateStatus: any) {
-  if (data.value.length > 14) {
-    data.value = data.value.slice(0, -1);
-  }
-
-  if (data.value.length == 14 && dateStatus == 1) {
-    dateFillFrom.value = true;
-  } else if (data.value.length == 14 && dateStatus == 2) {
-    dateFillTo.value = true;
-  }
-
-  if (isNaN(Number(strinData.slice(-1)))) {
-    data.value = data.value.slice(0, -1);
-  }
-
-  if (data.value.length == 1) {
-    const num = parseFloat(strinData);
-    if (num >= 4) {
-      data.value = "0" + strinData + " / ";
-    }
-  }
-
-  if (parseFloat(data.value[0]) < 4 && data.value.length == 2) {
-    const num = parseFloat(strinData);
-
-    if (parseFloat(data.value[0]) === 3 && num > 1) {
-      data.value = data.value.slice(0, -1);
-      data.value = data.value + "1 / ";
-    } else {
-      data.value = data.value + " / ";
-    }
-  }
-
-  if (parseFloat(data.value[0]) < 4 && data.value.length == 6) {
-    const num = parseFloat(strinData);
-    if (num > 1) {
-      data.value = data.value.slice(0, -1);
-      data.value = data.value + "0" + num + " / ";
-    }
-  }
-
-  if (parseFloat(data.value[0]) < 4 && data.value.length == 7) {
-    const num = parseFloat(strinData);
-    console.log(parseFloat(data.value[5]));
-    if (parseFloat(data.value[5]) == 1 && num > 2) {
-      data.value = data.value.slice(0, -1);
-      data.value = data.value + "2 / 20";
-    } else if (parseFloat(data.value[5]) == 1 && num <= 2) {
-      data.value = data.value + " / 20";
-    }
-  }
-}
 </script>
+
 <style lang="scss" scoped>
-main {
-  // background: #f0f0f0;
-  // border: 1px solid #222;
-  width: 100%;
-  padding: 1rem;
-  border-radius: 3px;
-  margin-top: 0.5rem;
+.form-input-component {
 }
-
-.form-filter {
+.avatar {
+  margin-bottom: 15px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  img {
+    width: 128px;
+    height: 128px;
+    display: block;
+    margin: auto;
+    border-radius: 10px;
+  }
+}
+.profile-edit-wrapper {
+  // background-image: linear-gradient(45deg, #ddeceba1, #cbe9e666);
+  margin-top: 1rem;
 }
 
-.calendar {
-  user-select: none;
-  width: 180px;
+.custom-file-upload {
+  display: block;
+  text-decoration: underline;
+  cursor: pointer;
   text-align: center;
+  margin: 10px auto 0;
 }
-
-.dateFillTo {}</style>
+</style>

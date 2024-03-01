@@ -59,6 +59,9 @@ export const useAuthStore = defineStore('user-login', {
                 if (!data.value?.token) { this.message = 'токен не получен'; return }
 
                 useCookie('token').value = data.value?.token
+                useCookie("token", {
+                    maxAge: 60 * 60 * 24 * 3
+                })
                 useRouter().push('dashboard')
 
             }

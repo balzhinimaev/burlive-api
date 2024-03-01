@@ -19,7 +19,13 @@
                   <NuxtLink to="/dashboard">Мой профиль</NuxtLink>
                 </li>
                 <li>
-                  <NuxtLink to="/dashboard">Статистика</NuxtLink>
+                  <NuxtLink to="/dashboard/messages">Сообщения</NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink to="/dashboard/sentences">Предложения</NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink to="/dashboard/sentences">Закладки</NuxtLink>
                 </li>
               </ul>
             </div>
@@ -59,7 +65,7 @@ async function logout() {
 $primary: #050505;
 .sidebar-component {
   //   background-color: $primary;
-  border-radius: 3px;
+  // border-radius: 3px;
   padding: 0.3rem 0;
   margin-bottom: 0.5rem;
 
@@ -101,8 +107,8 @@ $primary: #050505;
 
 .sidebar-wrapper {
   padding: 1rem;
-  border: 1px solid #eee;
   border-radius: 5px;
+  // border: 1px solid #eee;
 }
 
 .user-info {
