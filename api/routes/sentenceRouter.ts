@@ -30,4 +30,7 @@ sentencesRouter.put('/:id/accept', sentencesController.acceptSentence);
 // Маршрут для отклонения предложения
 sentencesRouter.put('/:id/reject', sentencesController.rejectSentence);
 
+// Маршрут для удаления предложений
+sentencesRouter.delete('/', sentencesController.deleteSentences);
+
 export default sentencesRouter;

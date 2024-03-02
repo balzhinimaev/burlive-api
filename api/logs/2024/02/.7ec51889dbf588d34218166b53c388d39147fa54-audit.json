@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\workspace\\b-nimaev\\burlive\\api\\logs\\2024\\02\\.7ec51889dbf588d34218166b53c388d39147fa54-audit.json",
+    "files": [
+        {
+            "date": 1708485241814,
+            "name": "C:\\workspace\\b-nimaev\\burlive\\api\\logs\\2024\\02\\log-2024-02-21.log.2024-02-21",
+            "hash": "75def0d5739704c380ba5bf0800d1fbed97f0ac20f1707d25f330cc6da987065"
+        }
+    ],
+    "hashType": "sha256"
+}

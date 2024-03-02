@@ -5,6 +5,10 @@ import validator from 'validator';
 import User from '../models/User';
 import logger from '../utils/logger';
 import Token from '../models/Token';
+import { isValidObjectId } from 'mongoose';
+import { ObjectId } from 'mongodb';
+import isValidObjectIdString from '../utils/isValidObjectIdString';
+import { AuthRequest } from '../middleware/authenticateToken';
 
 interface RegisterRequestBody {
     password: string;
@@ -59,10 +63,16 @@ const userController = {
                 const existingUserByUsername = await User.findOne({ username })
                 
                 if (existingUserByUsername) {
+
                     logger.error(`Пользователь с таким username уже существует: ${username}`);
                     return res.status(400).json({ message: `Пользователь с таким username уже существует` })
+
                 }
                 
+            } else {
+
+                username = await generateUniqueUsername(email)
+
             }
 
             // Хеширование пароля и создание нового пользователя
@@ -96,10 +106,10 @@ const userController = {
             // Проверка наличия пользователя и сравнение пароля
             if (user && (await bcrypt.compare(password, user.password))) {
                 // Создание JWT токена
-                const token = jwt.sign({ userId: user._id.toString() }, process.env.jwt_secret, { expiresIn: '1h' });
+                const token = jwt.sign({ userId: user._id.toString() }, process.env.jwt_secret, { expiresIn: '3d' });
 
                 // Сохранение токена в MongoDB
-                const expiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 час
+                const expiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000 * 24 * 3); // 3 дня
                 await Token.create({ userId: user._id, token, expiresAt });
                 logger.info(`Токен создан для пользователя: ${ user._id }`);
 
@@ -115,6 +125,161 @@ const userController = {
             res.status(500).json({ message: 'Ошибка при входе пользователя' });
         }
     },
+
+    getUser: async (req: Request, res: Response) => {
+        try {
+            
+            const { id } = req.params;
+            
+            if (!isValidObjectId(id)) {
+                // Проверяем, является ли id ObjectId
+
+                if (!isValidObjectIdString(id)) {
+                    // Может ли преобразоваться в ObjectId
+                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
+
+                }
+
+            }
+
+            if (!id || isValidObjectId(new ObjectId(id))) {
+                
+                const user = await User.findById(new ObjectId(id))
+
+                if (!user) {
+
+                    return res.status(404).json({ message: 'Пользователь не найден', user })
+
+                }
+
+                const publicProfile = user.getPublicProfile();
+                return res.status(200).json({ message: 'Пользователь получен!', user: publicProfile })
+
+            }
+
+        } catch (error) {
+            
+            logger.error(`Ошибка при получении пользователя: ${error.message}`);
+            res.status(500).json({ message: 'Ошибка при получении пользователя' });
+
+        }
+    },
+
+    getAllPublicUsers: async (req: Request, res: Response) => {
+        try {
+            const users = await User.find();
+
+            const publicProfiles = users.map((user) => user.getPublicProfile());
+
+            return res.status(200).json({ message: 'Публичные данные всех пользователей получены!', users: publicProfiles });
+        } catch (error) {
+            logger.error(`Ошибка при получении пользователей: ${error.message}`);
+            res.status(500).json({ message: 'Ошибка при получении пользователей' });
+        }
+    },
+
+    setProfilePhoto: async (req: AuthRequest, res: Response) => {
+        try {
+
+            if (!isValidObjectId(req.user.userId)) {
+                // Проверяем, является ли id ObjectId
+
+                if (!isValidObjectIdString(req.user.userId)) {
+                    // Может ли преобразоваться в ObjectId
+
+                    console.log(123)
+                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
+
+                }
+
+            }
+
+            const user = await User.findById(new ObjectId(req.user.userId))
+
+            if (!user) { return res.status(400).json({ message: 'Пользователь не найден', user }) }
+
+            await User.findByIdAndUpdate(new ObjectId(req.user.userId), {
+                $set: {
+                    avatar: req.body.userProfilePhoto
+                }
+            }).then(() => {
+                return res.status(200).json({ message: 'Аватарка успешно сохранена!', avatar: req.body.userProfilePhoto })
+            })
+
+        } catch (error) {
+            logger.error(`Ошибка при обновлении фотографии профиля: ${error}`);
+            res.status(500).json({ message: 'Ошибка при обновлении данных' })
+        }
+    },
+
+    updateName: async (req: AuthRequest, res: Response) => {
+        try {
+
+            const { firstName, lastName } = req.body
+
+            if (!isValidObjectId(req.user.userId)) {
+                // Проверяем, является ли id ObjectId
+
+                if (!isValidObjectIdString(req.user.userId)) {
+                    // Может ли преобразоваться в ObjectId
+
+                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
+
+                }
+
+            }
+
+            const user = await User.findById(new ObjectId(req.user.userId))
+
+            if (!user) { return res.status(400).json({ message: 'Пользователь не найден', user }) }
+
+            await User.findByIdAndUpdate(new ObjectId(req.user.userId), {
+                $set: {
+                    firstName,
+                    lastName
+                }
+            })
+    
+            logger.info("Данные пользователя обновлены!")
+            return res.status(200).json({ message: `Данные пользователя обновлены!` })
+
+        } catch (error) {
+            logger.error(`Ошибка при обновлении данных пользователя: ${error}`)
+            return res.status(500).json({ message: 'Ошибка при обнлвении данных' })
+        }
+    },
+
+    getMe: async (req: AuthRequest, res: Response) => {
+        try {
+
+            console.log(123)
+
+            if (!isValidObjectId(req.user.userId)) {
+                // Проверяем, является ли id ObjectId
+
+                if (!isValidObjectIdString(req.user.userId)) {
+                    // Может ли преобразоваться в ObjectId
+
+                    console.log(req.user.userId)
+
+                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
+
+                }
+
+            }
+
+            const user = await User.findById(new ObjectId(req.user.userId))
+
+            if (!user) { return res.status(400).json({ message: 'Пользователь не найден', user }) }
+
+            logger.info(`Пользователь получен`)
+            return res.status(200).json({ message: "Пользователь найден!", user })
+
+        } catch (error) {
+            logger.error(`Ошибка при обновлении фотографии профиля: ${error}`);
+            res.status(500).json({ message: 'Ошибка при обновлении данных' })
+        }
+    }
 };
 
 async function usernameChecker (username: string, index: number) {

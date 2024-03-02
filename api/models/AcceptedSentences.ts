@@ -4,6 +4,7 @@ import { Document, Schema, Types, model } from 'mongoose';
 export interface ISentence extends Document {
   text: string;
   language: string;
+  context: string;
   author: Types.ObjectId;
   contributors: Types.ObjectId[];
   translations: Types.ObjectId[];
@@ -14,6 +15,7 @@ export interface ISentence extends Document {
 const SentenceSchema = new Schema({
   text: { type: String, required: true, unique: true },
   language: { type: String },
+  context: { type: String },
   translations: [{ type: Schema.Types.ObjectId, ref: 'Translation', default: [] }],
   watchers: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },

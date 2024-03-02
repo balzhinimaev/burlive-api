@@ -43,6 +43,17 @@ interface IUser extends Document {
 
   createdAt: Date;
   updatedAt: Date;
+  getPublicProfile(): IPublicUser;
+}
+
+interface IPublicUser {
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  avatar?: string;
+  rating: number;
+  // Другие публичные поля, которые вы хотите включить
 }
 
 const UserSchema = new Schema({
@@ -86,6 +97,20 @@ const UserSchema = new Schema({
 }, {
     timestamps: true
 });
+
+// Добавляем метод getPublicProfile
+UserSchema.methods.getPublicProfile = function (): IPublicUser {
+  const publicUser: IPublicUser = {
+    username: this.username,
+    firstName: this.firstName,
+    lastName: this.lastName,
+    email: this.email,
+    avatar: this.avatar,
+    rating: this.rating,
+    // Другие публичные поля
+  };
+  return publicUser;
+};
 
 const User = model<IUser>('User', UserSchema);
 
