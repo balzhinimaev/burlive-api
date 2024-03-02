@@ -2,12 +2,6 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@pinia/nuxt", '@nuxt/image'],
-  app: {
-    pageTransition: {
-      name: 'bounce',
-      mode: 'out-in' // default
-    }
-  },
   css: [
     '@/node_modules/bootstrap/scss/bootstrap.scss',
     `@/node_modules/bootstrap-icons/font/bootstrap-icons.min.css`

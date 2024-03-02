@@ -1,11 +1,12 @@
 <template>
-  <div class="page-wrapper" data-bs-theme="dark">
-    <!-- <NuxtWelcome /> -->
-    <div class="container-fluid">
-      <navbarComponent />
-    </div>
-    <NuxtPage />
-    <!-- <footer>
+  <div>
+    <div class="page-wrapper" data-bs-theme="dark">
+      <!-- <NuxtWelcome /> -->
+      <div class="container-fluid">
+        <navbarComponent />
+      </div>
+      <NuxtPage />
+      <!-- <footer>
       <div class="container my-4">
         <h6>Цветовая схема</h6>
         <div class="btn-group" role="group" aria-label="Basic example">
@@ -14,12 +15,59 @@
         </div>
       </div>
     </footer> -->
+    </div>
+    <div class="app-notify">
+      <div class="app-notify-content success">
+        <div class="heading">
+          <h6>Успешно</h6>
+        </div>
+        <p>Lorem ipsum dolor sit amet consectetur</p>
+      </div>
+      <div class="app-notify-content error">
+        <div class="heading">
+          <h6>Не успешно</h6>
+        </div>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius hic repellendus quae.</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <style lang="scss">
 // @import '@/node_modules/bootstrap/scss/bootstrap';
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,300&display=swap");
+.app-notify {
+  padding: 1.5rem 1rem;
+  .app-notify-content {
+    background-color: #111;
+    padding: 1rem;
+    width: fit-content;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    max-width: 350px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    .heading {
+      h6 {
+        color: $success;
+      }
+    }
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    &.error {
+      .heading {
+        h6 {
+          color: $danger
+        }
+      }
+    }
+  }
+}
+
 [data-bs-theme="dark"] {
   --bs-heading-color: #dee2e6;
   --bs-link-color-rgb: #dee2e6;
@@ -29,9 +77,34 @@
   a {
     color: $light;
   }
+  .table {
+    --bs-table-bg: transparent;
+    padding: 1rem;
+  }
 }
+/* Стилизация полосы прокрутки */
+::-webkit-scrollbar {
+    width: 10px; /* Ширина полосы прокрутки */
+}
+
+/* Полоса прокрутки */
+::-webkit-scrollbar-track {
+    background: #111; /* Цвет фона полосы прокрутки */
+}
+
+/* Дорожка, по которой перемещается ползунок */
+::-webkit-scrollbar-thumb {
+    background-color: #222; /* Цвет ползунка */
+    border-radius: 5px; /* Скругление углов ползунка */
+}
+
+/* Ползунок при наведении на него курсора */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #333; /* Цвет ползунка при наведении */
+}
+
 .page-wrapper {
-  padding: 30px 1rem 0;
+  padding: 1.5rem 1rem;
   border-radius: 1rem;
   background-image: linear-gradient(269deg, #171f2085, #14141482);
 }
@@ -80,8 +153,8 @@ useHead({
   title: "BurLive",
 });
 onMounted(() => {
-  const element = document.getElementsByTagName('body')[0]
-  element.setAttribute('data-bs-theme', 'dark');
-  console.log(element)
-})
+  const element = document.getElementsByTagName("body")[0];
+  element.setAttribute("data-bs-theme", "dark");
+  console.log(element);
+});
 </script>

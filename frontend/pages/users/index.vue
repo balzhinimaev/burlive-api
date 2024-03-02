@@ -1,14 +1,29 @@
 <template>
   <div class="page">
-    <div class="container">
-      <div v-if="users">
-        <div class="user" v-for="(user, index) in users" :key="index">
-          <div class="avatar">
-            <NuxtImg :src="user.avatar" alt="" v-if="user.avatar" />
-            <NuxtImg src="https://placehold.co/96x96" alt="" v-else />
+    <div class="container-fluid">
+      <DashboardHeadingComponent title="Пользователи" />
+      <div class="row">
+        <div class="col-lg-3"></div>
+        <div class="col-lg-9">
+          <div class="custom-row">
+            <h5>Пользователи</h5>
+            <!-- <button class="btn btn-dark btn-sm">Новое предложение</button> -->
           </div>
-          <div class="userdata">
-            <span class="user-fullname">{{ user.firstName + ' ' + user.lastName  }}</span>
+          <p>
+            <i>Пользователей найдено: 51</i>
+          </p>
+          <div v-if="users">
+            <div class="user" v-for="(user, index) in users" :key="index">
+              <div class="avatar">
+                <NuxtImg :src="user.avatar" alt="" v-if="user.avatar" />
+                <NuxtImg src="https://placehold.co/96x96" alt="" v-else />
+              </div>
+              <div class="userdata">
+                <span class="user-fullname">{{
+                  user.firstName + " " + user.lastName
+                }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -37,24 +52,34 @@ onBeforeMount(() => {
 
 <style lang="scss" scoped>
 .user {
-    margin-bottom: 1rem;
-    display: flex;
-    &:last-child {
-        margin-bottom: 0;
-    }
+  margin-bottom: 1rem;
+  display: flex;
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 .avatar {
-    width: 96px;
-    height: 96px;
-    border-radius: 8px;
-    overflow: hidden;
-    margin: auto 1rem auto 0;
-    img {
-        width: 100%;
-        height: 100%;
-    }
+  width: 96px;
+  height: 96px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: auto 1rem auto 0;
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .user-fullname {
-    font-size: 16px;
-}</style>
+  font-size: 16px;
+}
+.custom-row {
+  display: flex;
+  justify-content: space-between;
+
+  h5,
+  button {
+    margin: auto 0;
+  }
+}
+</style>
