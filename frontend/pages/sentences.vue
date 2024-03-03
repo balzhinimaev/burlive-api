@@ -9,6 +9,12 @@
   </div>
 </template>
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Предложения'
+})
+definePageMeta({
+  middleware: ["authed"],
+});
 const calendarDate = ref("");
 const calendarDateTo = ref("");
 const day = ref("");

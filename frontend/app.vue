@@ -27,7 +27,10 @@
         <div class="heading">
           <h6>Не успешно</h6>
         </div>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius hic repellendus quae.</p>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius hic
+          repellendus quae.
+        </p>
       </div>
     </div>
   </div>
@@ -61,7 +64,7 @@
     &.error {
       .heading {
         h6 {
-          color: $danger
+          color: $danger;
         }
       }
     }
@@ -69,11 +72,65 @@
 }
 
 [data-bs-theme="dark"] {
+  /* Для темной темы */
+  --scrollbar-track-color: #111;
+  --scrollbar-thumb-color: #222;
+  --scrollbar-thumb-hover-color: #333;
+  /* Для темной темы */
+  --body-background-color: #0b0b0b;
   --bs-heading-color: #dee2e6;
   --bs-link-color-rgb: #dee2e6;
   --bs-link-hover-color-rgb: #dee2e6;
   --bs-body-bg-rgb: #dee2e6;
   --bs-body-color: #dee2e6;
+  --bs-table-bg: transparent;
+  .table {
+    --bs-table-bg: transparent;
+  }
+  a {
+    color: #d1d1d1;
+    transition: 400ms;
+    &:hover {
+      color: var(--bs-body-color);
+    }
+  }
+}
+.table {
+  padding: 1rem;
+}
+
+/* Стилизация полосы прокрутки */
+::-webkit-scrollbar {
+  width: 10px; /* Ширина полосы прокрутки */
+}
+
+/* Полоса прокрутки */
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color); /* Цвет фона полосы прокрутки */
+}
+
+/* Дорожка, по которой перемещается ползунок */
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-color); /* Цвет ползунка */
+  border-radius: 5px; /* Скругление углов ползунка */
+}
+
+/* Ползунок при наведении на него курсора */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(
+    --scrollbar-thumb-hover-color
+  ); /* Цвет ползунка при наведении */
+}
+
+[data-bs-theme="light"] {
+  --bs-heading-color: #dee2e6;
+  --bs-link-color-rgb: #dee2e6;
+  --bs-link-hover-color-rgb: #dee2e6;
+  --bs-body-bg-rgb: #dee2e6;
+  --bs-body-color: #dee2e6;
+  &:body {
+    background-color: #e5e5e5;
+  }
   a {
     color: $light;
   }
@@ -81,26 +138,6 @@
     --bs-table-bg: transparent;
     padding: 1rem;
   }
-}
-/* Стилизация полосы прокрутки */
-::-webkit-scrollbar {
-    width: 10px; /* Ширина полосы прокрутки */
-}
-
-/* Полоса прокрутки */
-::-webkit-scrollbar-track {
-    background: #111; /* Цвет фона полосы прокрутки */
-}
-
-/* Дорожка, по которой перемещается ползунок */
-::-webkit-scrollbar-thumb {
-    background-color: #222; /* Цвет ползунка */
-    border-radius: 5px; /* Скругление углов ползунка */
-}
-
-/* Ползунок при наведении на него курсора */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #333; /* Цвет ползунка при наведении */
 }
 
 .page-wrapper {
@@ -118,8 +155,8 @@ body,
   min-height: calc(100vh - 7.5rem);
 }
 body {
-  background-color: #0b0b0b;
   padding: 1rem;
+  background-color: var(--body-background-color);
 }
 .btn.btn-success {
   color: #fff;

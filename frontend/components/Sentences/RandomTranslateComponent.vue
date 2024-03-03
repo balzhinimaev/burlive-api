@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { useSentencesStore } from "@/stores/sentences";
+const sentencesStore = useSentencesStore();
+
 const sentenceText = ref("");
 const selectedLanguage = ref("ru");
 const options: any = ref([
@@ -6,54 +9,9 @@ const options: any = ref([
   { text: "Бурятский", value: "bur" },
   { text: "Английский", value: "en" },
 ]);
-
-const {
-  data: acceptedSentence,
-  pending: createdSentencePending,
-  error: createdSentenceError,
-}: {
-  data: any;
-  pending: any;
-  error: any;
-} = useAsyncData(`acceptedSentence`, () =>
-  $fetch(`http://localhost:5555/api/sentences/get-accepted-sentence`, {
-    method: "get",
-    headers: {
-      Authorization: `Bearer ${useCookie("token").value}`,
-      "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
-    },
-    onResponse({ response }: { response: any }) {
-      // Process the response data
-      sentenceText.value = "";
-    },
-    onResponseError({
-      request,
-      response,
-      options,
-    }: {
-      request: any;
-      response: any;
-      options: any;
-    }) {
-      console.log(response);
-      // Handle the response errors
-    },
-  })
-);
-
-const selectedPair = ref("personalDevelopment");
-const pairs = ref([
-  { value: "scientificResearch", key: "Научные исследования" },
-  { value: "familyRelationships", key: "Семейные отношения" },
-  { value: "environmentalIssues", key: "Экологические проблемы" },
-  { value: "technologicalInnovations", key: "Технологические новинки" },
-  { value: "ethicsAndMorality", key: "Этика и мораль" },
-  { value: "financialLiteracy", key: "Финансовая грамотность" },
-  { value: "healthyLifestyle", key: "Здоровый образ жизни" },
-  { value: "internationalRelations", key: "Международные отношения" },
-  { value: "personalDevelopment", key: "Развитие личности" },
-  { value: "culturalHeritage", key: "Культурное наследие" },
-]);
+onMounted(() => {
+  sentencesStore.fetchAcceptedSentence();
+});
 
 async function addSentence() {
   // Удаление переносов строк из каждой строки в массиве
@@ -74,30 +32,40 @@ async function addSentence() {
     <article class="form-for-add-sentence">
       <form @submit.prevent="addSentence">
         <h6>Случайное предложение</h6>
-        <p class="text-muted">{{ acceptedSentence.sentence.text }}</p>
-        <label for="translate" class="form-label">Перевод</label>
-        <div class="for-translate">
-          <textarea
-            id="translate"
-            class="form-control"
-            placeholder="Переведите текст"
-            v-model.lazy="sentenceText"
-          >
-          </textarea>
-          <div class="my-2">
-            <label for="sentenceLanguage" class="form-label">Укажите диалект</label>
-            <select
-              class="form-select"
-              aria-label="Default select example"
-              id="sentenceLanguage"
-              v-model="selectedLanguage"
+        <div v-if="sentencesStore.isLoadingFetchAcceptedSentence">
+          <p>Поиск случайного предложения ...</p>
+        </div>
+        <div v-else-if="sentencesStore.isErrorFetchAcceptedSentence">
+          <p>{{ sentencesStore.errorFetchAcceptedSentence }}</p>
+        </div>
+        <div v-else>
+          <p class="text-muted">{{ sentencesStore.acceptedSentence.text }}</p>
+          <label for="translate" class="form-label">Перевод</label>
+          <div class="for-translate">
+            <textarea
+              id="translate"
+              class="form-control"
+              placeholder="Переведите текст"
+              v-model="sentencesStore.randomSentenceTranslateText"
             >
-              <option v-for="option in options" :value="option.value">
-                {{ option.text }}
-              </option>
-            </select>
+            </textarea>
+            <div class="my-2">
+              <label for="sentenceLanguage" class="form-label"
+                >Укажите диалект</label
+              >
+              <select
+                class="form-select"
+                aria-label="Default select example"
+                id="sentenceLanguage"
+                v-model="selectedLanguage"
+              >
+                <option v-for="option in options" :value="option.value">
+                  {{ option.text }}
+                </option>
+              </select>
+            </div>
+            <input type="submit" class="mt-3 btn btn-primary" />
           </div>
-          <input type="submit" class="mt-3 btn btn-primary" />
         </div>
       </form>
     </article>

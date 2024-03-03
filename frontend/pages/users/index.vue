@@ -32,6 +32,9 @@
 </template>
 <script lang="ts" setup>
 const users = ref("");
+useSeoMeta({
+  title: 'Пользователи'
+})
 onBeforeMount(() => {
   const { data, pending, error } = useFetch(
     () => `http://localhost:5555/api/users`,

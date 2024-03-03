@@ -251,9 +251,7 @@ const userController = {
 
     getMe: async (req: AuthRequest, res: Response) => {
         try {
-
-            console.log(123)
-
+            
             if (!isValidObjectId(req.user.userId)) {
                 // Проверяем, является ли id ObjectId
 

@@ -41,7 +41,6 @@
         </div>
       </section>
       <section>
-        <DashboardTranslationComponent />
       </section>
     </main>
   </div>

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+
 import { useSentencesStore } from "@/stores/sentences";
 import { useAcceptedSentencesStore } from "@/stores/acceptedSentences";
 
@@ -54,7 +55,7 @@ function formatTimeString(timeString: any) {
             <div v-else-if="sentencesStore.isError">
               {{ sentencesStore.error?.message }}
             </div>
-            <div v-else-if="sentencesStore.sentences">
+            <div v-else-if="sentencesStore.sentences.length">
               <!-- <p>
                 <i
                   >Предложений получено:

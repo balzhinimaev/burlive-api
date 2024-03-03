@@ -6,28 +6,34 @@ import type { ApiError } from "@/types/error";
 export const useSentencesStore = defineStore("sentences", {
   state: () => ({
     sentences: [] as Sentence[],
-	
-	declineSentenceResponse: {
-		message: ''
-	},
+    acceptedSentence: {} as Sentence,
+
+    declineSentenceResponse: {
+      message: "",
+    },
 
     isLoading: false,
     isLoadingAcceptSentence: false,
+    isLoadingFetchAcceptedSentence: false,
     isLoadingAddSentence: false,
     isLoadingDeclineSentence: false,
 
     isError: false,
     isErrorAcceptSentence: false,
+    isErrorFetchAcceptedSentence: false,
     isErrorAddSentence: false,
     isErrorDeclineSentence: false,
 
     error: null as ApiError | null,
     errorAcceptSentence: null as ApiError | null,
+    errorFetchAcceptedSentence: null as ApiError | null,
     errorAddSentence: null as ApiError | null,
     errorDeclineSentence: null as ApiError | null,
 
     addSentences: "",
     addSentencesLanguage: "ru",
+
+    randomSentenceTranslateText: ''
   }),
   actions: {
     async fetchSentences() {
@@ -61,6 +67,46 @@ export const useSentencesStore = defineStore("sentences", {
         }
       } finally {
         this.isLoading = false;
+      }
+    },
+    async fetchAcceptedSentence() {
+      this.isLoadingFetchAcceptedSentence = true;
+      try {
+        const response = await fetch(
+          "http://localhost:5555/api/sentences/get-accepted-sentence",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${useCookie("token").value}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+          const data: {
+            message: string;
+            sentence: Sentence
+          } = await response.json();
+
+        if (!response.ok) {
+          const error = new Error();
+          error.message = data.message;
+          error.name = "Ошибка";
+
+          throw error;
+        } else {
+          this.acceptedSentence = data.sentence;
+        }
+
+      } catch (error) {
+        if (error instanceof Error) {
+          this.errorFetchAcceptedSentence = error;
+          this.isErrorFetchAcceptedSentence = true;
+        } else {
+          this.errorAddSentence = { message: "Неизвестная ошибка" };
+        }
+      } finally {
+        this.isLoadingFetchAcceptedSentence = false;
       }
     },
     toggleSentenceCheckStatus(sentenceId: string, checked: boolean) {
@@ -117,7 +163,7 @@ export const useSentencesStore = defineStore("sentences", {
           }
         );
 
-		const data = await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           const error = new Error();
@@ -130,10 +176,8 @@ export const useSentencesStore = defineStore("sentences", {
           this.sentences = this.sentences.filter(
             (sentence) => sentence._id !== sentenceId
           );
-		  this.declineSentenceResponse.message = data.message
+          this.declineSentenceResponse.message = data.message;
         }
-
-
       } catch (error) {
         if (error instanceof Error) {
           this.errorDeclineSentence = error;
@@ -144,14 +188,13 @@ export const useSentencesStore = defineStore("sentences", {
       } finally {
         this.isLoadingDeclineSentence = false;
       }
-
     },
     async addSentence() {
       this.isLoadingAddSentence = true;
-	  console.log(this.addSentences)
+      console.log(this.addSentences);
       const cleanedStrings = this.addSentences
         .split(".")
-		.map((s: any) => s = { text: s })
+        .map((s: any) => (s = { text: s }));
 
       try {
         const response = await fetch(
@@ -162,11 +205,14 @@ export const useSentencesStore = defineStore("sentences", {
               "Content-Type": "application/json",
               Authorization: `Bearer ${useCookie("token").value}`,
             },
-            body: JSON.stringify({ sentences: cleanedStrings, language: this.addSentencesLanguage }),
+            body: JSON.stringify({
+              sentences: cleanedStrings,
+              language: this.addSentencesLanguage,
+            }),
           }
         );
 
-		const data = await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           const error = new Error();
@@ -175,15 +221,14 @@ export const useSentencesStore = defineStore("sentences", {
 
           throw error;
         } else {
-			data.addedSentences.forEach((sentence: Sentence) => {
-				sentence.checkStatus = false
-				this.sentences.push(sentence)
-			});
-		}
+          data.addedSentences.forEach((sentence: Sentence) => {
+            sentence.checkStatus = false;
+            this.sentences.push(sentence);
+          });
+        }
 
         this.addSentences = ""; // Очищаем текст после успешной отправки
       } catch (error) {
-        console.log(error);
         if (error instanceof Error) {
           this.errorAddSentence = error;
           this.isErrorAddSentence = true;

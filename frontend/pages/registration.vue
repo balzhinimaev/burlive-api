@@ -81,7 +81,7 @@ function isValidSymbolForEmail(symbol: string) {
 <template>
   <div class="page registration-page">
     
-    <div class="container">
+    <div class="container-fluid">
       <h5>Регистрация</h5>
       <form autocomplete="off" v-on:submit.prevent="registration()">
         <!-- <div class="mb-2">

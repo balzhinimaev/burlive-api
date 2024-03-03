@@ -1,9 +1,7 @@
 <template>
   <div>
     <DashboardHeadingComponent title="Предложения" />
-
     <DashboardSentencesComponent />
-    <DashboardTranslationComponent />
   </div>
 </template>
 <script setup lang="ts">

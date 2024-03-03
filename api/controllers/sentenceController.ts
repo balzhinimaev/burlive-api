@@ -58,24 +58,22 @@ const sentenceController = {
     }
   },
 
+  // В вашем контроллере
   getAcceptedSentence: async (req: AuthRequest, res: Response) => {
     try {
-      const sentence = await AcceptedSentence.findOne({});
-
-      if (sentence) {
-        return res
-          .status(200)
-          .json({ message: "Предложение для перевода получено", sentence });
+      const sentence = await AcceptedSentence.findOne()
+        .lean()
+        .populate("author", "_id firstName username email");
+      if (!sentence) {
+        return res.status(404).json({ message: "Предложение для перевода не найдено" });
       }
-
-      return res
-        .status(404)
-        .json({ message: `Предложение для перевода не найдено`, sentence });
+      res.status(200).json({ message: "Предложение для перевода получено", sentence });
     } catch (error) {
-      console.error(error);
+      logger.error(`Ошибка при получении предложения для переода: ${error}`);
       res.status(500).json({ message: "Error retrieving sentence" });
     }
   },
+
 
   getNewSentence: async (req: AuthRequest, res: Response) => {
     try {
