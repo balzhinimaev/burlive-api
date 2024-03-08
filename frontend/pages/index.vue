@@ -1,12 +1,14 @@
 <template>
   <div class="page home-page">
     <header>
-      <h2 class="mb-0">Погрузитесь в мир бурятской культуры с BurLive!</h2>
-      <p>
-        Наша платформа предлагает уникальную возможность изучения языка и
-        вовлечения в создание его будущего.
-      </p>
-      <!-- <button class="btn btn-dark">Присоединиться</button> -->
+      <div class="container-fluid">
+        <h2 class="mb-0">Погрузитесь в мир бурятской культуры с BurLive!</h2>
+        <p>
+          Наша платформа предлагает уникальную возможность изучения языка и
+          вовлечения в создание его будущего.
+        </p>
+        <!-- <button class="btn btn-dark">Присоединиться</button> -->
+      </div>
     </header>
 
     <main>
@@ -40,8 +42,7 @@
           </div>
         </div>
       </section>
-      <section>
-      </section>
+      <section></section>
     </main>
   </div>
 </template>
@@ -53,15 +54,16 @@ header {
 
 .advantages-content {
   padding: 1rem;
-  // background: #f9f9f9;
-  border-radius: 8px;
+  background: var(--custom-wrapper-background-color);
+  width: fit-content;
+  border-radius: 5px;
   display: flex;
   gap: 1rem;
   .custom-card {
     padding: 1rem;
     min-height: 150px;
     border-radius: 8px;
-    background: #121212;
+    background: var(--custom-wrapper-inner-background-color);
     width: 350px;
   }
 }

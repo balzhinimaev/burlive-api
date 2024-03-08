@@ -15,27 +15,6 @@ onMounted(() => {
   acceptedSentencesStore.fetchSentences();
 });
 
-function formatTimeString(timeString: any) {
-  const dateObject = new Date(timeString);
-
-  const year = dateObject.getFullYear();
-  const month = dateObject.getMonth() + 1; // Месяцы в JavaScript начинаются с 0
-  const day = dateObject.getDate();
-  const hours = dateObject.getHours();
-  const minutes = dateObject.getMinutes();
-  const seconds = dateObject.getSeconds();
-
-  const formattedDateString = {
-    date: `${year}-${month < 10 ? "0" : ""}${month}-${
-      day < 10 ? "0" : ""
-    }${day}`,
-    time: `${hours < 10 ? "0" : ""}${hours}:${
-      minutes < 10 ? "0" : ""
-    }${minutes}:${seconds < 10 ? "0" : ""}${seconds}`,
-  };
-
-  return formattedDateString;
-}
 </script>
 <template>
   <div>

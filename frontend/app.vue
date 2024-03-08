@@ -1,6 +1,28 @@
+<script lang="ts" setup>
+import { useThemeStore } from "./stores/themeStore";
+const themeStore = useThemeStore();
+useHead({
+  title: "BurLive",
+});
+// Реактивно отслеживаем изменения темы
+watch(
+  () => themeStore.theme,
+  (newTheme) => {
+    updateTheme();
+  }
+);
+onMounted(() => {
+  updateTheme();
+});
+function updateTheme() {
+  const theme = themeStore.theme;
+  const element = document.body;
+  element.setAttribute("data-bs-theme", theme);
+}
+</script>
 <template>
   <div>
-    <div class="page-wrapper" data-bs-theme="dark">
+    <div class="page-wrapper">
       <!-- <NuxtWelcome /> -->
       <div class="container-fluid">
         <navbarComponent />
@@ -39,10 +61,82 @@
 <style lang="scss">
 // @import '@/node_modules/bootstrap/scss/bootstrap';
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,300&display=swap");
+
+[data-bs-theme="dark"] {
+  /* Для темной темы */
+  --scrollbar-track-color: #111;
+  --scrollbar-thumb-color: #222;
+  --scrollbar-thumb-hover-color: #333;
+  /* Для темной темы */
+  --body-background-color: #0b0b0b;
+  --bs-heading-color: #dee2e6;
+  --bs-link-color-rgb: #dee2e6;
+  --bs-link-hover-color-rgb: #dee2e6;
+  --bs-body-bg-rgb: #dee2e6;
+  --bs-body-color: #dee2e6;
+  --bs-table-bg: transparent;
+  --bs-body-font-size: 0.85rem;
+  --notify-background-color: #111;
+
+  --sidebar-background-color: #060606;
+
+  --background-image: linear-gradient(269deg, #171f2085, #14141482);
+  --component-background-image: linear-gradient(
+    109deg,
+    rgb(14 14 14),
+    rgb(0 0 0 / 11%)
+  );
+  .table {
+    --bs-table-bg: transparent;
+  }
+  a {
+    color: #d1d1d1;
+    transition: 400ms;
+    &:hover {
+      color: var(--bs-body-color);
+    }
+  }
+  --bs-success-rgb: #0ffd8e;
+}
+[data-bs-theme="light"] {
+  --bs-heading-color: #222;
+  --bs-link-color-rgb: #333;
+  --bs-link-hover-color-rgb: #111;
+  --body-background-color: #eee;
+  --bs-body-bg-rgb: #dee2e6;
+  --bs-body-color: #333;
+  --bs-body-font-size: 0.85rem;
+  --notify-background-color: #e6e6e6;
+
+  --sidebar-background-color: #f7f7f7;
+  --custom-card-background-color: #f7f7f7;
+
+  --custom-wrapper-background-color: #fafafa;
+  --custom-wrapper-inner-background-color: #fff;
+  
+  --background-image: linear-gradient(
+    269deg,
+    rgb(255 255 255),
+    rgb(255 255 255)
+  );
+  --component-background-image: linear-gradient(
+    109deg,
+    rgb(247 247 247),
+    rgb(245 245 245)
+  );
+  &:body {
+    background-color: #e5e5e5;
+  }
+  .table {
+    --bs-table-bg: transparent;
+    padding: 1rem;
+  }
+}
+
 .app-notify {
   padding: 1.5rem 1rem;
   .app-notify-content {
-    background-color: #111;
+    background-color: var(--notify-background-color);
     padding: 1rem;
     width: fit-content;
     border-radius: 10px;
@@ -71,29 +165,9 @@
   }
 }
 
-[data-bs-theme="dark"] {
-  /* Для темной темы */
-  --scrollbar-track-color: #111;
-  --scrollbar-thumb-color: #222;
-  --scrollbar-thumb-hover-color: #333;
-  /* Для темной темы */
-  --body-background-color: #0b0b0b;
-  --bs-heading-color: #dee2e6;
-  --bs-link-color-rgb: #dee2e6;
-  --bs-link-hover-color-rgb: #dee2e6;
-  --bs-body-bg-rgb: #dee2e6;
-  --bs-body-color: #dee2e6;
-  --bs-table-bg: transparent;
-  .table {
-    --bs-table-bg: transparent;
-  }
-  a {
-    color: #d1d1d1;
-    transition: 400ms;
-    &:hover {
-      color: var(--bs-body-color);
-    }
-  }
+.text-success {
+  color: var(--bs-success-rgb) !important;
+  opacity: 1;
 }
 .table {
   padding: 1rem;
@@ -122,32 +196,15 @@
   ); /* Цвет ползунка при наведении */
 }
 
-[data-bs-theme="light"] {
-  --bs-heading-color: #dee2e6;
-  --bs-link-color-rgb: #dee2e6;
-  --bs-link-hover-color-rgb: #dee2e6;
-  --bs-body-bg-rgb: #dee2e6;
-  --bs-body-color: #dee2e6;
-  &:body {
-    background-color: #e5e5e5;
-  }
-  a {
-    color: $light;
-  }
-  .table {
-    --bs-table-bg: transparent;
-    padding: 1rem;
-  }
-}
-
 .page-wrapper {
   padding: 1.5rem 1rem;
   border-radius: 1rem;
-  background-image: linear-gradient(269deg, #171f2085, #14141482);
+  background-image: var(--background-image);
 }
 body,
 .page-wrapper {
   font-family: "Montserrat", sans-serif;
+  min-height: calc(100vh - 2rem);
   // background-color: #101010;
   // background-color: var(--bs-body-bg);
 }
@@ -183,15 +240,20 @@ footer {
     font-size: 80%;
   }
 }
+:root {
+  --bs-body-font-size: 1rem;
+}
+@media screen and (max-width: 768px) {
+  :root,
+  [data-bs-theme="light"] {
+    --bs-body-font-size: 1rem !important;
+  }
+  body {
+    padding: 0;
+    font-size: var(--bs-body-font-size) !important;
+  }
+  .page-wrapper {
+    border-radius: 0;
+  }
+}
 </style>
-
-<script lang="ts" setup>
-useHead({
-  title: "BurLive",
-});
-onMounted(() => {
-  const element = document.getElementsByTagName("body")[0];
-  element.setAttribute("data-bs-theme", "dark");
-  console.log(element);
-});
-</script>

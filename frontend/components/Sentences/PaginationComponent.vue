@@ -43,22 +43,22 @@ const changePage = (page: number) => {
   padding: 0.5rem 0.75rem;
   margin-left: -1px;
   line-height: 1.25;
-  color: #eee;
-  background-color: #111;
+  color: var(--bs-body-color);
+  background-color: var(-scrollbar-thumb-hover-color);
   border: none;
   &:focus {
     box-shadow: none;
   }
 }
 .page-link:hover {
-  color: #eee;
+  color: var(--bs-body-color);
   text-decoration: none;
-  background-color: #222;
-  border-color: #dee2e6;
+  background-color: var(--notify-background-color);
+  border-color: #dee2e6;  
 }
 .active .page-link {
-  color: #ccc;
-  background-color: #222;
+  color: var(--bs-body-color);
+  background-color: var(--body-background-color);
   border-color: #007bff;
 }
 </style>

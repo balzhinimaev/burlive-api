@@ -79,7 +79,8 @@ async function addSentence() {
   border-radius: 1rem;
   margin: 1rem 0;
   color: #2c2c2c;
-  background-image: linear-gradient(109deg, rgb(14 14 14), rgb(0 0 0 / 11%));
+  // background-image: linear-gradient(109deg, rgb(14 14 14), rgb(0 0 0 / 11%));
+  background-color: var(--sidebar-background-color);
   .custom-form-row {
     display: flex;
     #sentence {

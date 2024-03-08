@@ -3,14 +3,13 @@
     <div class="container-fluid">
       <DashboardHeadingComponent title="Пользователи" />
       <div class="row">
-        <div class="col-lg-3"></div>
-        <div class="col-lg-9">
+        <div class="col-lg-12">
           <div class="custom-row">
             <h5>Пользователи</h5>
             <!-- <button class="btn btn-dark btn-sm">Новое предложение</button> -->
           </div>
           <p>
-            <i>Пользователей найдено: 51</i>
+            <i>Пользователей найдено: {{ users.length }}</i>
           </p>
           <div v-if="users">
             <div class="user" v-for="(user, index) in users" :key="index">
