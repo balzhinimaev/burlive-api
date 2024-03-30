@@ -31,6 +31,9 @@
 </template>
 <script lang="ts" setup>
 const users = ref("");
+definePageMeta({
+  middleware: ["authed"],
+});
 useSeoMeta({
   title: 'Пользователи'
 })

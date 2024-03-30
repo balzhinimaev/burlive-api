@@ -17,7 +17,9 @@ export default defineNuxtRouteMiddleware((to) => {
     // if token doesn't exist redirect to log in
     if (
       (!token.value && to?.name == "dashboard") ||
-      (!token.value && to?.name == "sentences")
+      (!token.value && to?.name == "sentences") || 
+      (!token.value && to?.name == "users") || 
+      (!token.value && to?.name == "translations")
     ) {
       abortNavigation();
       return navigateTo("/auth");

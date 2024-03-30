@@ -38,9 +38,10 @@ const sentenceController = {
 
       if (sentences.length === 0) {
         logger.error(`Предложений не найдено`);
-        res.status(404).json({ message: "Предложения не найдены", sentences: [] });
+        res
+          .status(404)
+          .json({ message: "Предложения не найдены", sentences: [] });
       } else {
-
         // Возвращайте также общее количество записей для поддержки пагинации на клиенте
         const count = await Sentence.countDocuments();
 
@@ -49,7 +50,7 @@ const sentenceController = {
           message: `Предложения найдены`,
           sentences,
           count: sentences.length,
-          total_count: count
+          total_count: count,
         });
       }
     } catch (error) {
@@ -65,15 +66,18 @@ const sentenceController = {
         .lean()
         .populate("author", "_id firstName username email");
       if (!sentence) {
-        return res.status(404).json({ message: "Предложение для перевода не найдено" });
+        return res
+          .status(404)
+          .json({ message: "Предложение для перевода не найдено" });
       }
-      res.status(200).json({ message: "Предложение для перевода получено", sentence });
+      res
+        .status(200)
+        .json({ message: "Предложение для перевода получено", sentence });
     } catch (error) {
       logger.error(`Ошибка при получении предложения для переода: ${error}`);
       res.status(500).json({ message: "Error retrieving sentence" });
     }
   },
-
 
   getNewSentence: async (req: AuthRequest, res: Response) => {
     try {
@@ -107,6 +111,7 @@ const sentenceController = {
     }
   },
 
+  // Получение предлождения по ID
   getSentence: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -135,6 +140,7 @@ const sentenceController = {
     }
   },
 
+  // Создание одного предложения
   createSentence: async (req: AuthRequest, res: Response) => {
     try {
       const { text, language } = req.body;
@@ -210,6 +216,7 @@ const sentenceController = {
     }
   },
 
+  // Создание нескольких предложений
   createSentenceMultiple: async (req: AuthRequest, res: Response) => {
     try {
       const { sentences, language, context } = req.body;
@@ -318,7 +325,6 @@ const sentenceController = {
         }
       }
 
-      console.log(addedSentences);
       return res.status(200).json({
         message: `Предложения успешно добавлены!`,
         existsTranslations,
@@ -333,65 +339,7 @@ const sentenceController = {
     }
   },
 
-  // updateStatus: async (req: Request, res: Response) => {
-  //     try {
-  //         const { id } = req.params;
-  //         const { status, contributorId } = req.body;
-
-  //         const validStatuses: ('processing' | 'accepted' | 'rejected')[] = ['processing', 'accepted', 'rejected'];
-
-  //         if (!isValidObjectId(id)) {
-  //             // return res.status(400).json({ message: 'Неверные входные данные' });
-
-  //             if (!isValidObjectIdString(id)) {
-
-  //                 return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
-
-  //             }
-
-  //         }
-
-  //         if (contributorId && (!isValidObjectId(contributorId))) {
-
-  //             return res.status(400).json({ message: `Неверный contributorId` })
-
-  //         } else if (contributorId) {
-
-  //             const contributorIsExists = await User.findOne({ _id: contributorId })
-
-  //             if (!contributorIsExists) {
-
-  //                 return res.status(404).json({ message: `Контрибьютора не существует` })
-
-  //             }
-
-  //         }
-
-  //         if (!validStatuses.includes(status)) {
-  //             return res.status(400).json({ message: 'Неверный статус' });
-  //         }
-
-  //         const sentence = await SuggestedSentence.findById({ _id: new ObjectId(id) });
-
-  //         if (sentence === null) {
-  //             return res.status(404).json({ message: 'Предложение не найдено', sentence });
-  //         }
-
-  //         // Добавление нового участника, если статус 'accepted' и передан contributorId
-  //         if (status === 'accepted' && contributorId) {
-  //             sentence.contributors.push(contributorId);
-  //         }
-
-  //         sentence.status = status;
-  //         await sentence.save();
-
-  //         res.status(200).json({ message: 'Статус предложения успешно обновлен', sentence });
-  //     } catch (error) {
-  //         console.error(error);
-  //         res.status(500).json({ message: 'Ошибка при обновлении статуса предложения' });
-  //     }
-  // },
-
+  //  Принятие предложения
   acceptSentence: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -426,6 +374,7 @@ const sentenceController = {
     }
   },
 
+  // Отклонение предложения
   rejectSentence: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -445,6 +394,7 @@ const sentenceController = {
       if (!sentence) {
         return res.status(404).json({ message: "Предложение не найдено" });
       }
+
       logger.info(`Предложение отклонено: ${sentence._id}`);
       res.json({ message: "Предложение отклонено", sentence });
     } catch (error) {
@@ -452,6 +402,8 @@ const sentenceController = {
       res.status(500).json({ message: "Ошибка при отклонении предложения" });
     }
   },
+
+  // Удаление предложений
   deleteSentences: async (req: Request, res: Response) => {
     try {
       const { sentences } = req.body;
