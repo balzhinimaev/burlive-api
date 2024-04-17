@@ -7,6 +7,10 @@ export const useSentencesStore = defineStore("sentences", {
   state: () => ({
     sentences: [] as Sentence[],
     acceptedSentence: {} as Sentence,
+    isPageLoading: false,
+    currentPage: 1,
+    pageSize: 10,
+    totalItems: 0,
 
     declineSentenceResponse: {
       message: "",
@@ -14,7 +18,7 @@ export const useSentencesStore = defineStore("sentences", {
 
     isLoading: false,
     isLoadingAcceptSentence: false,
-    isLoadingFetchAcceptedSentence: false,
+    isLoadingFetchAcceptedSentence: true,
     isLoadingAddSentence: false,
     isLoadingDeclineSentence: false,
 
@@ -33,14 +37,17 @@ export const useSentencesStore = defineStore("sentences", {
     addSentences: "",
     addSentencesLanguage: "ru",
 
-    randomSentenceTranslateText: ''
+    randomSentenceTranslateText: "",
   }),
   actions: {
-    async fetchSentences() {
+    async fetchSentences(page = 1) {
+      this.currentPage = page;
+      this.isPageLoading = true;
+
       this.isLoading = true;
       try {
         const response = await fetch(
-          "http://localhost:5555/api/sentences/?notAccepted=true",
+          `http://localhost:5555/api/sentences/?notAccepted=true&page=${this.currentPage}&limit=${this.pageSize}`,
           {
             method: "GET",
             headers: {
@@ -50,17 +57,26 @@ export const useSentencesStore = defineStore("sentences", {
           }
         );
 
-        if (!response.ok) {
-          //   throw new Error();
-        }
         const data: SentencesResponse = await response.json();
+
+        if (!response.ok) {
+          const error = new Error();
+          error.message = data.message;
+          error.name = "Ошибка";
+
+          throw error;
+        }
+
         this.sentences = data.sentences.map((sentence) => ({
           ...sentence,
           checkStatus: false,
         }));
+        
+        this.totalItems = data.total_count;
+
       } catch (error) {
         if (error instanceof Error) {
-          this.error = { message: error.message };
+          this.error = error;
           this.isError = true;
         } else {
           this.error = { message: "Неизвестная ошибка" };
@@ -83,10 +99,10 @@ export const useSentencesStore = defineStore("sentences", {
           }
         );
 
-          const data: {
-            message: string;
-            sentence: Sentence
-          } = await response.json();
+        const data: {
+          message: string;
+          sentence: Sentence;
+        } = await response.json();
 
         if (!response.ok) {
           const error = new Error();
@@ -97,7 +113,6 @@ export const useSentencesStore = defineStore("sentences", {
         } else {
           this.acceptedSentence = data.sentence;
         }
-
       } catch (error) {
         if (error instanceof Error) {
           this.errorFetchAcceptedSentence = error;
@@ -241,6 +256,17 @@ export const useSentencesStore = defineStore("sentences", {
     },
     setSentenceText(text: string) {
       this.addSentences = text;
+    },
+    async updateCurrentPage(page: number) {
+      this.currentPage = page;
+      // Здесь можно добавить логику для загрузки данных новой страницы
+      await this.fetchSentences(this.currentPage);
+    },
+    setTotalItems(total: number) {
+      this.totalItems = total;
+    },
+    setPageSize(size: number) {
+      this.pageSize = size;
     },
     // Дополнительные actions для удаления, добавления, принятия предложений...
   },

@@ -67,6 +67,23 @@ header {
     width: 350px;
   }
 }
+
+@media screen and (max-width: 1200px) {
+  .advantages-content {
+    .custom-card {
+      width: 30%
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .advantages-content {
+    flex-wrap: wrap;
+    .custom-card {
+      width: 350px;
+    }
+  }
+}
 // footer {
 //   padding: 30px 0;
 //   background-color: #111;

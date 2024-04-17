@@ -4,7 +4,11 @@ import type { ApiError } from "@/types/error";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
-    user: {},
+    user: {} as {
+      isLoading: boolean,
+      firstName?: string,
+      lastName?: string
+    },
 
     isLoading: false,
 

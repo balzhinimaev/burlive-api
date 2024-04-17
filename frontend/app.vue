@@ -77,29 +77,31 @@ function updateTheme() {
   --bs-table-bg: transparent;
   --bs-body-font-size: 0.85rem;
   --notify-background-color: #111;
-
+  --sentences-table-background-color: #00000036;
+  --menu-content-background-color: #010101;
+  
   --sidebar-background-color: #060606;
-
+  
   --background-image: linear-gradient(269deg, #171f2085, #14141482);
   --component-background-image: linear-gradient(
     109deg,
     rgb(14 14 14),
     rgb(0 0 0 / 11%)
-  );
-  .table {
-    --bs-table-bg: transparent;
-  }
-  a {
-    color: #d1d1d1;
-    transition: 400ms;
-    &:hover {
-      color: var(--bs-body-color);
+    );
+    .table {
+      --bs-table-bg: transparent;
     }
+    a {
+      color: #d1d1d1;
+      transition: 400ms;
+      &:hover {
+        color: var(--bs-body-color);
+      }
+    }
+    --bs-success-rgb: #0ffd8e;
   }
-  --bs-success-rgb: #0ffd8e;
-}
-[data-bs-theme="light"] {
-  --bs-heading-color: #222;
+  [data-bs-theme="light"] {
+    --bs-heading-color: #222;
   --bs-link-color-rgb: #333;
   --bs-link-hover-color-rgb: #111;
   --body-background-color: #eee;
@@ -108,8 +110,12 @@ function updateTheme() {
   --bs-body-font-size: 0.85rem;
   --notify-background-color: #e6e6e6;
 
+  --sentences-table-background-color: #f7f7f796;
+
   --sidebar-background-color: #f7f7f7;
   --custom-card-background-color: #f7f7f7;
+
+  --menu-content-background-color: #f8f8f8;
 
   --custom-wrapper-background-color: #fafafa;
   --custom-wrapper-inner-background-color: #fff;
@@ -248,6 +254,11 @@ footer {
   [data-bs-theme="light"] {
     --bs-body-font-size: 1rem !important;
   }
+
+  html {
+    font-size: 100%;
+  }
+
   body {
     padding: 0;
     font-size: var(--bs-body-font-size) !important;

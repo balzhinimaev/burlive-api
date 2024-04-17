@@ -1,5 +1,6 @@
 <template>
-  <nav>
+  <nav :class="{ expanded: navbarIsExpanded }">
+    <!-- Logotype -->
     <div class="logotype">
       <h4 class="title">
         <NuxtLink to="/">BurLive</NuxtLink>
@@ -8,6 +9,8 @@
         <p>Изучение бурятского</p>
       </div>
     </div>
+
+    <!-- Right Side Menu -->
     <div class="menu-wrapper">
       <div class="menu-content">
         <div class="theme-switcher">
@@ -28,13 +31,13 @@
         </div>
         <ul class="menu">
           <li>
-            <NuxtLink to="/">Главная</NuxtLink>
+            <NuxtLink @click="closeNavbar()" to="/">Главная</NuxtLink>
           </li>
           <li>
-            <NuxtLink to="/users">Пользователи</NuxtLink>
+            <NuxtLink @click="closeNavbar()" to="/users">Пользователи</NuxtLink>
           </li>
           <li>
-            <NuxtLink to="/sentences">Предложения</NuxtLink>
+            <NuxtLink @click="closeNavbar()" to="/sentences">Предложения</NuxtLink>
           </li>
           <!-- <li>
         <NuxtLink to="/dialogs">Диалоги</NuxtLink>
@@ -45,17 +48,22 @@
             <p>Загрузка</p>
           </div>
           <div v-else-if="user.firstName">
-            <NuxtLink class="to-dashboard" to="/dashboard">
+            <NuxtLink @click="closeNavbar()" class="to-dashboard" to="/dashboard">
               <h6>{{ user.firstName }}</h6>
             </NuxtLink>
           </div>
         </div>
         <div v-else class="my-auto auth">
           <p class="mb-0">
-            <NuxtLink to="/auth">Вход</NuxtLink>
+            <NuxtLink @click="closeNavbar()" to="/auth">Вход</NuxtLink>
           </p>
         </div>
+        <div class="logout">
+          <p><a href="javascript:void(0)"><i class="bi bi-box-arrow-left"></i> <span>Выйти</span></a></p>
+          <button @click="themeStore.closeNavbar()" class="btn btn-sm btn-dark" style="display: flex; padding: 3px 12px; border-radius: 5px; font-size: 14px;"><i class="bi bi-x-square" style="margin-right: 5px; margin-top: 1px;"></i> <span>Закрыть</span></button>
+        </div>
       </div>
+      <button class="btn btn-dark menu-toggler" @click="themeStore.openNavbar()">Меню</button>
     </div>
   </nav>
 </template>
@@ -66,7 +74,7 @@ import { useThemeStore } from "@/stores/themeStore"; // Импортируем �
 
 const userStore = useUserStore();
 const themeStore = useThemeStore(); // Используем хранилище темы
-
+const { navbarIsExpanded } = storeToRefs(themeStore);
 const token = ref(useCookie("token").value);
 
 onMounted(() => {
@@ -79,12 +87,36 @@ const user = computed(() => userStore.user); // Реактивное свойс�
 const setTheme = (theme: string) => {
   themeStore.setTheme(theme);
 };
+
+const closeNavbar = async () => {
+  themeStore.closeNavbar()
+}
 </script>
 
 <style lang="scss" scoped>
+.menu-toggler {
+  display: none;
+}
 .logotype {
-  h4, p {
+  h4,
+  p {
     margin-bottom: 0;
+  }
+}
+.logout {
+  display: none;
+  margin: 1rem auto 2rem 3.5rem;
+  a {
+    display: flex;
+    width: fit-content;
+    padding: 5px 15px;
+    background-color: #111;
+    color: #eee;
+    border-radius: 5px;
+    i {
+      display: block;
+      margin-right: 5px;
+    }
   }
 }
 .menu-wrapper {
@@ -97,27 +129,12 @@ const setTheme = (theme: string) => {
   margin: auto 0 auto auto;
   position: relative;
 }
-@media screen and (max-width: 768px) {
-  .menu-wrapper {
-    position: inherit;
-  }
-  .menu-content {
-    position: absolute;
-    background-color: #fff;
-    padding: 1rem;
-    font-size: 1.5rem;
-    top: 0;
-    left: 0;
-    flex-direction: column;
-    width: 100%;
-    // background-color: #ccc;
-    .menu {
-      flex-direction: column;
-    }
-  }
-}
+
 .auth {
+  // margin-left: 3.5rem;
   margin-left: 1rem;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
 }
 .theme-switcher {
   margin: auto 0 auto auto;
@@ -170,5 +187,78 @@ nav {
 
 .to-dashboard {
   text-decoration: none;
+}
+@media screen and (max-width: 768px) {
+  .menu-toggler {
+    display: block;
+  }
+  .menu-wrapper {
+    position: inherit;
+  }
+  .menu-content {
+    position: absolute;
+    background-color: var(--menu-content-background-color);
+    padding: 1rem;
+    font-size: 1.5rem;
+    top: 0;
+    left: 0;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    // background-color: #ccc;
+    transition: 400ms;
+    left: -100%;
+    .menu {
+      flex-direction: column;
+    }
+  }
+
+  .expanded {
+    .menu-content {
+      left: 0;
+    }
+  }
+
+  .btn-sm {
+    padding: 2px 7px;
+    font-size: 1.5rem;
+    border-radius: 5rem;
+  }
+  .theme-switcher {
+    margin: 3rem auto 0;
+    border-radius: 5rem;
+  }
+  .userdata {
+    margin: 2rem 3.5rem auto;
+    h6 {
+      margin: 0;
+      font-size: 24px;
+    }
+  }
+  nav {
+    ul {
+      margin: 3rem 0 0 3rem;
+      li {
+        a {
+          text-decoration: none;
+          font-size: 24px;
+          display: block;
+          margin: 5px 0;
+          transition: 400ms;
+          position: relative;
+          left: 0;
+          &:hover {
+            left: 5px;
+          }
+        }
+      }
+    }
+  }
+  .auth {
+    margin-left: 3.5rem;
+  }
+  .logout {
+    display: block;
+  }
 }
 </style>

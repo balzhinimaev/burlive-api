@@ -9,7 +9,8 @@ const options: any = ref([
   { text: "Бурятский", value: "bur" },
   { text: "Английский", value: "en" },
 ]);
-onMounted(() => {
+
+onBeforeMount(() => {
   sentencesStore.fetchAcceptedSentence();
 });
 
