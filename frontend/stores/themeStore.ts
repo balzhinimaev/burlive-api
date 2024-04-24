@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 
 export const useThemeStore = defineStore("theme", {
   state: () => ({
-    theme: "light", // По умолчанию тема светлая,
+    theme: useCookie("theme").value !== null ? <'light' | 'dark'>useCookie("theme").value : 'light' as string, // По умолчанию тема светлая,
     navbarIsExpanded: false as boolean
   }),
   actions: {

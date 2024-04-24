@@ -1,10 +1,10 @@
 {
 	"folders": [
 		{
-			"path": "api"
+			"path": "frontend"
 		},
 		{
-			"path": "frontend"
+			"path": "api"
 		},
 		{
 			"path": "bot"

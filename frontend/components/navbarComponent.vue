@@ -59,7 +59,7 @@
           </p>
         </div>
         <div class="logout">
-          <p><a href="javascript:void(0)"><i class="bi bi-box-arrow-left"></i> <span>Выйти</span></a></p>
+          <p v-if="token"><a href="javascript:void(0)"><i class="bi bi-box-arrow-left"></i> <span>Выйти</span></a></p>
           <button @click="themeStore.closeNavbar()" class="btn btn-sm btn-dark" style="display: flex; padding: 3px 12px; border-radius: 5px; font-size: 14px;"><i class="bi bi-x-square" style="margin-right: 5px; margin-top: 1px;"></i> <span>Закрыть</span></button>
         </div>
       </div>
@@ -86,6 +86,10 @@ const user = computed(() => userStore.user); // Реактивное свойс�
 // Функция для смены темы через хранилище
 const setTheme = (theme: string) => {
   themeStore.setTheme(theme);
+  useCookie("theme").value = theme
+  useCookie("theme", {
+      maxAge: 60 * 60 * 24 * 12
+  })
 };
 
 const closeNavbar = async () => {

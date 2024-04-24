@@ -30,7 +30,11 @@
   </div>
 </template>
 <script lang="ts" setup>
-const users = ref("");
+const users: Ref<{
+  avatar?: string;
+  firstName?: string;
+  lastName?: string;
+}[]> = ref([]);
 definePageMeta({
   middleware: ["authed"],
 });

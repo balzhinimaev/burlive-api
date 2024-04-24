@@ -1,5 +1,10 @@
 <script lang="ts" setup>
 import { useThemeStore } from "./stores/themeStore";
+import { useNotifyStore } from "./stores/notifyStore";
+const notifyStore = useNotifyStore();
+// Реактивное отслеживание уведомлений из хранилища
+const notifications = computed(() => notifyStore.notifications);
+
 const themeStore = useThemeStore();
 useHead({
   title: "BurLive",
@@ -11,11 +16,12 @@ watch(
     updateTheme();
   }
 );
-onMounted(() => {
+onBeforeMount(() => {
   updateTheme();
 });
+
 function updateTheme() {
-  const theme = themeStore.theme;
+  const theme: string = themeStore.theme;
   const element = document.body;
   element.setAttribute("data-bs-theme", theme);
 }
@@ -28,32 +34,17 @@ function updateTheme() {
         <navbarComponent />
       </div>
       <NuxtPage />
-      <!-- <footer>
-      <div class="container my-4">
-        <h6>Цветовая схема</h6>
-        <div class="btn-group" role="group" aria-label="Basic example">
-          <button type="button" class="btn btn-light">День</button>
-          <button type="button" class="btn btn-black">Ночь</button>
-        </div>
-      </div>
-    </footer> -->
     </div>
+
+    <!-- Уведомления -->
     <div class="app-notify">
-      <div class="app-notify-content success">
-        <div class="heading">
-          <h6>Успешно</h6>
-        </div>
-        <p>Lorem ipsum dolor sit amet consectetur</p>
-      </div>
-      <div class="app-notify-content error">
-        <div class="heading">
-          <h6>Не успешно</h6>
-        </div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius hic
-          repellendus quae.
-        </p>
-      </div>
+      <NotifyComponent
+        v-for="notification in notifications"
+        :key="notification.id"
+        :heading="notification.heading"
+        :message="notification.message"
+        :status="notification.status"
+      />
     </div>
   </div>
 </template>
@@ -76,32 +67,32 @@ function updateTheme() {
   --bs-body-color: #dee2e6;
   --bs-table-bg: transparent;
   --bs-body-font-size: 0.85rem;
-  --notify-background-color: #111;
+  --notify-background-color: #000000e3;
   --sentences-table-background-color: #00000036;
   --menu-content-background-color: #010101;
-  
+
   --sidebar-background-color: #060606;
-  
+
   --background-image: linear-gradient(269deg, #171f2085, #14141482);
   --component-background-image: linear-gradient(
     109deg,
     rgb(14 14 14),
     rgb(0 0 0 / 11%)
-    );
-    .table {
-      --bs-table-bg: transparent;
-    }
-    a {
-      color: #d1d1d1;
-      transition: 400ms;
-      &:hover {
-        color: var(--bs-body-color);
-      }
-    }
-    --bs-success-rgb: #0ffd8e;
+  );
+  .table {
+    --bs-table-bg: transparent;
   }
-  [data-bs-theme="light"] {
-    --bs-heading-color: #222;
+  a {
+    color: #d1d1d1;
+    transition: 400ms;
+    &:hover {
+      color: var(--bs-body-color);
+    }
+  }
+  --bs-success-rgb: #0ffd8e;
+}
+[data-bs-theme="light"] {
+  --bs-heading-color: #222;
   --bs-link-color-rgb: #333;
   --bs-link-hover-color-rgb: #111;
   --body-background-color: #eee;
@@ -119,7 +110,7 @@ function updateTheme() {
 
   --custom-wrapper-background-color: #fafafa;
   --custom-wrapper-inner-background-color: #fff;
-  
+
   --background-image: linear-gradient(
     269deg,
     rgb(255 255 255),
@@ -141,19 +132,45 @@ function updateTheme() {
 
 .app-notify {
   padding: 1.5rem 1rem;
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
   .app-notify-content {
+    animation: slideIn 0.5s ease-out forwards,
+      fadeOut 0.5s 2.5s ease-in forwards;
+    @keyframes slideIn {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
     background-color: var(--notify-background-color);
     padding: 1rem;
     width: fit-content;
     border-radius: 10px;
     margin-bottom: 1rem;
     max-width: 350px;
+    box-shadow: 0 3px 3px 3px #000;
     &:last-child {
       margin-bottom: 0;
     }
     .heading {
       h6 {
         color: $success;
+        margin: 0;
       }
     }
     p {
@@ -165,6 +182,7 @@ function updateTheme() {
       .heading {
         h6 {
           color: $danger;
+          margin: 0;
         }
       }
     }
@@ -215,7 +233,7 @@ body,
   // background-color: var(--bs-body-bg);
 }
 .page {
-  min-height: calc(100vh - 7.5rem);
+  // min-height: calc(100vh - 7.5rem);
 }
 body {
   padding: 1rem;

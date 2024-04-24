@@ -2,6 +2,7 @@
 import { defineStore } from "pinia";
 import type { Sentence, SentencesResponse } from "@/types/sentences";
 import type { ApiError } from "@/types/error";
+import { useNotifyStore } from "@/stores/notifyStore"; // Путь может отличаться
 
 export const useSentencesStore = defineStore("sentences", {
   state: () => ({
@@ -71,9 +72,8 @@ export const useSentencesStore = defineStore("sentences", {
           ...sentence,
           checkStatus: false,
         }));
-        
-        this.totalItems = data.total_count;
 
+        this.totalItems = data.total_count;
       } catch (error) {
         if (error instanceof Error) {
           this.error = error;
@@ -206,7 +206,7 @@ export const useSentencesStore = defineStore("sentences", {
     },
     async addSentence() {
       this.isLoadingAddSentence = true;
-      console.log(this.addSentences);
+      const notifyStore = useNotifyStore(); // Используем хранилище уведомлений
       const cleanedStrings = this.addSentences
         .split(".")
         .map((s: any) => (s = { text: s }));
@@ -228,27 +228,47 @@ export const useSentencesStore = defineStore("sentences", {
         );
 
         const data = await response.json();
-
+        console.log('Данные получены!')
         if (!response.ok) {
-          const error = new Error();
-          error.message = data.message;
+          const error = new Error(
+            data.message || "Произошла ошибка при добавлении предложений"
+          );
           error.name = "Ошибка";
 
           throw error;
         } else {
+          console.log("нет ошшибки")
           data.addedSentences.forEach((sentence: Sentence) => {
             sentence.checkStatus = false;
             this.sentences.push(sentence);
+          });
+          notifyStore.addNotification({
+            heading: "Успех",
+            message: "Предложения успешно добавлены!",
+            status: "success",
           });
         }
 
         this.addSentences = ""; // Очищаем текст после успешной отправки
       } catch (error) {
+        console.log('ошибка загрузки')
         if (error instanceof Error) {
           this.errorAddSentence = error;
           this.isErrorAddSentence = true;
+          notifyStore.addNotification({
+            heading: "Ошибка",
+            message: error.message,
+            status: "error",
+          });
+
         } else {
           this.errorAddSentence = { message: "Неизвестная ошибка" };
+          notifyStore.addNotification({
+            heading: "Ошибка",
+            message: "Неизвестная ошибка",
+            status: "error",
+          });
+
         }
       } finally {
         this.isLoadingAddSentence = true;
