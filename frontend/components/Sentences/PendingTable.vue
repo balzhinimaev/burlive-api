@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import type { Sentence, SentencesResponse } from "@/types/sentences";
 import { useSentencesStore } from "@/stores/sentences";
-const acceptedSentencesStore = useSentencesStore();
+const pendingSentencesStore = useSentencesStore();
 async function updateCurrentPage(page: number) {
-  acceptedSentencesStore.currentPage = page;
+  pendingSentencesStore.currentPage = page;
   // Здесь вызовите метод для получения данных новой страницы
 }
-const sentencesStore = useSentencesStore();
 
 defineProps<{
   sentences: Sentence[];
@@ -72,13 +71,13 @@ defineProps<{
         </tr>
       </tbody>
     </table>
-    <div class="my-2" v-if="sentencesStore.declineSentenceResponse.message">
-      <p>{{ sentencesStore.declineSentenceResponse.message }}</p>
+    <div class="my-2" v-if="pendingSentencesStore.declineSentenceResponse.message">
+      <p>{{ pendingSentencesStore.declineSentenceResponse.message }}</p>
     </div>
     <sentences-pending-pagination-component
-      :currentPage="acceptedSentencesStore.currentPage"
-      :totalItems="acceptedSentencesStore.totalItems"
-      :pageSize="acceptedSentencesStore.pageSize"
+      :currentPage="pendingSentencesStore.currentPage"
+      :totalItems="pendingSentencesStore.totalItems"
+      :pageSize="pendingSentencesStore.pageSize"
       @update:currentPage="updateCurrentPage"
     ></sentences-pending-pagination-component>
   </div>

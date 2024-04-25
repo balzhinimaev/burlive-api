@@ -1,33 +1,31 @@
+<script lang="ts" setup>
+import { useSentencesStore } from "@/stores/sentences";
+const pendingSentencesStore = useSentencesStore();
+
+const totalPages = computed(() => Math.ceil(pendingSentencesStore.totalItems / pendingSentencesStore.pageSize));
+
+const changePage = (page: number) => {
+  if (page < 1 || page > totalPages.value || page === pendingSentencesStore.currentPage) {
+    return;
+  }
+  pendingSentencesStore.updateCurrentPage(page);
+};
+</script>
 <template>
   <nav aria-label="Page navigation">
     <ul class="pagination">
-      <li class="page-item" :class="{ disabled: acceptedSentencesStore.currentPage <= 1 }">
-        <a class="page-link" href="#" @click="changePage(acceptedSentencesStore.currentPage - 1)">Предыдущая</a>
+      <li class="page-item" :class="{ disabled: pendingSentencesStore.currentPage <= 1 }">
+        <a class="page-link" href="#" @click="changePage(pendingSentencesStore.currentPage - 1)">Предыдущая</a>
       </li>
-      <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: page === acceptedSentencesStore.currentPage }">
+      <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: page === pendingSentencesStore.currentPage }">
         <a class="page-link" href="#" @click="changePage(page)">{{ page }}</a>
       </li>
-      <li class="page-item" :class="{ disabled: acceptedSentencesStore.currentPage >= totalPages }">
-        <a class="page-link" href="#" @click="changePage(acceptedSentencesStore.currentPage + 1)">Следующая</a>
+      <li class="page-item" :class="{ disabled: pendingSentencesStore.currentPage >= totalPages }">
+        <a class="page-link" href="#" @click="changePage(pendingSentencesStore.currentPage + 1)">Следующая</a>
       </li>
     </ul>
   </nav>
 </template>
-
-<script lang="ts" setup>
-import { useAcceptedSentencesStore } from "@/stores/acceptedSentences";
-import { useSentencesStore } from "@/stores/sentences";
-const acceptedSentencesStore = useSentencesStore();
-
-const totalPages = computed(() => Math.ceil(acceptedSentencesStore.totalItems / acceptedSentencesStore.pageSize));
-
-const changePage = (page: number) => {
-  if (page < 1 || page > totalPages.value || page === acceptedSentencesStore.currentPage) {
-    return;
-  }
-  acceptedSentencesStore.updateCurrentPage(page);
-};
-</script>
 
 <style scoped>
 /* Стили остаются без изменений */

@@ -2,7 +2,7 @@
 import { defineStore } from "pinia";
 import type { Sentence, SentencesResponse } from "@/types/sentences";
 import type { ApiError } from "@/types/error";
-
+const apiUrl = `http://localhost:5555/backendapi`
 export const useAcceptedSentencesStore = defineStore("accepted-sentences", {
   state: () => ({
     acceptedSentences: [] as Sentence[],
@@ -43,7 +43,7 @@ export const useAcceptedSentencesStore = defineStore("accepted-sentences", {
       this.isLoading = true;
       try {
         const response = await fetch(
-          `http://localhost:5555/api/sentences/?notAccepted=false&page=${this.currentPage}&limit=${this.pageSize}`,
+          `${ apiUrl }/sentences/?notAccepted=false&page=${this.currentPage}&limit=${this.pageSize}`,
           {
             method: "GET",
             headers: {
@@ -89,7 +89,7 @@ export const useAcceptedSentencesStore = defineStore("accepted-sentences", {
       this.isLoadingAcceptSentence = true;
       try {
         const response = await fetch(
-          `http://localhost:5555/api/sentences/${sentenceId}/accept`,
+          `${ apiUrl }/sentences/${sentenceId}/accept`,
           {
             method: "PUT",
             headers: {
@@ -123,7 +123,7 @@ export const useAcceptedSentencesStore = defineStore("accepted-sentences", {
 
       try {
         const response = await fetch(
-          `http://localhost:5555/api/sentences/${sentenceId}/reject`,
+          `${ apiUrl }/sentences/${sentenceId}/reject`,
           {
             method: "PUT",
             headers: {
@@ -168,7 +168,7 @@ export const useAcceptedSentencesStore = defineStore("accepted-sentences", {
 
       try {
         const response = await fetch(
-          "http://localhost:5555/api/sentences/create-sentences-multiple",
+          `${ apiUrl }/sentences/create-sentences-multiple`,
           {
             method: "POST",
             headers: {

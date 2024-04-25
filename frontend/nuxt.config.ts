@@ -8,7 +8,10 @@ export default defineNuxtConfig({
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { charset: "utf-8" },
-        { name: "description", content: "Изучение и развитие бурятского языка" },
+        {
+          name: "description",
+          content: "Изучение и развитие бурятского языка",
+        },
         // Добавьте другие глобальные мета-теги здесь
       ],
       // Дополнительно можно добавить link теги, скрипты и т.д.
@@ -16,6 +19,11 @@ export default defineNuxtConfig({
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
         // Добавьте другие ресурсы, которые должны быть предварительно загружены или подключены глобально
       ],
+    },
+  },
+  runtimeConfig: {
+    public: {
+      apiUrl: "http://localhost:5555/backendapi",
     },
   },
   css: [

@@ -33,6 +33,8 @@ onMounted(() => {
           </div>
           <div class="col-lg-9">
             <main>
+
+              <!-- Предложения не принятые -->
               <section id="pending-sentences">
                 <div class="custom-row">
                   <h5>Предложения</h5>
@@ -44,17 +46,13 @@ onMounted(() => {
                   {{ sentencesStore.error?.message }}
                 </div>
                 <div v-else-if="sentencesStore.sentences.length">
-                  <!-- <p>
-                <i
-                  >Предложений получено:
-                  {{ sentencesStore.sentences.length }}</i
-                >
-              </p> -->
                   <sentences-pending-table
                     :sentences="sentencesStore.sentences"
                   ></sentences-pending-table>
                 </div>
               </section>
+
+              <!-- Принятые предложения -->
               <section id="accepted-sentences">
                 <div class="custom-row">
                   <h5>Принятые предложения</h5>

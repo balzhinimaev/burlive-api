@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "bot"
+		},
+		{
+			"path": "../../ref/bot"
 		}
 	],
 	"settings": {}

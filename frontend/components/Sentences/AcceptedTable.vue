@@ -1,14 +1,13 @@
 <script lang="ts" setup>
 import type { Sentence, SentencesResponse } from "@/types/sentences";
 import { useSentencesStore } from "@/stores/sentences";
+import { useAcceptedSentencesStore } from "@/stores/acceptedSentences";
 const acceptedSentencesStore = useAcceptedSentencesStore();
 
 async function updateCurrentPage(page: number) {
   acceptedSentencesStore.currentPage = page;
   // Здесь вызовите метод для получения данных новой страницы
 }
-
-const sentencesStore = useSentencesStore();
 
 defineProps<{
   sentences: Sentence[];
@@ -28,10 +27,6 @@ defineProps<{
           <th scope="col">Текст</th>
           <th scope="col">Автор</th>
           <th scope="col">Язык</th>
-          <th scope="col" style="width: 115px" class="text-center">Принять</th>
-          <th scope="col" style="width: 115px" class="text-center">
-            Отклонить
-          </th>
           <!-- <th scope="col">Создан</th> -->
         </tr>
       </thead>
@@ -57,26 +52,12 @@ defineProps<{
               {{ element.language === "bur" ? "Бурятский" : null }}
             </span>
           </td>
-          <td>
-            <div class="d-flex">
-              <sentences-accept-sentence-component
-                :sentenceId="element._id"
-              ></sentences-accept-sentence-component>
-            </div>
-          </td>
-          <td>
-            <div class="d-flex">
-              <sentences-decline-sentence-component
-                :sentenceId="element._id"
-              ></sentences-decline-sentence-component>
-            </div>
-          </td>
           <!-- <td class="createdAt"><span>{{ formatTimeString(sentence.createdAt).date }}<br>{{ formatTimeString(sentence.createdAt).time }}</span></td> -->
         </tr>
       </tbody>
     </table>
-    <div class="my-2" v-if="sentencesStore.declineSentenceResponse.message">
-      <p>{{ sentencesStore.declineSentenceResponse.message }}</p>
+    <div class="my-2" v-if="acceptedSentencesStore.declineSentenceResponse.message">
+      <p>{{ acceptedSentencesStore.declineSentenceResponse.message }}</p>
     </div>
     <sentences-pagination-component
       :currentPage="acceptedSentencesStore.currentPage"

@@ -21,8 +21,11 @@ onBeforeMount(() => {
 });
 
 function updateTheme() {
-  const theme: string = themeStore.theme;
+  let theme: string = themeStore.theme;
   const element = document.body;
+  if (!theme) {
+    theme = 'light'
+  }
   element.setAttribute("data-bs-theme", theme);
 }
 </script>
@@ -72,7 +75,7 @@ function updateTheme() {
   --menu-content-background-color: #010101;
 
   --sidebar-background-color: #060606;
-
+  --messages-wrapper-background: #00000030; 
   --background-image: linear-gradient(269deg, #171f2085, #14141482);
   --component-background-image: linear-gradient(
     109deg,
@@ -105,7 +108,7 @@ function updateTheme() {
 
   --sidebar-background-color: #f7f7f7;
   --custom-card-background-color: #f7f7f7;
-
+  --messages-wrapper-background: #fff;
   --menu-content-background-color: #f8f8f8;
 
   --custom-wrapper-background-color: #fafafa;

@@ -19,13 +19,19 @@
                   <NuxtLink to="/dashboard">Мой профиль</NuxtLink>
                 </li>
                 <li>
+                  <NuxtLink to="/dashboard/friends">Мои друзья</NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink to="/dashboard/finance">Финансы</NuxtLink>
+                </li>
+                <li>
                   <NuxtLink to="/dashboard/messages">Сообщения</NuxtLink>
                 </li>
                 <li>
                   <NuxtLink to="/dashboard/sentences">Предложения</NuxtLink>
                 </li>
                 <li>
-                  <NuxtLink to="/dashboard/sentences">Закладки</NuxtLink>
+                  <NuxtLink to="/dashboard/bookmarks">Закладки</NuxtLink>
                 </li>
               </ul>
             </div>

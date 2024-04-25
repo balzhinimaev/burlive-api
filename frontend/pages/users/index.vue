@@ -41,9 +41,10 @@ definePageMeta({
 useSeoMeta({
   title: 'Пользователи'
 })
+const runtimeConfig = useRuntimeConfig()
 onBeforeMount(() => {
   const { data, pending, error } = useFetch(
-    () => `http://localhost:5555/api/users`,
+    () => `${ runtimeConfig.public.apiUrl }/users`,
     {
       method: "get",
       headers: {

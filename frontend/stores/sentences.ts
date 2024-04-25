@@ -3,8 +3,9 @@ import { defineStore } from "pinia";
 import type { Sentence, SentencesResponse } from "@/types/sentences";
 import type { ApiError } from "@/types/error";
 import { useNotifyStore } from "@/stores/notifyStore"; // Путь может отличаться
+const apiUrl = `http://localhost:5555/backendapi`
 
-export const useSentencesStore = defineStore("sentences", {
+export const useSentencesStore = defineStore("pending-sentences", {
   state: () => ({
     sentences: [] as Sentence[],
     acceptedSentence: {} as Sentence,
@@ -47,8 +48,9 @@ export const useSentencesStore = defineStore("sentences", {
 
       this.isLoading = true;
       try {
+        
         const response = await fetch(
-          `http://localhost:5555/api/sentences/?notAccepted=true&page=${this.currentPage}&limit=${this.pageSize}`,
+          `${apiUrl}/sentences/?notAccepted=true&page=${this.currentPage}&limit=${this.pageSize}`,
           {
             method: "GET",
             headers: {
@@ -89,7 +91,7 @@ export const useSentencesStore = defineStore("sentences", {
       this.isLoadingFetchAcceptedSentence = true;
       try {
         const response = await fetch(
-          "http://localhost:5555/api/sentences/get-accepted-sentence",
+          `${apiUrl}/sentences/get-accepted-sentence`,
           {
             method: "GET",
             headers: {
@@ -134,7 +136,7 @@ export const useSentencesStore = defineStore("sentences", {
       this.isLoadingAcceptSentence = true;
       try {
         const response = await fetch(
-          `http://localhost:5555/api/sentences/${sentenceId}/accept`,
+          `${apiUrl}/sentences/${sentenceId}/accept`,
           {
             method: "PUT",
             headers: {
@@ -168,7 +170,7 @@ export const useSentencesStore = defineStore("sentences", {
 
       try {
         const response = await fetch(
-          `http://localhost:5555/api/sentences/${sentenceId}/reject`,
+          `${apiUrl}/sentences/${sentenceId}/reject`,
           {
             method: "PUT",
             headers: {
@@ -213,7 +215,7 @@ export const useSentencesStore = defineStore("sentences", {
 
       try {
         const response = await fetch(
-          "http://localhost:5555/api/sentences/create-sentences-multiple",
+          `${ apiUrl }/sentences/create-sentences-multiple`,
           {
             method: "POST",
             headers: {

@@ -4,6 +4,7 @@
     <DashboardSentencesComponent />
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref, watch } from "vue";
 const calendarDate = ref("");
@@ -122,8 +123,6 @@ async function maskNucleus(data: any, strinData: any, dateStatus: any) {
 </script>
 <style lang="scss" scoped>
 main {
-  // background: #f0f0f0;
-  // border: 1px solid #222;
   width: 100%;
   padding: 1rem;
   border-radius: 3px;

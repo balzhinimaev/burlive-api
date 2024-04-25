@@ -18,18 +18,21 @@ const sentenceController = {
 
       const pageNumber = Number(page);
       const limitNumber = Number(limit);
-
+      let count;
       let sentences;
       const skipIndex = (pageNumber - 1) * limitNumber;
 
       if (notAccepted === "true") {
+        count = await SuggestedSentence.find({ status: "pending" }).countDocuments()
         sentences = await SuggestedSentence.find({ status: "pending" })
-          .sort({ _id: 1 })
-          .skip(skipIndex)
-          .limit(limitNumber)
-          .populate("author", "_id firstName username email");
+        .sort({ _id: 1 })
+        .skip(skipIndex)
+        .limit(limitNumber)
+        .populate("author", "_id firstName username email");
+        
       } else {
-        sentences = await Sentence.find()
+          count = await Sentence.find().countDocuments()
+          sentences = await Sentence.find()
           .sort({ _id: 1 })
           .skip(skipIndex)
           .limit(limitNumber)
@@ -43,8 +46,6 @@ const sentenceController = {
           .json({ message: "Предложения не найдены", sentences: [] });
       } else {
         // Возвращайте также общее количество записей для поддержки пагинации на клиенте
-        const count = await Sentence.countDocuments();
-
         logger.info(`Предложения получены!`);
         res.status(200).json({
           message: `Предложения найдены`,
@@ -115,7 +116,7 @@ const sentenceController = {
   getSentence: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-
+      console.log(req.params)
       if (!isValidObjectId(id)) {
         // return res.status(400).json({ message: 'Неверные входные данные' });
 

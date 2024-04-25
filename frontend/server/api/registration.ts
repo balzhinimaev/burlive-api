@@ -1,12 +1,16 @@
 export default defineEventHandler(async (event) => {
+    const runtimeConfig = useRuntimeConfig()
     const body = await readBody(event)    
-    const query = await $fetch('http://localhost:5555/api/users/register', {
-        method: 'post',
+    const query = await $fetch(
+      `${runtimeConfig.public.apiUrl}/users/register`,
+      {
+        method: "post",
         body: {
-            email: body.email,
-            password: body.password
-        }
-    })
+          email: body.email,
+          password: body.password,
+        },
+      }
+    );
 
     return query
 

@@ -1,10 +1,11 @@
 <script lang="ts" setup>
+const runtimeConfig = useRuntimeConfig()
 const {
   data: translations,
   pending,
   error,
 } = useAsyncData(`translations`, () =>
-  $fetch("http://localhost:5555/api/translations", {
+  $fetch(`${ runtimeConfig.public.apiUrl }/translations`, {
     method: "get",
     headers: {
       Authorization: `Bearer ${useCookie("token").value}`,

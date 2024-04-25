@@ -1,3 +1,16 @@
+<script lang="ts" setup>
+import { useAcceptedSentencesStore } from "@/stores/acceptedSentences";
+const acceptedSentencesStore = useAcceptedSentencesStore();
+
+const totalPages = computed(() => Math.ceil(acceptedSentencesStore.totalItems / acceptedSentencesStore.pageSize));
+
+const changePage = (page: number) => {
+  if (page < 1 || page > totalPages.value || page === acceptedSentencesStore.currentPage) {
+    return;
+  }
+  acceptedSentencesStore.updateCurrentPage(page);
+};
+</script>
 <template>
   <nav aria-label="Page navigation">
     <ul class="pagination">
@@ -13,20 +26,6 @@
     </ul>
   </nav>
 </template>
-
-<script lang="ts" setup>
-import { useAcceptedSentencesStore } from "@/stores/acceptedSentences";
-const acceptedSentencesStore = useAcceptedSentencesStore();
-
-const totalPages = computed(() => Math.ceil(acceptedSentencesStore.totalItems / acceptedSentencesStore.pageSize));
-
-const changePage = (page: number) => {
-  if (page < 1 || page > totalPages.value || page === acceptedSentencesStore.currentPage) {
-    return;
-  }
-  acceptedSentencesStore.updateCurrentPage(page);
-};
-</script>
 
 <style scoped>
 /* Стили остаются без изменений */

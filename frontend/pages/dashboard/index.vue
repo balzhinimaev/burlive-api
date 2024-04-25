@@ -1,3 +1,87 @@
+<script setup lang="ts">
+const runtimeConfig = useRuntimeConfig()
+const avatar = ref("");
+const firstName = ref();
+const lastName = ref();
+onBeforeMount(() => {
+  const { data, pending, error } = useFetch(
+    () => `${ runtimeConfig.public.apiUrl }/users/getMe`,
+    {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${useCookie("token").value}`,
+        "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
+      },
+      onResponse({ request, response, options }) {
+        // Process the response data
+        avatar.value = response._data.user.avatar;
+        firstName.value = response._data.user.firstName;
+        lastName.value = response._data.user.lastName;
+      },
+    }
+  );
+});
+const myFile: any = ref();
+const imageSrc = ref();
+async function previewFile(event: any) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e: any) {
+      const base64String = e.target.result;
+      imageSrc.value = base64String;
+    };
+    reader.readAsDataURL(file);
+    // console.log(reader)
+  }
+}
+async function uploadFile() {
+  let formData = new FormData();
+  console.log(myFile);
+  // formData.append("files", myFile, myFile.name);
+  console.log(formData);
+}
+async function saveProfilePhoto() {
+  const { data, pending, error } = useFetch(
+    () => `${ runtimeConfig.public.apiUrl }/users/set-profile-photo`,
+    {
+      method: "put",
+      headers: {
+        Authorization: `Bearer ${useCookie("token").value}`,
+        "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
+      },
+      body: {
+        userProfilePhoto: imageSrc.value,
+      },
+    }
+  );
+}
+
+async function saveUserData() {
+  try {
+    const { data, pending, error } = useFetch(
+      () => `${ runtimeConfig.public.apiUrl }/users/update-user-data`,
+      {
+        method: "put",
+        headers: {
+          Authorization: `Bearer ${useCookie("token").value}`,
+          "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
+        },
+        body: {
+          firstName: firstName.value,
+          lastName: lastName.value
+        },
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+useSeoMeta({
+  title: 'Личный кабинет'
+})
+</script>
+
 <template>
   <div>
     <DashboardHeadingComponent title="Мой профиль" />
@@ -70,85 +154,7 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
-const avatar = ref("");
-const firstName = ref();
-const lastName = ref();
-onBeforeMount(() => {
-  const { data, pending, error } = useFetch(
-    () => `http://localhost:5555/api/users/getMe`,
-    {
-      method: "get",
-      headers: {
-        Authorization: `Bearer ${useCookie("token").value}`,
-        "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
-      },
-      onResponse({ request, response, options }) {
-        // Process the response data
-        avatar.value = response._data.user.avatar;
-        firstName.value = response._data.user.firstName;
-        lastName.value = response._data.user.lastName;
-      },
-    }
-  );
-});
-const myFile: any = ref();
-const imageSrc = ref();
-async function previewFile(event: any) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e: any) {
-      const base64String = e.target.result;
-      imageSrc.value = base64String;
-    };
-    reader.readAsDataURL(file);
-    // console.log(reader)
-  }
-}
-async function uploadFile() {
-  let formData = new FormData();
-  console.log(myFile);
-  // formData.append("files", myFile, myFile.name);
-  console.log(formData);
-}
-async function saveProfilePhoto() {
-  const { data, pending, error } = useFetch(
-    () => `http://localhost:5555/api/users/set-profile-photo`,
-    {
-      method: "put",
-      headers: {
-        Authorization: `Bearer ${useCookie("token").value}`,
-        "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
-      },
-      body: {
-        userProfilePhoto: imageSrc.value,
-      },
-    }
-  );
-}
 
-async function saveUserData() {
-  try {
-    const { data, pending, error } = useFetch(
-      () => `http://localhost:5555/api/users/update-user-data`,
-      {
-        method: "put",
-        headers: {
-          Authorization: `Bearer ${useCookie("token").value}`,
-          "Content-Type": "application/json", // Укажите тип контента, если это необходимо,
-        },
-        body: {
-          firstName: firstName.value,
-          lastName: lastName.value
-        },
-      }
-    );
-  } catch (error) {
-    console.log(error);
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .form-input-component {
