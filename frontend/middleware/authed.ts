@@ -13,7 +13,6 @@ export default defineNuxtRouteMiddleware((to) => {
     if (token.value && to?.name === 'auth' || token.value && to?.name === 'registration') {
         return navigateTo('/dashboard');
     }
-    console.log('123')
     // if token doesn't exist redirect to log in
     if (
       (!token.value && to?.name == "dashboard") ||

@@ -1,88 +1,116 @@
 // store/auth.ts
 
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
 interface UserPayloadInterface {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
+const apiUrl = "http://localhost:5555/backendapi";
+export const useAuthStore = defineStore("user-login", {
+  state: () => ({
+    authenticated: false,
+    loading: false,
+    isError: false,
+    error: null as any,
+    message: "",
+    username: "",
+    statusCode: 0,
+    password: "",
+  }),
+  actions: {
+    // async authenticateUser() {
+    //   this.statusCode = 0;
 
-export const useAuthStore = defineStore('user-login', {
-    state: () => ({
-        authenticated: false,
-        loading: false,
-        message: '',
-        username: '',
-        statusCode: 0,
-        password: ''
-    }),
-    actions: {
-        async authenticateUser() {
+    //   const { data, pending, error, refresh } = await useFetch<{
+    //     token: string;
+    //   }>("/api/login", {
+    //     method: "post",
+    //     body: { username: this.username, password: this.password },
+    //     onRequest({ request, options }) {
+    //       // Set the request headers
+    //       options.headers = options.headers || {};
 
-            this.statusCode = 0
+    //       console.log("on request");
+    //     },
+    //     onRequestError({ request, options, error }) {
+    //       console.log("on request error");
+    //       console.log(error);
+    //       // Handle the request errors
+    //     },
+    //     onResponse({ request, response, options }) {
+    //       this.authenticated = true;
+    //       useCookie("token").value = data.value?.token;
+    //       useCookie("token", {
+    //         maxAge: 60 * 60 * 24 * 3,
+    //       });
+    //       return useRouter().push("dashboard");
+    //       // Process the response data
+    //       // localStorage.setItem('token', response._data.token)
+    //     },
+    //     onResponseError({ request, response, options }) {
+    //       // Handle the response errors
+    //     },
+    //   });
 
-            const { data, pending, error, refresh } = await useFetch<{
-                token: string,
-            }>('/api/login', {
-                method: 'post',
-                body: { username: this.username, password: this.password },
-                onRequest({ request, options }) {
-                    // Set the request headers
-                    options.headers = options.headers || {}
+    //   this.loading = pending.value;
 
-                    console.log('on request')
+    //   if (data.value) {
+    //   }
 
-                  },
-                  onRequestError({ request, options, error }) {
-                    console.log('on request error')
-                    console.log(error)
-                    // Handle the request errors
-                  },
-                  onResponse({ request, response, options }) {
-                    console.log('on response')
-                    console.log(response)
-                    // Process the response data
-                    // localStorage.setItem('token', response._data.token)
-                  },
-                  onResponseError({ request, response, options }) {
-                    console.log('on response error')
-                    console.log(response)
-                    console.log('123123')
-                    // Handle the response errors
-                  }
-            })
+    //   if (error.value) {
+    //     if (error.value.data.statusCode === 401) {
+    //       this.password = "";
+    //       this.statusCode = 401;
+    //     }
 
-            this.loading = pending.value;
+    //     this.message = error.value.data.data.message;
+    //   }
+    // },
+    async authenticateUser() {
+      this.loading = true;
+      try {
+        const response = await fetch(`${apiUrl}/users/login`, {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            password: this.password,
+            email: this.username,
+          }),
+        });
 
-            if (data.value) {
+        const data = await response.json();
 
-                if (!data.value?.token) { this.message = 'токен не получен'; return }
-
-                useCookie('token').value = data.value?.token
-                useCookie("token", {
-                    maxAge: 60 * 60 * 24 * 3
-                })
-                useRouter().push('dashboard')
-
-            }
-
-            if (error.value) {
-
-                if (error.value.data.statusCode === 401) {
-
-                    this.password = ''
-                    this.statusCode = 401
-
-                }
-
-                this.message = error.value.data.data.message
-
-            }
-        },
-        logUserOut() {
-            const token = useCookie('token'); // useCookie new hook in nuxt 3
-            this.authenticated = false; // set authenticated  state value to false
-            token.value = null; // clear the token cookie
-        },
+        if (!response.ok) {
+          throw new Error();
+        } else {
+          useCookie("token").value = data.token;
+          useCookie("token", {
+            maxAge: 60 * 60 * 24 * 3,
+          });
+          console.log(data)
+          console.log(useCookie("token"))
+          await useUserStore().fetchUser(data.token);
+          this.authenticated = true;
+          return useRouter().push("dashboard");
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = { message: error.message };
+          this.isError = true;
+        } else {
+          this.error = { message: "Неизвестная ошибка" };
+        }
+      } finally {
+        this.loading = false;
+      }
     },
+    logUserOut() {
+      const token = useCookie("token"); // useCookie new hook in nuxt 3
+      this.authenticated = false; // set authenticated  state value to false
+      token.value = null; // clear the token cookie
+    },
+  },
 });

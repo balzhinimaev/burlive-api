@@ -178,6 +178,31 @@ const userController = {
         }
     },
 
+    getPublicUserByUsername: async (req: Request, res: Response) => {
+        try {
+
+            const { username } = req.params
+            const user = await User.findOne({
+                username
+            });
+
+            if (typeof(username) !== 'string') {
+                return res.status(404).json({ message: 'Неправильный параметр username' })
+            }
+
+            if (!user) {
+                return res.status(404).json({ message: 'Пользователь не найден' })
+            }
+
+            const publicProfile = user.getPublicProfile();
+
+            return res.status(200).json({ message: 'Публичные данные получены!', publicProfile });
+        } catch (error) {
+            logger.error(`Ошибка при получении пользователя: ${error.message}`);
+            res.status(500).json({ message: 'Ошибка при получении пользователя' });
+        }
+    },
+
     setProfilePhoto: async (req: AuthRequest, res: Response) => {
         try {
 

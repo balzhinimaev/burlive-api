@@ -101,8 +101,9 @@ useSeoMeta({
                 id="preview"
                 alt="Предпросмотр изображения"
                 :src="avatar"
-                v-if="avatar"
+                v-if="avatar && !imageSrc"
               />
+              <NuxtImg src="https://placehold.co/128x128" alt="" v-else v-if="!imageSrc" />
               <button
                 class="btn btn-success mt-3"
                 @click="saveProfilePhoto"
@@ -110,7 +111,7 @@ useSeoMeta({
               >
                 Сохранить
               </button>
-              <label for="file-upload" class="custom-file-upload">
+              <label for="file-upload" class="custom-file-upload" v-if="!imageSrc">
                 Загрузить изображение
               </label>
             </div>

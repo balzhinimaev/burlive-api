@@ -18,9 +18,21 @@
                 <NuxtImg src="https://placehold.co/96x96" alt="" v-else />
               </div>
               <div class="userdata">
-                <span class="user-fullname">{{
-                  user.firstName + " " + user.lastName
-                }}</span>
+                <div v-if="user.firstName || user.lastName">
+                  <span class="user-fullname">{{
+                    user.firstName + " " + user.lastName
+                  }}</span>
+                  <br />
+                </div>
+                <div v-else>
+                  <span class="user-fullname">Анонимный пользователь</span>
+                </div>
+                <p style="margin-bottom: 0">
+                  <NuxtLink :to="'/users/' + user.username"
+                    >@{{ user.username }}</NuxtLink
+                  >
+                </p>
+                <p v-if="user.rating">Рейтинг: {{ user.rating }}</p>
               </div>
             </div>
           </div>
@@ -30,21 +42,25 @@
   </div>
 </template>
 <script lang="ts" setup>
-const users: Ref<{
-  avatar?: string;
-  firstName?: string;
-  lastName?: string;
-}[]> = ref([]);
+const users: Ref<
+  {
+    avatar?: string;
+    firstName?: string;
+    lastName?: string;
+    username: string;
+    rating: number;
+  }[]
+> = ref([]);
 definePageMeta({
   middleware: ["authed"],
 });
 useSeoMeta({
-  title: 'Пользователи'
-})
-const runtimeConfig = useRuntimeConfig()
+  title: "Пользователи",
+});
+const runtimeConfig = useRuntimeConfig();
 onBeforeMount(() => {
   const { data, pending, error } = useFetch(
-    () => `${ runtimeConfig.public.apiUrl }/users`,
+    () => `${runtimeConfig.public.apiUrl}/users`,
     {
       method: "get",
       headers: {

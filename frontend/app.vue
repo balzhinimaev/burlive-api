@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import { useUserStore } from "@/stores/userStore";
 import { useThemeStore } from "./stores/themeStore";
 import { useNotifyStore } from "./stores/notifyStore";
 const notifyStore = useNotifyStore();
+const userStore = useUserStore();
 // Реактивное отслеживание уведомлений из хранилища
 const notifications = computed(() => notifyStore.notifications);
 
@@ -16,7 +18,12 @@ watch(
     updateTheme();
   }
 );
-onBeforeMount(() => {
+onBeforeMount(async () => {
+  console.log('nidex')
+  if (useCookie("token").value) {
+    await userStore.fetchUser(<string>useCookie("token").value)
+  }
+
   updateTheme();
 });
 
@@ -24,7 +31,7 @@ function updateTheme() {
   let theme: string = themeStore.theme;
   const element = document.body;
   if (!theme) {
-    theme = 'light'
+    theme = "light";
   }
   element.setAttribute("data-bs-theme", theme);
 }
@@ -75,7 +82,10 @@ function updateTheme() {
   --menu-content-background-color: #010101;
 
   --sidebar-background-color: #060606;
-  --messages-wrapper-background: #00000030; 
+  --messages-wrapper-rightside-background-color: #0d0d0d;
+  --messages-wrapper-background: #00000030;
+  --messages-wrapper-color-heading: #5c5c5c;
+
   --background-image: linear-gradient(269deg, #171f2085, #14141482);
   --component-background-image: linear-gradient(
     109deg,
@@ -108,7 +118,12 @@ function updateTheme() {
 
   --sidebar-background-color: #f7f7f7;
   --custom-card-background-color: #f7f7f7;
-  --messages-wrapper-background: #fff;
+  --messages-wrapper-background: #fbfbfb;
+
+  --messages-wrapper-rightside-background-color: #fff;
+
+  --messages-message-component-background: #fff;
+  --messages-wrapper-color-heading: #000;
   --menu-content-background-color: #f8f8f8;
 
   --custom-wrapper-background-color: #fafafa;

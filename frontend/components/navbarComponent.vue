@@ -37,19 +37,27 @@
             <NuxtLink @click="closeNavbar()" to="/users">Пользователи</NuxtLink>
           </li>
           <li>
+            <NuxtLink @click="closeNavbar()" to="/users">Самоучитель</NuxtLink>
+          </li>
+          <li>
             <NuxtLink @click="closeNavbar()" to="/sentences">Предложения</NuxtLink>
           </li>
           <!-- <li>
         <NuxtLink to="/dialogs">Диалоги</NuxtLink>
       </li> -->
         </ul>
-        <div class="userdata" v-if="token">
+        <div class="userdata" v-if="isAuthed">
           <div v-if="user.isLoading">
             <p>Загрузка</p>
           </div>
           <div v-else-if="user.firstName">
             <NuxtLink @click="closeNavbar()" class="to-dashboard" to="/dashboard">
               <h6>{{ user.firstName }}</h6>
+            </NuxtLink>
+          </div>
+          <div v-else-if="user.username">
+            <NuxtLink @click="closeNavbar()" class="to-dashboard" to="/dashboard">
+              <h6>{{ user.username }}</h6>
             </NuxtLink>
           </div>
         </div>
@@ -69,17 +77,16 @@
 </template>
 
 <script lang="ts" setup>
+import { storeToRefs } from "pinia"; // import storeToRefs helper hook from pinia
 import { useUserStore } from "@/stores/userStore";
 import { useThemeStore } from "@/stores/themeStore"; // Импортируем наше новое хранилище
-
+import { useAuthStore } from "@/stores/auth/login"; // Импортируем наше новое хранилище
+const userAuthStore = useAuthStore();
 const userStore = useUserStore();
 const themeStore = useThemeStore(); // Используем хранилище темы
 const { navbarIsExpanded } = storeToRefs(themeStore);
 const token = ref(useCookie("token").value);
-
-onMounted(() => {
-  userStore.fetchUser();
-});
+const isAuthed = storeToRefs(userAuthStore).authenticated
 
 const user = computed(() => userStore.user); // Реактивное свойство для доступа к пользователю
 
@@ -91,6 +98,12 @@ const setTheme = (theme: string) => {
       maxAge: 60 * 60 * 24 * 12
   })
 };
+onBeforeMount(() => {
+  const token = useCookie("token").value
+  if (token) {
+    isAuthed.value = true
+  }
+})
 
 const closeNavbar = async () => {
   themeStore.closeNavbar()
@@ -175,7 +188,7 @@ nav {
   }
 }
 
-.userdata {
+.userdata, .auth{
   margin: auto 15px;
   h6 {
     margin: 0;

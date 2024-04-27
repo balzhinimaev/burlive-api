@@ -19,6 +19,9 @@ userRouter.get('/getMe', authenticateToken, userController.getMe);
 // Получение пользователя
 userRouter.get('/:id', userController.getUser);
 
+// Получение публичных данных пользователя через username
+userRouter.get('/public/:username', userController.getPublicUserByUsername);
+
 // Получение всех пользоваталей
 userRouter.get('/', userController.getAllPublicUsers);
 

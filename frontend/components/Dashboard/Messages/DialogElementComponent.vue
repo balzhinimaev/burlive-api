@@ -17,9 +17,8 @@ const randomMessage = ref(
   randomMessages[Math.floor(Math.random() * randomMessages.length)]
 );
 function truncateString(str: string) {
-    return str.length > 30 ? str.slice(0, 30) + '...' : str;
+  return str.length > 30 ? str.slice(0, 30) + "..." : str;
 }
-
 </script>
 <template>
   <div class="message-component">
@@ -36,7 +35,10 @@ function truncateString(str: string) {
 <style lang="scss" scoped>
 .message-component {
   display: flex;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
+  padding: 5px;
+  background: var(--messages-message-component-background);
+  border-radius: 15px;
   &:last-child {
     margin-bottom: 0;
   }

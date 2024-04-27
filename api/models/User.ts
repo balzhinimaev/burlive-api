@@ -44,6 +44,9 @@ interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   ton?: ITonWallet;
+  
+  isFake?: boolean;
+
   getPublicProfile(): IPublicUser;
   getWalletData(): {
     walletAddress: string;
@@ -64,6 +67,7 @@ interface IPublicUser {
   avatar?: string;
   rating: number;
   ton?: ITonWallet;
+  isFake: boolean;
   // Другие публичные поля, которые вы хотите включить
 }
 
@@ -112,6 +116,7 @@ const UserSchema = new Schema(
       walletAddress: { type: String },
       walletBalance: { type: Number },
     },
+    isFake: { type: Boolean }
   },
   {
     timestamps: true,
@@ -128,6 +133,7 @@ UserSchema.methods.getPublicProfile = function (): IPublicUser {
     avatar: this.avatar,
     rating: this.rating,
     ton: this.ton,
+    isFake: this.isFake
     // Другие публичные поля
   };
   return publicUser;
