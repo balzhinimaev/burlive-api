@@ -17,6 +17,7 @@ import translationsRouter from './routes/translationRouter';
 import dialectRouter from './routes/dialectRouter';
 import financeRouter from './routes/financeRouter';
 import dialogsRouter from './routes/dialogsRouter';
+import vocabularyRouter from './routes/vocabularyRouter';
 
 
 const app = express();
@@ -27,8 +28,8 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/backendapi/users', userRouter);
 app.use('/backendapi/dialect', authenticateToken, dialectRouter);
-app.use('/backendapi/sentences', sentencesRouter);
-app.use('/backendapi/vocabulary', authenticateToken, sentencesRouter);
+app.use('/backendapi/sentences', authenticateToken, sentencesRouter);
+app.use('/backendapi/vocabulary', authenticateToken, vocabularyRouter);
 app.use('/backendapi/translations', authenticateToken, translationsRouter);
 app.use('/backendapi/dialogs', authenticateToken, dialogsRouter);
 app.use('/backendapi/finance', financeRouter);

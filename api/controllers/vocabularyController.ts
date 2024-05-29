@@ -1,217 +1,187 @@
 // vocabularyController.ts
-import { Request, Response } from 'express';
-import Sentence from '../models/SuggestedSentence';
-import { AuthRequest } from '../middleware/authenticateToken';
-import { ObjectId } from 'mongodb';
-import { isValidObjectId } from 'mongoose';
-import logger from '../utils/logger';
-import isValidObjectIdString from '../utils/isValidObjectIdString';
-import User from '../models/User';
-import updateRating from '../utils/updateRating';
+import { Request, Response } from "express";
+import Sentence from "../models/SuggestedSentence";
+import { AuthRequest } from "../middleware/authenticateToken";
+import { ObjectId } from "mongodb";
+import { Types, isValidObjectId } from "mongoose";
+import logger from "../utils/logger";
+import isValidObjectIdString from "../utils/isValidObjectIdString";
+import User from "../models/User";
+import updateRating from "../utils/updateRating";
+import Vocabulary from "../models/Vocabulary";
+import WordModel from "../models/Vocabulary/WordModel";
+import SuggestedWordModel from "../models/Vocabulary/SuggestedWordModel";
 
 const vocabularyController = {
-    getAllSentences: async (req: Request, res: Response) => {
-        try {
-            const sentence = await Sentence.find();
+  getAllWords: async (req: Request, res: Response) => {
+    try {
+      // const wordsCount = await Vocabulary.find().countDocuments();
+      const words = await Vocabulary.find()
+        .sort({ _id: 1 })
+        .populate("author", "_id firstname username email");
 
-            if (sentence.length === 0) {
-                
-                logger.error(`Предложений не найдено`);
-                res.status(404).json({ message: 'Предложения не найдены' });
-
-            } else {
-
-                logger.info(`Предложения получены: ${sentence.length}`);
-                res.status(200).json(sentence);
-            }
-
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Error retrieving sentence' });
-        }
-    },
-
-    getSentence: async (req: Request, res: Response) => {
-        try {
-
-            const { id } = req.params
-
-            if (!isValidObjectId(id)) {
-                // return res.status(400).json({ message: 'Неверные входные данные' });
-
-                if (!isValidObjectIdString(id)) {
-
-                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
-
-                }
-
-            }
-
-            const sentence = await Sentence.findById(new ObjectId(id))
-            
-            if (sentence) {
-
-                return res.status(200).json(sentence)
-
-            }
-
-            return res.status(404).json({ message: 'Предложение не найдено' })
-
-        } catch (error) {
-            
-            console.error(error);
-            logger.error(`Ошибка при получении предложения: ${ req.params.id }`)
-            res.status(500).json({ message: `Ошибка при получении предложения` })
-
-        }
-    },
-
-    createSentence: async (req: AuthRequest, res: Response) => {
-        try {
-
-            const { text, language } = req.body;
-            const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
-
-            if (!text || !language || !author) {
-                logger.error(`Пожалуйста, предоставьте текст, язык и автора`);
-                return res.status(400).json({ message: 'Пожалуйста, предоставьте текст, язык и автора' });
-            }
-
-            // Валидация текста
-            if (!text || typeof text !== 'string' || text.trim().length === 0) {
-                logger.error(`Неверный формат текста`);
-                return res.status(400).json({ message: 'Неверный формат текста' });
-            }
-
-            // Валидация языка
-            if (!language || typeof language !== 'string' || language.trim().length === 0) {
-                logger.error(`Неверный формат языка`);
-                return res.status(400).json({ message: 'Неверный формат языка' });
-            }
-
-            const isExists = await Sentence.findOne({ text })
-
-            if (isExists) {
-
-                await Sentence.updateOne({ text }, {
-                    $addToSet: {
-                        contributors: author
-                    }
-                }).then(() => { console.log('автор записан') }).catch(error => console.log(error))
-
-                return res.status(200).json({ message: 'Такое предложение существует, вы добавлены в контрибьютеры', isExists })
-
-            }
-
-            const newSentence = await new Sentence({ text, language, author }).save();
-
-            await User.findByIdAndUpdate({ _id: author }, { $push: { suggestedSentences: newSentence._id } })
-            logger.info(`Предложение успешно создано: ${newSentence._id}`);
-
-            // Вызываем метод обновления рейтинга пользователя
-            const updateR = await updateRating(author);
-            logger.info(`typeof(updateR) ${ typeof(updateR) }`)
-            
-            res.status(201).json({ message: 'Предложение успешно создано', sentenceId: newSentence._id });
-
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Ошибка при создании предложения' });
-        }
-    },
-
-    updateStatus: async (req: Request, res: Response) => {
-        try {
-            const { id } = req.params;
-            const { status, contributorId } = req.body;
-
-            const validStatuses: ('processing' | 'accepted' | 'rejected')[] = ['processing', 'accepted', 'rejected'];
-
-            if (!isValidObjectId(id)) {
-                // return res.status(400).json({ message: 'Неверные входные данные' });
-
-                if (!isValidObjectIdString(id)) {
-
-                    return res.status(400).json({ message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId` })
-
-                }
-
-            }
-
-            if (contributorId && (!isValidObjectId(contributorId))) {
-
-                return res.status(400).json({ message: `Неверный contributorId` })
-
-            } else if (contributorId) {
-
-                const contributorIsExists = await User.findOne({ _id: contributorId })
-
-                if (!contributorIsExists) {
-
-                    return res.status(404).json({ message: `Контрибьютора не существует` })
-
-                }
-
-            }
-
-            if (!validStatuses.includes(status)) {
-                return res.status(400).json({ message: 'Неверный статус' });
-            }
-
-            const sentence = await Sentence.findById({ _id: new ObjectId(id) });
-
-            if (sentence === null) {
-                return res.status(404).json({ message: 'Предложение не найдено', sentence });
-            }
-
-            // Добавление нового участника, если статус 'accepted' и передан contributorId
-            if (status === 'accepted' && contributorId) {
-                sentence.contributors.push(contributorId);
-            }
-
-            sentence.status = status;
-            await sentence.save();
-
-            res.status(200).json({ message: 'Статус предложения успешно обновлен', sentence });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Ошибка при обновлении статуса предложения' });
-        }
-    },
-
-    acceptSentence: async (req: Request, res: Response) => {
-        try {
-            const { id } = req.params;
-
-            const sentence = await Sentence.findByIdAndUpdate(id, { status: 'accepted' }, { new: true });
-
-            if (!sentence) {
-                return res.status(404).json({ message: 'Предложение не найдено' });
-            }
-
-            res.json({ message: 'Предложение принято для перевода', sentence });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Ошибка при принятии предложения для перевода' });
-        }
-    },
-
-    rejectSentence: async (req: Request, res: Response) => {
-        try {
-            const { id } = req.params;
-
-            const sentence = await Sentence.findByIdAndUpdate(id, { status: 'rejected' }, { new: true });
-
-            if (!sentence) {
-                return res.status(404).json({ message: 'Предложение не найдено' });
-            }
-
-            res.json({ message: 'Предложение отклонено', sentence });
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Ошибка при отклонении предложения' });
-        }
+      logger.info(`Все слова получены!`);
+      res.status(200).json({ message: `Словарь найден`, words });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error retrieving words" });
     }
+  },
+
+  suggestWordTranslate: async (req: AuthRequest, res: Response) => {
+    const { word_id, translate_language, translate } = req.body;
+    try {
+      if (!word_id || !translate_language || !translate) {
+        logger.error(
+          `Ошибка при предложении перевода в словарь, отсутствует один из параметров`
+        );
+        return res.status(400).json({
+          message: `Ошибка при предложении перевода в словарь, отсутствует один из параметров`,
+        });
+      }
+
+      // Поиск исходного слова в базе данных
+      const is_exists = await WordModel.findById(word_id);
+      if (!is_exists) {
+        return res.status(400).json({
+          message: `Ошибка при предложении перевода в словарь, отсутствует исходное слово`,
+        });
+      }
+
+      // Создание нового документа с переводом
+      const newSuggestedWord = await new SuggestedWordModel({
+        text: translate,
+        language: translate_language,
+        author: new Types.ObjectId(req.user.userId),
+      }).save();
+
+      // Получение ID нового документа
+      const newSuggestedWordId = newSuggestedWord._id;
+
+      // Обновление поля translations в исходном слове
+      is_exists.translations.push(newSuggestedWordId);
+      await is_exists.save();
+
+      // Обновление поля pre_translations в новом документе с переводом
+      await SuggestedWordModel.findByIdAndUpdate(newSuggestedWordId, {
+        $push: { pre_translations: is_exists._id },
+      });
+
+      return res
+        .status(200)
+        .json({ message: "Перевод успешно предложен и добавлен в словарь" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Ошибка при предлоджении перевода" });
+    }
+  },
+
+  suggestWord: async (req: AuthRequest, res: Response) => {
+    const { text, language } = req.body;
+    try {
+      if (!text || !language) {
+        logger.error(
+          `Ошибка при предложении слова, отсутствует один из параметров`
+        );
+        return res.status(400).json({
+          message: `Ошибка при предложении слова, отсутствует один из параметров`,
+        });
+      }
+
+      const existingWord = await SuggestedWordModel.findOne({ text });
+
+      if (existingWord) {
+        if (
+          !existingWord.contributors.includes(new ObjectId(req.user.userId))
+        ) {
+          existingWord.contributors.push(new Types.ObjectId(req.user.userId));
+          await existingWord.save();
+        }
+        return res.status(200).json({
+          message:
+            "Слово уже существует, автор добавлен в список контрибьюторов",
+          existingWord,
+        });
+      } else {
+        const newSuggestedWord = await new SuggestedWordModel({
+          text,
+          language,
+          author: new Types.ObjectId(req.user.userId),
+          contributors: [new Types.ObjectId(req.user.userId)],
+        }).save();
+
+        return res
+          .status(200)
+          .json({ message: "Слово успешно предложено", newSuggestedWord });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Ошибка при предложении слова" });
+    }
+  },
+
+  acceptSuggestedWord: async (req: AuthRequest, res: Response) => {
+    const { suggestedWordId } = req.body;
+    try {
+      if (!suggestedWordId) {
+        logger.error(`Ошибка при принятии предложенного слова, отсутствует ID`);
+        return res.status(400).json({
+          message: `Ошибка при принятии предложенного слова, отсутствует ID`,
+        });
+      }
+
+      const suggestedWord = await SuggestedWordModel.findById(suggestedWordId);
+      if (!suggestedWord) {
+        return res.status(404).json({
+          message: `Предложенное слово не найдено`,
+        });
+      }
+
+      const wordToUpdate = await WordModel.findOne({
+        text: suggestedWord.text,
+      });
+
+      if (wordToUpdate) {
+        // Обновление существующего документа
+        wordToUpdate.language = suggestedWord.language;
+        wordToUpdate.author = suggestedWord.author;
+        wordToUpdate.contributors = Array.from(
+          new Set([...wordToUpdate.contributors, ...suggestedWord.contributors])
+        );
+        wordToUpdate.translations = Array.from(
+          new Set([
+            ...wordToUpdate.translations,
+            ...suggestedWord.pre_translations,
+          ])
+        );
+        await wordToUpdate.save();
+      } else {
+        // Создание нового документа с сохранением старого ID
+        await new WordModel({
+          _id: suggestedWordId,
+          text: suggestedWord.text,
+          language: suggestedWord.language,
+          author: suggestedWord.author,
+          contributors: suggestedWord.contributors,
+          translations: suggestedWord.pre_translations, // предполагается, что переводы обрабатываются в другом месте
+        }).save();
+      }
+
+      await SuggestedWordModel.findByIdAndDelete(suggestedWordId);
+
+      return res
+        .status(200)
+        .json({ message: "Слово успешно принято и добавлено в словарь" });
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "Ошибка при принятии предложенного слова" });
+    }
+  },
+  // suggestWordTranslate: async (req: Request, res: Response) => {},
+  // suggestWordTranslate: async (req: Request, res: Response) => {},
+  // suggestWordTranslate: async (req: Request, res: Response) => {},
 };
 
 export default vocabularyController;
