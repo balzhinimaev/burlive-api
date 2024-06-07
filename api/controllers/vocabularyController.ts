@@ -11,14 +11,16 @@ import updateRating from "../utils/updateRating";
 import Vocabulary from "../models/Vocabulary";
 import WordModel from "../models/Vocabulary/WordModel";
 import SuggestedWordModel from "../models/Vocabulary/SuggestedWordModel";
+import { validateSuggestedWordRequest } from "../middleware/validateSuggestedWord";
 
 const vocabularyController = {
   getAllWords: async (req: Request, res: Response) => {
     try {
       // const wordsCount = await Vocabulary.find().countDocuments();
-      const words = await Vocabulary.find()
+      const words = await WordModel.find()
         .sort({ _id: 1 })
-        .populate("author", "_id firstname username email");
+        .populate("author", "_id firstname username email")
+        .populate("translations", "_id text");
 
       logger.info(`Все слова получены!`);
       res.status(200).json({ message: `Словарь найден`, words });
@@ -28,8 +30,34 @@ const vocabularyController = {
     }
   },
 
+  getWordsOnApproval: async (req: Request, res: Response) => {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+
+      const pageNumber = Number(page);
+      const limitNumber = Number(limit);
+      const skipIndex = (pageNumber - 1) * limitNumber;
+
+      const count = await SuggestedWordModel.find().countDocuments();
+      const words = await SuggestedWordModel.find()
+        .sort({ _id: 1 })
+        .skip(skipIndex)
+        .limit(limitNumber)
+        .populate("author", "_id firstname username email")
+        .populate("pre_translations", "_id text");
+
+      logger.info(`Все предложенные слова получены!`);
+      res
+        .status(200)
+        .json({ message: `Словарь найден`, words, total_count: count });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error retrieving words" });
+    }
+  },
+
   suggestWordTranslate: async (req: AuthRequest, res: Response) => {
-    const { word_id, translate_language, translate } = req.body;
+    const { word_id, translate_language, translate, dialect } = req.body;
     try {
       if (!word_id || !translate_language || !translate) {
         logger.error(
@@ -48,24 +76,40 @@ const vocabularyController = {
         });
       }
 
-      // Создание нового документа с переводом
-      const newSuggestedWord = await new SuggestedWordModel({
+      const is_exists_on_suggesteds = await SuggestedWordModel.findOne({
         text: translate,
-        language: translate_language,
-        author: new Types.ObjectId(req.user.userId),
-      }).save();
-
-      // Получение ID нового документа
-      const newSuggestedWordId = newSuggestedWord._id;
-
-      // Обновление поля translations в исходном слове
-      is_exists.translations.push(newSuggestedWordId);
-      await is_exists.save();
-
-      // Обновление поля pre_translations в новом документе с переводом
-      await SuggestedWordModel.findByIdAndUpdate(newSuggestedWordId, {
-        $push: { pre_translations: is_exists._id },
       });
+
+      if (is_exists_on_suggesteds) {
+        await WordModel.findByIdAndUpdate(word_id, {
+          $addToSet: { translations: is_exists_on_suggesteds._id },
+        });
+        await SuggestedWordModel.findByIdAndUpdate(
+          is_exists_on_suggesteds._id,
+          {
+            $addToSet: { pre_translations: is_exists._id },
+          }
+        );
+      } else {
+        // Создание нового документа с переводом
+        const newSuggestedWord = await new SuggestedWordModel({
+          text: translate,
+          language: translate_language,
+          author: new Types.ObjectId(req.user.userId),
+          dialect,
+        }).save();
+        // Получение ID нового документа
+        const newSuggestedWordId = newSuggestedWord._id;
+        // Обновление поля translations в исходном слове
+        await WordModel.findByIdAndUpdate(word_id, {
+          $addToSet: { translations: newSuggestedWordId },
+        });
+        // Обновление поля pre_translations в новом документе с переводом
+        await SuggestedWordModel.findByIdAndUpdate(newSuggestedWordId, {
+          $addToSet: { pre_translations: is_exists._id },
+        });
+      }
+      await is_exists.save();
 
       return res
         .status(200)
@@ -76,67 +120,69 @@ const vocabularyController = {
     }
   },
 
-  suggestWord: async (req: AuthRequest, res: Response) => {
+  suggestWords: async (req: AuthRequest, res: Response) => {
     const { text, language } = req.body;
+
+    console.log(text)
+    console.log(language)
+
     try {
       if (!text || !language) {
         logger.error(
-          `Ошибка при предложении слова, отсутствует один из параметров`
+          "Ошибка при предложении слов, отсутствует один из параметров"
         );
         return res.status(400).json({
-          message: `Ошибка при предложении слова, отсутствует один из параметров`,
-        });
-      }
-
-      const existingWord = await SuggestedWordModel.findOne({ text });
-
-      if (existingWord) {
-        if (
-          !existingWord.contributors.includes(new ObjectId(req.user.userId))
-        ) {
-          existingWord.contributors.push(new Types.ObjectId(req.user.userId));
-          await existingWord.save();
-        }
-        return res.status(200).json({
           message:
-            "Слово уже существует, автор добавлен в список контрибьюторов",
-          existingWord,
+            "Ошибка при предложении слов, отсутствует один из параметров",
         });
-      } else {
-        const newSuggestedWord = await new SuggestedWordModel({
-          text,
-          language,
-          author: new Types.ObjectId(req.user.userId),
-          contributors: [new Types.ObjectId(req.user.userId)],
-        }).save();
-
-        return res
-          .status(200)
-          .json({ message: "Слово успешно предложено", newSuggestedWord });
       }
+
+      const wordsArray = text.split(",").map((word) => word.trim());
+      const userId = new Types.ObjectId(req.user.userId);
+      const results = [];
+
+      for (const word of wordsArray) {
+        let existingWord = await SuggestedWordModel.findOne({ text: word });
+
+        if (existingWord) {
+          if (!existingWord.contributors.includes(userId)) {
+            existingWord.contributors.push(userId);
+            await existingWord.save();
+          }
+          results.push({
+            message:
+              "Слово уже существует, автор добавлен в список контрибьюторов",
+            existingWord,
+          });
+        } else {
+          const newSuggestedWord = await new SuggestedWordModel({
+            text: word,
+            language,
+            author: userId,
+            contributors: [],
+          }).save();
+
+          results.push({
+            message: "Слово успешно предложено",
+            newSuggestedWord,
+          });
+        }
+      }
+
+      return res.status(200).json(results);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Ошибка при предложении слова" });
+      res.status(500).json({ message: "Ошибка при предложении слов" });
     }
   },
 
-  acceptSuggestedWord: async (req: AuthRequest, res: Response) => {
-    const { suggestedWordId } = req.body;
+  acceptSuggestedWord: async (
+    req: validateSuggestedWordRequest,
+    res: Response
+  ) => {
+    const suggestedWord = req.suggestedWord;
+
     try {
-      if (!suggestedWordId) {
-        logger.error(`Ошибка при принятии предложенного слова, отсутствует ID`);
-        return res.status(400).json({
-          message: `Ошибка при принятии предложенного слова, отсутствует ID`,
-        });
-      }
-
-      const suggestedWord = await SuggestedWordModel.findById(suggestedWordId);
-      if (!suggestedWord) {
-        return res.status(404).json({
-          message: `Предложенное слово не найдено`,
-        });
-      }
-
       const wordToUpdate = await WordModel.findOne({
         text: suggestedWord.text,
       });
@@ -158,16 +204,16 @@ const vocabularyController = {
       } else {
         // Создание нового документа с сохранением старого ID
         await new WordModel({
-          _id: suggestedWordId,
+          _id: suggestedWord._id,
           text: suggestedWord.text,
           language: suggestedWord.language,
           author: suggestedWord.author,
           contributors: suggestedWord.contributors,
-          translations: suggestedWord.pre_translations, // предполагается, что переводы обрабатываются в другом месте
+          translations: suggestedWord.pre_translations,
         }).save();
       }
 
-      await SuggestedWordModel.findByIdAndDelete(suggestedWordId);
+      await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
 
       return res
         .status(200)
@@ -177,6 +223,24 @@ const vocabularyController = {
       res
         .status(500)
         .json({ message: "Ошибка при принятии предложенного слова" });
+    }
+  },
+
+  declineSuggestedWord: async (
+    req: validateSuggestedWordRequest,
+    res: Response
+  ) => {
+    const suggestedWord = req.suggestedWord;
+
+    try {
+      await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
+
+      return res.status(200).json({ message: "Слово успешно отклонено" });
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "Ошибка при отклонении предложенного слова" });
     }
   },
   // suggestWordTranslate: async (req: Request, res: Response) => {},

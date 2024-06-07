@@ -14,7 +14,10 @@ export interface IWordModel extends Document {
 const WordSchema = new Schema({
   text: { type: String, required: true, unique: true },
   language: { type: String },
-  translations: { type: [{ type: Schema.Types.ObjectId, ref: "Translation" }], default: [] },
+  translations: {
+    type: [{ type: Schema.Types.ObjectId, ref: "suggested_word" }],
+    default: [],
+  },
   author: { type: Schema.Types.ObjectId, ref: "User", required: true },
   contributors: [{ type: Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: Date.now },

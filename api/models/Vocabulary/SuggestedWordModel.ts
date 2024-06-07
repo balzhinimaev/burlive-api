@@ -7,6 +7,7 @@ export interface ISuggestedWordModel extends Document {
   author: Types.ObjectId;
   contributors: Types.ObjectId[];
   status: "new" | "processing" | "accepted" | "rejected"; // Added field for status
+  dialect: string;
   createdAt: Date;
   pre_translations: Types.ObjectId[];
   // Additional fields, if needed
@@ -22,6 +23,7 @@ const SuggestedWordSchema = new Schema({
     enum: ["new", "processing", "accepted", "rejected"],
     default: "new",
   },
+  dialect: { type: String },
   pre_translations: [{ type: Schema.Types.ObjectId, ref: 'Word' }],
   createdAt: { type: Date, default: Date.now },
   // Additional fields, if needed
