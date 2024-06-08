@@ -1,14 +1,15 @@
-// middleware/validateSuggestedWord.ts
 import { Request, Response, NextFunction } from "express";
-import SuggestedWordModel, { ISuggestedWordModel } from "../models/Vocabulary/SuggestedWordModel";
+import SuggestedWordModel, {
+  ISuggestedWordModel,
+} from "../models/Vocabulary/SuggestedWordModel";
 import logger from "../utils/logger";
 
-export interface validateSuggestedWordRequest extends Request {
-  suggestedWord: ISuggestedWordModel;
+export interface ValidateSuggestedWordRequest extends Request {
+  suggestedWord?: ISuggestedWordModel;
 }
 
 const validateSuggestedWord = async (
-  req: validateSuggestedWordRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -26,7 +27,7 @@ const validateSuggestedWord = async (
       return res.status(404).json({ message: "Предложенное слово не найдено" });
     }
     // Attach the found suggested word to the request object for use in the route handler
-    req.suggestedWord = suggestedWord;
+    (req as ValidateSuggestedWordRequest).suggestedWord = suggestedWord;
     next();
   } catch (error) {
     logger.error("Ошибка при проверке предложенного слова:", error);

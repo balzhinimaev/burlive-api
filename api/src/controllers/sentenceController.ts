@@ -23,16 +23,17 @@ const sentenceController = {
       const skipIndex = (pageNumber - 1) * limitNumber;
 
       if (notAccepted === "true") {
-        count = await SuggestedSentence.find({ status: "pending" }).countDocuments()
+        count = await SuggestedSentence.find({
+          status: "pending",
+        }).countDocuments();
         sentences = await SuggestedSentence.find({ status: "pending" })
-        .sort({ _id: 1 })
-        .skip(skipIndex)
-        .limit(limitNumber)
-        .populate("author", "_id firstName username email");
-        
+          .sort({ _id: 1 })
+          .skip(skipIndex)
+          .limit(limitNumber)
+          .populate("author", "_id firstName username email");
       } else {
-          count = await Sentence.find().countDocuments()
-          sentences = await Sentence.find()
+        count = await Sentence.find().countDocuments();
+        sentences = await Sentence.find()
           .sort({ _id: 1 })
           .skip(skipIndex)
           .limit(limitNumber)
@@ -116,7 +117,7 @@ const sentenceController = {
   getSentence: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      console.log(req.params)
+      console.log(req.params);
       if (!isValidObjectId(id)) {
         // return res.status(400).json({ message: 'Неверные входные данные' });
 
@@ -145,6 +146,11 @@ const sentenceController = {
   createSentence: async (req: AuthRequest, res: Response) => {
     try {
       const { text, language } = req.body;
+
+      if (!req.user) {
+        return res.json({ message: "Вы не авторизованы!" });
+      }
+
       const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
 
       if (!text || !language || !author) {
@@ -221,6 +227,11 @@ const sentenceController = {
   createSentenceMultiple: async (req: AuthRequest, res: Response) => {
     try {
       const { sentences, language, context } = req.body;
+
+      if (!req.user) {
+        return res.json({ message: "Вы не авторизованы!" });
+      }
+
       const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
 
       if (!sentences || !Array.isArray(sentences) || sentences.length === 0) {
@@ -417,8 +428,8 @@ const sentenceController = {
 
       // Создаем массив для хранения всех _id
       const ids = sentences
-        .map((sentence) => sentence._id)
-        .filter((id) => isValidObjectId(id));
+        .map((sentence: any) => sentence._id)
+        .filter((id: any) => isValidObjectId(id));
 
       if (ids.length !== sentences.length) {
         return res.status(400).json({ message: "Некоторые _id невалидны!" });

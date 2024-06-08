@@ -1,13 +1,11 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { createServer } from 'node:http';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
-import http from 'http'; // Импортируем модуль http
 import { Server } from "socket.io";
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config(); // Загружаем переменные окружения из файла .env
-import * as fs from 'fs';
 const PORT = process.env.port || 3000
 
 import userRouter from './routes/userRouter';
@@ -43,7 +41,7 @@ io.on('connection', (socket) => {
 });
 
 // Подключение к базе данных
-mongoose.connect(process.env.DB_CONNECTION_STRING)
+mongoose.connect(<string>process.env.DB_CONNECTION_STRING)
   .then(() => {
     console.log('Подключено к базе данных');
   })

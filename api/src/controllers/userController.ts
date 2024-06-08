@@ -85,7 +85,7 @@ const userController = {
 
         } catch (error) {
             console.error(error);
-            logger.error(`Ошибка при регистрации пользователя: ${error.message}`);
+            logger.error(`Ошибка при регистрации пользователя`);
             res.status(500).json({ message: 'Ошибка при регистрации пользователя' });
         }
     },
@@ -106,7 +106,7 @@ const userController = {
             // Проверка наличия пользователя и сравнение пароля
             if (user && (await bcrypt.compare(password, user.password))) {
                 // Создание JWT токена
-                const token = jwt.sign({ userId: user._id.toString() }, process.env.jwt_secret, { expiresIn: '3d' });
+                const token = jwt.sign({ userId: user._id.toString() }, <string>process.env.jwt_secret, { expiresIn: '3d' });
 
                 // Сохранение токена в MongoDB
                 const expiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000 * 24 * 3); // 3 дня
@@ -121,7 +121,7 @@ const userController = {
             res.status(401).json({ message: 'Неверное имя пользователя или пароль' });
         } catch (error) {
             console.error(error);
-            logger.error(`Ошибка при входе пользователя: ${error.message}`);
+            logger.error(`Ошибка при входе пользователя`);
             res.status(500).json({ message: 'Ошибка при входе пользователя' });
         }
     },
@@ -159,7 +159,7 @@ const userController = {
 
         } catch (error) {
             
-            logger.error(`Ошибка при получении пользователя: ${error.message}`);
+            logger.error(`Ошибка при получении пользователя`);
             res.status(500).json({ message: 'Ошибка при получении пользователя' });
 
         }
@@ -173,7 +173,7 @@ const userController = {
 
             return res.status(200).json({ message: 'Публичные данные всех пользователей получены!', users: publicProfiles });
         } catch (error) {
-            logger.error(`Ошибка при получении пользователей: ${error.message}`);
+            logger.error(`Ошибка при получении пользователей`);
             res.status(500).json({ message: 'Ошибка при получении пользователей' });
         }
     },
@@ -198,13 +198,17 @@ const userController = {
 
             return res.status(200).json({ message: 'Публичные данные получены!', publicProfile });
         } catch (error) {
-            logger.error(`Ошибка при получении пользователя: ${error.message}`);
+            logger.error(`Ошибка при получении пользователя`);
             res.status(500).json({ message: 'Ошибка при получении пользователя' });
         }
     },
 
     setProfilePhoto: async (req: AuthRequest, res: Response) => {
         try {
+
+            if (!req.user || !req.user.userId) {
+                return false
+            }
 
             if (!isValidObjectId(req.user.userId)) {
                 // Проверяем, является ли id ObjectId
@@ -242,6 +246,10 @@ const userController = {
 
             const { firstName, lastName } = req.body
 
+            if (!req.user || !req.user.userId) {
+                return false
+            }
+
             if (!isValidObjectId(req.user.userId)) {
                 // Проверяем, является ли id ObjectId
 
@@ -277,6 +285,10 @@ const userController = {
     getMe: async (req: AuthRequest, res: Response) => {
         try {
             
+            if (!req.user || !req.user.userId) {
+                return false
+            }
+
             if (!isValidObjectId(req.user.userId)) {
                 // Проверяем, является ли id ObjectId
 
@@ -347,7 +359,7 @@ async function usernameChecker (username: string, index: number) {
     }
 }
 
-async function generateUniqueUsername(email, suffix = 0) {
+async function generateUniqueUsername(email: string, suffix = 0) {
     let username = email.split('@', 1)[0];
     if (suffix > 0) {
         username += suffix;
