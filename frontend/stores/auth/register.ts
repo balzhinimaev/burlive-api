@@ -1,6 +1,7 @@
 // store/auth.ts
 
 import { defineStore } from 'pinia';
+import { useAuthStore } from './login';
 
 interface UserPayloadInterface {
     email: string;
@@ -63,6 +64,12 @@ export const userRegisterStore = defineStore('user-register', {
 
                 this.status = 'success'
                 this.result = data.value.message
+                
+                useAuthStore().password = this.password
+                useAuthStore().username = this.email
+
+                await useAuthStore().authenticateUser()
+                // useRouter().push("/dashboard")
 
             }
             

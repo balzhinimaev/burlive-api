@@ -37,6 +37,9 @@
             <NuxtLink @click="closeNavbar()" to="/users">Пользователи</NuxtLink>
           </li>
           <li>
+            <NuxtLink @click="closeNavbar()" to="/vocabulary">Словарь</NuxtLink>
+          </li>
+          <li>
             <NuxtLink @click="closeNavbar()" to="/users">Самоучитель</NuxtLink>
           </li>
           <li>

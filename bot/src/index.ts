@@ -15,13 +15,14 @@ import settings from './bot/views/settings.scene';
 import dashboard from './bot/views/dashboard.scene';
 import vocabular from './bot/views/vocabular.scene';
 import moderation from './bot/views/moderation.scene';
+import study from './bot/views/study.scene';
 import chat from './bot/views/chat.scene';
 import { Translation, voteModel } from './models/ISentence';
 import { IUser, User } from './models/IUser';
 import { ExtraEditMessageText } from 'telegraf/typings/telegram-types';
 import { InlineQueryResult } from 'telegraf/typings/core/types/typegram';
 import { greeting } from './bot/views/home.scene';
-const stage: any = new Scenes.Stage<rlhubContext>([home, chat, vocabular, sentences, dashboard, moderation, settings], { default: 'home' });
+const stage: any = new Scenes.Stage<rlhubContext>([home, study, chat, vocabular, sentences, dashboard, moderation, settings], { default: 'home' });
 
 console.log('hi')
 

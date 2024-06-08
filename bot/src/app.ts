@@ -1,19 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { IUser, User } from './models/IUser';
-import { IPayment, Payment } from './models/IPayment';
-import { ObjectId } from 'mongodb';
 import { bot } from './index';
 import cors from 'cors';
 const morgan = require("morgan")
 const PORT = process.env.PORT;
-import https from 'https'; 
-import fs from 'fs';
-import axios from 'axios';
 import dotenv from 'dotenv';
-import { idText } from 'typescript';
-import rlhubContext from './bot/models/rlhubContext';
-import { greeting } from './bot/views/home.scene';
 
 dotenv.config()
 
@@ -30,19 +21,6 @@ app.use((req, res, next) => {
     next();
 });
 
-const privateKey = fs.readFileSync('./ssl/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('./ssl/fullchain.pem', 'utf8');
-const credentials = {
-    key: privateKey,
-    cert: certificate,
-};
-// Настройка CORS
-const corsOptions = {
-    origin: '*', // Замените на адрес вашего клиентского приложения
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-};
 app.post(`/telegraf/burlang`, (req, res) => {
     bot.handleUpdate(req.body, res);
 });

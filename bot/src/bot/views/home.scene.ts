@@ -172,8 +172,9 @@ home.action("translater", async (ctx) => {
 })
 
 home.action("study", async (ctx) => {
-    console.log('study')
-    return ctx.answerCbQuery('Программа обучения на стадии разработки 🎯')
+    // console.log('study')
+    ctx.scene.enter("study")
+    // return ctx.answerCbQuery('Программа обучения на стадии разработки 🎯')
 })
 
 home.action("moderation", async (ctx) => {
