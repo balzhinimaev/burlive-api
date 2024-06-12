@@ -12,11 +12,11 @@ export default async function greeting(ctx: rlhubContext) {
                     [
                         {
                             text: 'Русский',
-                            callback_data: 'russian'
+                            callback_data: 'selectlanguage russian'
                         },
                         {
                             text: 'Бурятский',
-                            callback_data: 'buryat'
+                            callback_data: 'selectlanguage buryat'
                         }
                     ],
                     [

@@ -8,5 +8,7 @@ const scene = new Scenes.WizardScene("study", handler,
 );
 
 scene.enter(async (ctx: rlhubContext) => await greeting(ctx));
+scene.action("history", async (ctx: rlhubContext) => await ctx.answerCbQuery("На стадии разработки"));
+scene.action("back", async (ctx: rlhubContext) => ctx.scene.enter("home"));
 
 export default scene

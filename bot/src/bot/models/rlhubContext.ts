@@ -21,7 +21,7 @@ interface rlhubWizardSession extends Scenes.WizardSessionData {
 
 interface rlhubSession extends Scenes.WizardSession<rlhubWizardSession> {
     sentences: string[];
-    language: 'buryat-word' | 'russian-word';
+    language: 'buryat' | 'russian';
 }
 
 interface rlhubContext extends Context {
