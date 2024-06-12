@@ -25,6 +25,7 @@ const authenticateToken = async (
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       userId: string;
+      sessionId: string;
     };
 
     const existingToken = await JwtTokenModel.findOne({
@@ -33,15 +34,18 @@ const authenticateToken = async (
     });
 
     if (!existingToken) {
+      logger.warn(`Токен не найден в базе данных: ${token}`);
       return res.status(401).json({ message: "Неверный токен аутентификации" });
     }
 
     req.user = { userId: decoded.userId };
-    
-    logger.info(`Токен верифицирован для ${existingToken.userId}`);
+    logger.info(
+      `Токен верифицирован для пользователя: ${existingToken.userId}`
+    );
     next();
   } catch (error) {
     console.error(error);
+    logger.error(`Ошибка при проверке токена: ${error.message}`);
     return res.status(401).json({ message: "Неверный токен аутентификации" });
   }
 };

@@ -16,6 +16,7 @@ import dialectRouter from './routes/dialectRouter';
 import financeRouter from './routes/financeRouter';
 import dialogsRouter from './routes/dialogsRouter';
 import vocabularyRouter from './routes/vocabularyRouter';
+import telegramRouter from './routes/telegramRouter';
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/backendapi/sentences', authenticateToken, sentencesRouter);
 app.use('/backendapi/vocabulary', authenticateToken, vocabularyRouter);
 app.use('/backendapi/translations', authenticateToken, translationsRouter);
 app.use('/backendapi/dialogs', authenticateToken, dialogsRouter);
+app.use('/backendapi/telegram', authenticateToken, telegramRouter);
 app.use('/backendapi/finance', financeRouter);
 
 server.listen(PORT, () => {
@@ -41,7 +43,9 @@ io.on('connection', (socket) => {
 });
 
 // Подключение к базе данных
-mongoose.connect(<string>process.env.DB_CONNECTION_STRING)
+mongoose.connect(<string>process.env.DB_CONNECTION_STRING, {
+  dbName: 'burlang'
+})
   .then(() => {
     console.log('Подключено к базе данных');
   })

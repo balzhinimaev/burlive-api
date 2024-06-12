@@ -202,7 +202,6 @@ async function translate_word(ctx: rlhubContext) {
     if (ctx.updateType === "message") {
       if (ctx.message) {
         if (ctx.message.text) {
-            
           let word: string = ctx.message.text;
           let language: string = ctx.session.language;
 
@@ -215,35 +214,19 @@ async function translate_word(ctx: rlhubContext) {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${data.token}`,
               },
-              body: JSON.stringify({ word, language, user_id: ctx.from.id })
+              body: JSON.stringify({ word, language, user_id: ctx.from.id }),
             }
           );
 
-          console.log(await query.json())
-
-          let response = await axios
-            .get(`https://burlang.ru/api/v1/${language}/translate?q=${word}`)
-            .then(function (response) {
-              return response.data;
-            })
-            .catch(function (error) {
-              return error;
-            });
-
-          let message: string = "";
-
-          if (response.translations) {
-            message = response.translations[0].value;
-          } else {
-            if (language === "russian-word") {
-              message = "Перевод отсутствует";
-            } else {
-              message = "Оршуулга угы байна..";
-            }
+          const query_reponse = await query.json();
+          if (!query.ok) {
+            ctx.reply("Ошибка сервера");
+            return ctx.scene.enter("home");
           }
 
-          await ctx.reply(message, {
-            parse_mode: "HTML",
+          let message: string = ``;
+          const extra: ExtraEditMessageText = {
+            parse_mode: 'HTML',
             reply_markup: {
               inline_keyboard: [
                 [
@@ -254,7 +237,36 @@ async function translate_word(ctx: rlhubContext) {
                 ],
               ],
             },
-          });
+          };
+
+          if (
+            query_reponse.translations.length == 0 &&
+            !query_reponse.burlang_api
+          ) {
+            message = `В <b>${
+              language === "russian" ? "Русско-бурятском" : "Бурятско-русском"
+            }</b> словаре нет такого слова`;
+
+            return await ctx.reply(message, extra)
+          }
+
+          if (query_reponse.translations.length > 0) {
+            message += `Burlive:\n`;
+            for (let i = 0; i < query_reponse.translations.length; i++) {
+              let translate = query_reponse.translations[i];
+              message += `Язык: ${translate.language}; Перевод: ${translate.text}`;
+            }
+          }
+          console.log(query_reponse.burlang_api);
+          if (query_reponse.burlang_api) {
+            message += `Burlang\n`;
+            for (let i = 0; i < query_reponse.burlang_api.translations.length; i++) {
+              let translate = query_reponse.burlang_api.translations[i];
+              message += `${translate.value}`
+            }
+          }
+
+          await ctx.reply(message, extra);
         } else {
           await ctx.reply("Нужно отправить в текстовом виде");
         }
