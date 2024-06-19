@@ -23,6 +23,16 @@ const telegramController = {
       logger.error("error");
     }
   },
+  paymentCb: async (req: Request, res: Response) => {
+    try {
+
+      console.log(req.body);
+
+      return res.status(200);
+    } catch {
+      logger.error("error");
+    }
+  },
   new_word_translate_request: async (req: Request, res: Response) => {
     try {
       const { word, language, user_id } = req.body;

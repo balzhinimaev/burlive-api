@@ -5,6 +5,7 @@ const telegramRouter = express.Router();
 
 // Маршрут для создания диалога
 telegramRouter.post("/", telegramController.create);
+telegramRouter.post("/payment-callback", telegramController.paymentCb);
 
 // Маршрут для проверки существования пользователя
 telegramRouter.get("/user/is-exists/:id", telegramController.user_is_exists);
