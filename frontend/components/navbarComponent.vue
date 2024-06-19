@@ -34,6 +34,9 @@
             <NuxtLink @click="closeNavbar()" to="/">Главная</NuxtLink>
           </li>
           <li>
+            <NuxtLink @click="closeNavbar()" to="/roadmap">Дорожная карта</NuxtLink>
+          </li>
+          <li>
             <NuxtLink @click="closeNavbar()" to="/users">Пользователи</NuxtLink>
           </li>
           <li>

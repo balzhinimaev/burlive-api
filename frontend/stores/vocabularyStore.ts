@@ -7,7 +7,7 @@ import type {
   ISuggestedWordModel,
   IWordModel,
 } from "~/types/IVocabulary";
-const apiUrl = `http://localhost:5555/backendapi`;
+const apiUrl = `http://localhost:5000/backendapi`;
 export const useVocabularyStore = defineStore("vocabulary-store", {
   state: () => ({
     acceptedWords: [] as IWordModel[],
