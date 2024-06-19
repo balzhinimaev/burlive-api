@@ -3,7 +3,12 @@ import rlhubContext from "../models/rlhubContext";
 const shopId = process.env.shopId;
 const secretKey = process.env.yookassa_secret_key;
 
-const createPayment = async (ctx: rlhubContext,amount: string, description: string, returnUrl: string) => {
+const createPayment = async (
+  ctx: rlhubContext,
+  amount: string,
+  description: string,
+  returnUrl: string
+) => {
   const idempotenceKey = new Date().getTime().toString();
   const response = await fetch("https://api.yookassa.ru/v3/payments", {
     method: "POST",
@@ -28,7 +33,7 @@ const createPayment = async (ctx: rlhubContext,amount: string, description: stri
         customer: {
           telegram_user_id: ctx.from.id,
           firstName: ctx.from.first_name,
-          phone: ctx.from.id
+          phone: ctx.from.id,
         },
         items: [
           {
@@ -46,11 +51,11 @@ const createPayment = async (ctx: rlhubContext,amount: string, description: stri
   });
 
   if (!response.ok) {
-    console.log(await response.json())
+    console.log(await response.json());
     throw new Error(`Error: ${response.statusText}`);
   }
 
   return response.json();
 };
 
-export default createPayment
+export default createPayment;

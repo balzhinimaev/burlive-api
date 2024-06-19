@@ -17,6 +17,7 @@ import financeRouter from './routes/financeRouter';
 import dialogsRouter from './routes/dialogsRouter';
 import vocabularyRouter from './routes/vocabularyRouter';
 import telegramRouter from './routes/telegramRouter';
+import payRouter from './routes/payRouter';
 
 
 const app = express();
@@ -33,6 +34,10 @@ app.use('/backendapi/translations', authenticateToken, translationsRouter);
 app.use('/backendapi/dialogs', authenticateToken, dialogsRouter);
 app.use('/backendapi/telegram', authenticateToken, telegramRouter);
 app.use('/backendapi/finance', financeRouter);
+app.use('/backendapi/pay-cb', (req, res) => {
+  console.log(req.body)
+  console.log(req.params)
+});
 
 server.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);

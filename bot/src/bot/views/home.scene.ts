@@ -183,7 +183,7 @@ async function sendInvoice(ctx: rlhubContext) {
 }
 
 home.action("rub 199", async (ctx) => {
-  const returnUrl = `https://burlive.ru/backendapi/telegram/success-payment/${ctx.from.id}`;
+  const returnUrl = `https://t.me/burlive_bot`;
   const description = `Подписка на сервис по изучению и развитию бурятского языка`;
   const amount = `199.00`;
   try {
@@ -201,7 +201,7 @@ home.action("rub 199", async (ctx) => {
   }
 });
 home.action("rub 837", async (ctx) => {
-  const returnUrl = `https://burlive.ru/backendapi/telegram/success-payment/${ctx.from.id}`;
+  const returnUrl = `https://t.me/burlive_bot`;
   const description = `Подписка на сервис по изучению и развитию бурятского языка`;
   const amount = `837.00`;
   try {
@@ -219,7 +219,7 @@ home.action("rub 837", async (ctx) => {
   }
 });
 home.action("rub 1436", async (ctx) => {
-  const returnUrl = `https://burlive.ru/backendapi/telegram/success-payment/${ctx.from.id}`;
+  const returnUrl = `https://t.me/burlive_bot`;
   const description = `Подписка на сервис по изучению и развитию бурятского языка \nСрок подписки: 12 месяцев`;
   const amount = `1436.00`;
   try {
