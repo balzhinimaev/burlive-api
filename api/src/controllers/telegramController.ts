@@ -5,6 +5,7 @@ import { DialogModel } from "../models/Dialog";
 import TelegramUserModel from "../models/TelegramUsers";
 import WordModel from "../models/Vocabulary/WordModel";
 import SearchedWordModel from "../models/Vocabulary/SearchedWordModel";
+import TelegramUserState from "../models/Telegram/UserState";
 
 const telegramController = {
   create: async (req: Request, res: Response) => {
@@ -25,7 +26,9 @@ const telegramController = {
   new_word_translate_request: async (req: Request, res: Response) => {
     try {
       const { word, language, user_id } = req.body;
-
+      console.log(word);
+      console.log(language);
+      console.log(user_id);
       const user = await TelegramUserModel.findOne({ id: user_id });
 
       let selectedLanguage = language === "russian" ? "русский" : "бурятский";
@@ -60,7 +63,10 @@ const telegramController = {
       const words_on_my_database = await WordModel.find({
         text: word,
         language: selectedLanguage,
-      }).populate("translations", "_id text language author contributors");
+      }).populate(
+        "translations",
+        "_id text language author contributors dialect"
+      );
 
       // Если переводы найдены, добавить их в массив translations
       if (words_on_my_database.length > 0) {
@@ -94,17 +100,25 @@ const telegramController = {
   user_is_exists: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const user = await TelegramUserModel.findOne({ id });
+      const user = await TelegramUserModel.findOne({ id }).select(
+        "email createdAt first_name rating"
+      );
 
       if (!user) {
         return res
           .status(200)
-          .json({ is_exists: false, message: "Пользователь не сущесвует" });
+          .json({ is_exists: false, message: "Пользователь не существует" });
       }
 
-      return res
-        .status(200)
-        .json({ is_exists: true, message: "Пользователь существует" });
+      return res.status(200).json({
+        is_exists: true,
+        message: "Пользователь существует",
+        user: {
+          createdAt: user.createdAt,
+          first_name: user.first_name,
+          rating: user.rating,
+        },
+      });
     } catch (error) {
       logger.error("Error in user_is_exists:", error);
       return res.status(500).json({ error: "Internal server error" });
@@ -155,6 +169,36 @@ const telegramController = {
       return res.status(200);
     } catch (error) {
       logger.error("error");
+    }
+  },
+
+  save_user_state: async (req: Request, res: Response) => {
+    try {
+      console.log("сохранение стейта");
+      const { userId, scene, stateData } = req.body;
+      await TelegramUserState.findOneAndUpdate(
+        { userId },
+        { scene, stateData },
+        { upsert: true }
+      );
+      return res.status(200).json({ message: "State saved successfully" });
+    } catch (error) {
+      logger.error(`Error saving user state: ${error}`);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  get_user_state: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      console.log(id);
+      const userState = await TelegramUserState.findOne({ userId: id });
+      if (!userState) {
+        return res.status(404).json({ message: "User state not found" });
+      }
+      return res.status(200).json(userState);
+    } catch (error) {
+      logger.error(`Error fetching user state: ${error}`);
+      return res.status(500).json({ error: "Internal server error" });
     }
   },
 };

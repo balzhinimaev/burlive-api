@@ -22,12 +22,12 @@ export default async function greeting(ctx: rlhubContext) {
               callback_data: "messages",
             },
           ],
-          [
-            {
-              text: "💸 Поддержка проекта",
-              callback_data: "help",
-            },
-          ],
+          // [
+          //   {
+          //     text: "💸 Поддержка проекта",
+          //     callback_data: "help",
+          //   },
+          // ],
           [
             {
               text: "Персональные данные",
@@ -63,6 +63,12 @@ export default async function greeting(ctx: rlhubContext) {
     const message = `<b>Личный кабинет</b> \n\n`;
 
     ctx.updateType === "message" ? await ctx.reply(message, extra) : false;
+    if (ctx.update.callback_query.message.text === "Личный кабинет" && ctx.updateType === 'callback_query') {
+      ctx.answerCbQuery()
+      // return next()
+      return false;
+    }
+
     ctx.updateType === "callback_query"
       ? await ctx.editMessageText(message, extra)
       : false;

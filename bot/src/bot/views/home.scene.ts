@@ -5,125 +5,14 @@ import { IUser, User } from "../../models/IUser";
 import rlhubContext from "../models/rlhubContext";
 import { home_greeting, render_home_section } from "./homeView/greeting";
 import { bot } from "../..";
+import createPayment from "../utlis/yookassa";
+import { saveSceneMiddleware } from "../utlis/saveSceneMiddleware";
 const handler = new Composer<rlhubContext>();
-const home = new Scenes.WizardScene("home", handler);
-
-export async function greeting(ctx: rlhubContext, reply?: boolean) {
-  let user: IUser | null = await User.findOne({ id: ctx.from?.id });
-
-  if (user) {
-    if (user.interface_language) {
-      ctx.scene.session.interface_ln = user.interface_language;
-    } else {
-      ctx.scene.session.interface_ln = "russian";
-    }
-  }
-
-  let keyboard_translates: any = {
-    learns: {
-      russian: "Самоучитель",
-      english: "Learns",
-      buryat: "Заабари",
-    },
-    dictionary: {
-      russian: "Словарь",
-      english: "Dictionary",
-      buryat: "Толи",
-    },
-    sentences: {
-      russian: "Предложения",
-      english: "Sentences",
-      buryat: "Мэдуулэлнуд",
-    },
-    translator: {
-      russian: "Переводчик",
-      english: "Translator",
-      buryat: "Оршуулгари",
-    },
-    moderation: {
-      russian: "Модерация",
-      english: "Moderation",
-      buryat: "Зохисуулал",
-    },
-    dashboard: {
-      russian: "Личный кабинет",
-      english: "Dashboard",
-      buryat: "Оорын таhaг",
-    },
-  };
-
-  const extra: ExtraEditMessageText = {
-    parse_mode: "HTML",
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: keyboard_translates.learns[ctx.scene.session.interface_ln],
-            callback_data: "study",
-          },
-          {
-            text: keyboard_translates.dictionary[
-              ctx.scene.session.interface_ln
-            ],
-            callback_data: "vocabular",
-          },
-        ],
-        [
-          {
-            text: keyboard_translates.sentences[ctx.scene.session.interface_ln],
-            callback_data: "sentences",
-          },
-        ],
-        [
-          {
-            text: keyboard_translates.translator[
-              ctx.scene.session.interface_ln
-            ],
-            callback_data: "translater",
-          },
-        ],
-        [
-          {
-            text: keyboard_translates.moderation[
-              ctx.scene.session.interface_ln
-            ],
-            callback_data: "moderation",
-          },
-        ],
-        [{ text: "🔓 Chat GPT", callback_data: "chatgpt" }],
-        // [{ text: "📈 Общая статистика", callback_data: "table" }],
-        [
-          {
-            text: keyboard_translates.dashboard[ctx.scene.session.interface_ln],
-            callback_data: "dashboard",
-          },
-        ],
-      ],
-    },
-  };
-
-  let message: any = {
-    russian: `Самоучитель бурятского языка \n\nКаждое взаимодействие с ботом, \nвлияет на сохранение и дальнейшее развитие <b>Бурятского языка</b> \n\nВыберите раздел, чтобы приступить`,
-    buryat: `Буряд хэлэнэ заабари \n\nКаждое взаимодействие с ботом, \nвлияет на сохранение и дальнейшее развитие <b>Бурятского языка</b> \n\nЭхилхиин, нэгэ юумэ дарагты`,
-    english: `Buryat Language Tutorial \n\nEvery interaction with the bot affects the preservation and further development of the Buryat language \n\nChoose a section to start`,
-  };
-
-  try {
-    if (reply) {
-      return ctx.reply(message[ctx.scene.session.interface_ln], extra);
-    }
-
-    // ctx.updateType === 'message' ? await ctx.reply(message, extra) : false
-    ctx.updateType === "callback_query"
-      ? await ctx.editMessageText(
-          message[ctx.scene.session.interface_ln],
-          extra
-        )
-      : ctx.reply(message[ctx.scene.session.interface_ln], extra);
-  } catch (err) {
-    console.log(err);
-  }
-}
+const home = new Scenes.WizardScene(
+  "home",
+  handler,
+  async (ctx: rlhubContext, next) => subscribe_section_handler(ctx, next)
+);
 
 export async function loginBurlive() {
   try {
@@ -140,7 +29,6 @@ export async function loginBurlive() {
     });
 
     const text = await response.text(); // Сначала получаем текст ответа
-    console.log("Response Text:", text);
 
     const data = JSON.parse(text); // Затем пытаемся распарсить JSON
     if (!response.ok) {
@@ -154,7 +42,7 @@ export async function loginBurlive() {
   }
 }
 
-home.start(async (ctx: rlhubContext) => await home_greeting(ctx));
+// home.start(async (ctx: rlhubContext, next) => await home_greeting(ctx, next));
 
 home.action("check_subscription", async (ctx) => {
   const userId = ctx.from.id;
@@ -195,14 +83,21 @@ home.action("check_subscription", async (ctx) => {
   }
 });
 
-home.action("vocabular", async (ctx) => {
-    console.log("Переход в словарь")
+home.action("vocabular", async (ctx, next) => {
+  console.log("Переход в словарь");
   ctx.answerCbQuery();
-  return ctx.scene.enter("vocabular");
+  await ctx.scene.enter("vocabular");
+  await saveSceneMiddleware(ctx, next, true);
 });
 
 home.action("sentences", async (ctx) => {
   return ctx.scene.enter("sentences");
+});
+
+home.action("to_subscribe", async (ctx) => {
+  await ctx.answerCbQuery();
+  await subscribe_section(ctx);
+  // return ctx.scene.enter("sentences");
 });
 
 home.action("translater", async (ctx) => {
@@ -213,8 +108,151 @@ home.action("translater", async (ctx) => {
     parse_mode: "HTML",
     disable_web_page_preview: true,
   });
-  await greeting(ctx, true);
+
+  await render_home_section(ctx, true);
   return ctx.answerCbQuery("На стадии разработки 🎯");
+});
+
+export async function subscribe_section(ctx: rlhubContext) {
+  try {
+    let message: string = `<b>💎 Премиум подписка</b> \n\n`;
+    message += `Расширяйте свои возможности. Поддержите бурятский язык. Получите доступ к материалам. \n\n`;
+
+    const extra: ExtraEditMessageText = {
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "1 месяц / 199 ₽", callback_data: "rub 199" }],
+          [{ text: "6 месяцев / 837 ₽", callback_data: "rub 837" }],
+          [{ text: "12 месяцев / 1436 ₽", callback_data: "rub 1436" }],
+          [
+            {
+              text: "Назад",
+              callback_data: "back",
+            },
+          ],
+        ],
+      },
+    };
+
+    if (ctx.updateType === "callback_query") {
+      await ctx.editMessageText(message, extra);
+    } else {
+      await ctx.reply(message, extra);
+    }
+
+    ctx.wizard.selectStep(1);
+  } catch (err) {
+    console.log(err);
+  }
+}
+async function subscribe_section_handler(ctx: rlhubContext, next: any) {
+  try {
+    const data = ctx.update.callback_query.data;
+    if (data === "back") {
+      await render_home_section(ctx);
+    }
+    ctx.answerCbQuery();
+  } catch (error) {}
+}
+
+// Токен провайдера платежей от ЮKassa
+const providerToken = process.env.PROVIDER_TOKEN;
+
+// Функция для отправки счета
+async function sendInvoice(ctx: rlhubContext) {
+  try {
+    const invoice = {
+      chat_id: ctx.chat.id,
+      provider_token: providerToken,
+      start_parameter: "start",
+      title: "Подписка на сервис",
+      description: "Подписка на использование всех функций Burlive на 1 месяц",
+      currency: "RUB",
+      prices: [{ label: "Подписка", amount: 19900 }], // 19900 копеек = 199 рублей
+      payload: JSON.stringify({ unique_id: `${ctx.from.id}_${Date.now()}` }),
+      need_phone_number: true,
+      need_email: true,
+    };
+    await ctx.deleteMessage();
+    await ctx.replyWithInvoice(invoice);
+  } catch (error) {
+    console.log("Ошибка при отправке счета:", error);
+    ctx.reply("Произошла ошибка при создании счета.");
+  }
+}
+
+home.action("rub 199", async (ctx) => {
+  const returnUrl = `https://burlive.ru/backendapi/telegram/success-payment/${ctx.from.id}`;
+  const description = `Подписка на сервис по изучению и развитию бурятского языка`;
+  const amount = `199.00`;
+  try {
+    const payment = await createPayment(ctx, amount, description, returnUrl);
+    const confirmationUrl = payment.confirmation.confirmation_url;
+    await ctx.answerCbQuery("Счет сгенерирован");
+    await ctx.reply(
+      `Для оформления подписки перейдите по ссылке: ${confirmationUrl}`
+    );
+  } catch (error) {
+    console.error(error);
+    ctx.reply(
+      "Произошла ошибка при создании платежа. Пожалуйста, попробуйте позже."
+    );
+  }
+});
+home.action("rub 837", async (ctx) => {
+  const returnUrl = `https://burlive.ru/backendapi/telegram/success-payment/${ctx.from.id}`;
+  const description = `Подписка на сервис по изучению и развитию бурятского языка`;
+  const amount = `837.00`;
+  try {
+    const payment = await createPayment(ctx, amount, description, returnUrl);
+    const confirmationUrl = payment.confirmation.confirmation_url;
+    await ctx.answerCbQuery("Счет сгенерирован");
+    await ctx.reply(
+      `Для оформления подписки перейдите по ссылке: ${confirmationUrl}`
+    );
+  } catch (error) {
+    console.error(error);
+    ctx.reply(
+      "Произошла ошибка при создании платежа. Пожалуйста, попробуйте позже."
+    );
+  }
+});
+home.action("rub 1436", async (ctx) => {
+  const returnUrl = `https://burlive.ru/backendapi/telegram/success-payment/${ctx.from.id}`;
+  const description = `Подписка на сервис по изучению и развитию бурятского языка \nСрок подписки: 12 месяцев`;
+  const amount = `1436.00`;
+  try {
+    const payment = await createPayment(ctx, amount, description, returnUrl);
+    const confirmationUrl = payment.confirmation.confirmation_url;
+    await ctx.answerCbQuery("Счет сгенерирован");
+    await ctx.reply(
+      `Для оформления подписки перейдите по ссылке: ${confirmationUrl}`
+    );
+  } catch (error) {
+    console.error(error);
+    ctx.reply(
+      "Произошла ошибка при создании платежа. Пожалуйста, попробуйте позже."
+    );
+  }
+});
+
+// Обработка PreCheckoutQuery
+home.on("pre_checkout_query", (ctx) => {
+  ctx.answerPreCheckoutQuery(true);
+});
+
+// Обработка SuccessfulPayment
+home.on("successful_payment", async (ctx) => {
+  console.log("Успешный платеж:", ctx.message.successful_payment);
+  const payment = ctx.message.successful_payment;
+
+  // Сохраните provider_payment_charge_id для дальнейшего использования
+  const providerPaymentChargeId = payment.provider_payment_charge_id;
+  console.log(payment);
+  // Дополнительные действия после успешного платежа
+  await ctx.reply("Спасибо за оплату! Ваша подписка активирована.");
+  await render_home_section(ctx, true);
 });
 
 home.action("study", async (ctx) => {
@@ -232,13 +270,19 @@ home.action("chatgpt", async (ctx) => {
   return ctx.scene.enter("chatgpt");
 });
 
-home.action("dashboard", async (ctx) => {
+home.action("dashboard", async (ctx: rlhubContext, next) => {
   await ctx.answerCbQuery("Личный кабинет");
-  return ctx.scene.enter("dashboard");
+  await ctx.scene.enter("dashboard", next);
 });
 
-home.enter(async (ctx) => {
- await render_home_section(ctx);
+home.enter(async (ctx: rlhubContext) => {
+  try {
+    // await saveSceneMiddleware(ctx);
+    await render_home_section(ctx);
+  } catch (error) {
+    console.log(error);
+    await ctx.reply("Ошибка сервера");
+  }
 });
 
 home.command("add_sentences", async (ctx) => {
@@ -253,5 +297,44 @@ home.command("reset_activet", async (ctx) => {
     active_translator: [],
   });
 });
+
+handler.on("message", async (ctx: rlhubContext, next) => {
+  const message = ctx.update.message.text;
+
+  if (message === "/premium") {
+    return next();
+  }
+  if (message === "/dictionary") {
+    return next();
+  }
+  if (message === "/webapp") {
+    return next();
+  }
+
+  await render_home_section(ctx);
+});
+
+home.action(/.*/, async (ctx: rlhubContext, next) => {
+  // Логирование текущей сцены
+  console.log("Current scene: " + ctx.scene.current?.id);
+
+  // Ваш код для обработки действий и пересылки пользователя на нужную сцену
+  const actionData = ctx.update.callback_query.data;
+  console.log(`handled action: ${actionData}`);
+
+  // Например, можете проверять значение actionData и пересылать пользователя на соответствующие сцены
+  // if (actionData === 'to_home') {
+  // await ctx.scene.enter('home');
+  // } else if (actionData === 'to_chat') {
+  // await ctx.scene.enter('chat');
+  // } else {
+  // Обработка других действий
+  // }
+
+  // Не забудьте подтвердить получение действия, чтобы убрать "часики" в интерфейсе пользователя
+  await ctx.answerCbQuery();
+  await render_home_section(ctx);
+});
+// home.on("message", async (ctx) => await render_home_section(ctx));
 
 export default home;

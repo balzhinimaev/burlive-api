@@ -118,10 +118,13 @@ export default async function help_handler(ctx: rlhubContext) {
         }
 
         if (ctx.updateType === 'message') {
+
             let amount: number = 0
 
             // @ts-ignore
             if (ctx.message.text) {
+
+                let message = ctx.message.text
 
                 // @ts-ignore
                 if (parseFloat(ctx.message.text) > 0 && parseFloat(ctx.message.text) < 60000) {

@@ -3,9 +3,22 @@ import { bot } from "../../..";
 import rlhubContext from "../../models/rlhubContext";
 import { loginBurlive } from "../home.scene";
 import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
+import userIsExists from "../../utlis/userIsExists";
 
-export async function home_greeting(ctx: rlhubContext) {
+export async function home_greeting(ctx: rlhubContext, next?: any, enter?: boolean) {
   try {
+
+    let refererID: string | number = ctx.startPayload    
+
+    if (refererID) {
+      refererID = refererID.replace("ref_", "")
+      refererID = Number(refererID);
+      const isExists = await userIsExists(ctx, refererID)
+      if (!isExists) {
+        ctx.reply("Реферальная ссылка битая")
+      }
+    }
+
     const data = await loginBurlive();
     const response = await fetch(
       `${process.env.api_url}/telegram/user/is-exists/${ctx.from.id}`,
@@ -43,7 +56,7 @@ export async function home_greeting(ctx: rlhubContext) {
     );
 
     if (!isMember) {
-      return await ctx.reply(
+      await ctx.reply(
         `Подпишитесь на канал для продолжения работы ${process.env.telegram_channel_link}`,
         {
           reply_markup: {
@@ -62,6 +75,13 @@ export async function home_greeting(ctx: rlhubContext) {
           },
         }
       );
+
+      if (next) {
+        return next();
+      } else {
+        return true;
+      }
+
     }
 
     console.log("Пользователь подписан на канал");
@@ -82,9 +102,18 @@ export async function home_greeting(ctx: rlhubContext) {
       const createUserParse = await createUser.json();
       console.log(createUserParse);
       await ctx.reply("Поздравляю, Вы зарегистрированы!");
+      // await render_home_section(ctx, true);
     } else {
-      console.log("Пользователь зарегистрирован в бд");
-      await render_home_section(ctx);
+      // console.log("Пользователь зарегистрирован в бд");
+      // ctx.scene.enter("home")
+      // await render_home_section(ctx, next);
+    }
+
+    if (enter) {
+      console.log(ctx.scene)
+      // @ts-ignore
+      ctx.scene.leave(ctx.scene.current.id)
+      ctx.scene.enter("home")
     }
 
     // Здесь можно добавить логику для работы с результатом
@@ -93,7 +122,7 @@ export async function home_greeting(ctx: rlhubContext) {
   }
 }
 
-export async function render_home_section(ctx: rlhubContext) {
+export async function render_home_section(ctx: rlhubContext, reply?: boolean) {
   try {
     const message = `Самоучитель бурятского языка \n\nКаждое взаимодействие с ботом, \nвлияет на сохранение и дальнейшее развитие <b>Бурятского языка</b> \n\nВыберите раздел, чтобы приступить`;
     const keyboard: InlineKeyboardMarkup = {
@@ -103,6 +132,7 @@ export async function render_home_section(ctx: rlhubContext) {
           { text: "Словарь", callback_data: "vocabular" },
         ],
         [{ text: "Предложения", callback_data: "sentences" }],
+        [{ text: "💎 Премиум", callback_data: "to_subscribe" }],
         [{ text: "Личный кабинет", callback_data: "dashboard" }],
       ],
     };
@@ -112,11 +142,14 @@ export async function render_home_section(ctx: rlhubContext) {
       reply_markup: keyboard,
     };
 
-    ctx.updateType === "callback_query"
-      ? await ctx.editMessageText(message, extra)
-      : await ctx.reply(message, extra);
+    if (reply) {
+      await ctx.reply(message, extra);
+    } else {
+      ctx.updateType === "callback_query"
+        ? await ctx.editMessageText(message, extra)
+        : await ctx.reply(message, extra);
+    }
 
-    ctx.wizard.selectStep(0);
   } catch (error) {
     console.error(`Error on render home section`, error);
   }

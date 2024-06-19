@@ -7,12 +7,15 @@ const telegramRouter = express.Router();
 telegramRouter.post("/", telegramController.create);
 
 // Маршрут для проверки существования пользователя
-telegramRouter.get(
-  "/user/is-exists/:id",
-  telegramController.user_is_exists
-);
+telegramRouter.get("/user/is-exists/:id", telegramController.user_is_exists);
 
-telegramRouter.post('/create-user', telegramController.register_telegram_user)
+// Маршрут для создания пользователя
+telegramRouter.post("/create-user", telegramController.register_telegram_user);
+
+// Маршруты для сохранения и получения состояния пользователя
+telegramRouter.post("/user/save-state", telegramController.save_user_state);
+telegramRouter.get("/user/get-state/:id", telegramController.get_user_state);
+
 telegramRouter.post(
   "/select-language-for-vocabular",
   telegramController.select_language_for_vocabular

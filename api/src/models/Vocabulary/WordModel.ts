@@ -8,6 +8,7 @@ export interface IWordModel extends Document {
   contributors: Types.ObjectId[];
   translations: Types.ObjectId[];
   createdAt: Date;
+  dialect: string;
   // Additional fields, if needed
 }
 
@@ -15,6 +16,7 @@ const WordSchema = new Schema(
   {
     text: { type: String, required: true, unique: true },
     language: { type: String },
+    dialect: { type: String },
     translations: {
       type: [{ type: Schema.Types.ObjectId, ref: "word" }],
       default: [],

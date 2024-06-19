@@ -198,6 +198,7 @@ const vocabularyController = {
           _id: suggestedWord._id,
           text: suggestedWord.text,
           language: suggestedWord.language,
+          dialect: suggestedWord.dialect,
           author: suggestedWord.author,
           contributors: suggestedWord.contributors,
           translations: suggestedWord.pre_translations,

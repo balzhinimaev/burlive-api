@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
 
 // Подключение к базе данных
 mongoose.connect(<string>process.env.DB_CONNECTION_STRING, {
-  dbName: 'burlang'
+  dbName: 'burlive'
 })
   .then(() => {
     console.log('Подключено к базе данных');

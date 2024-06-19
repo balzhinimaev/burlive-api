@@ -1,5 +1,4 @@
 import rlhubContext from "../../models/rlhubContext"
-import { greeting } from "../home.scene"
 import { updateSentence } from "./moderationSentencesHandler"
 import moderation_sentences_render from "./sentencesRender"
 

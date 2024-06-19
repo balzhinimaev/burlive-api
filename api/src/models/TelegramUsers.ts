@@ -6,6 +6,7 @@ interface TelegramUser extends User {
     referrals_telegram?: Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
+    email: string;
     vocabular: {
       selected_language_for_translate: 'russian' | 'buryat'
     }
@@ -16,6 +17,7 @@ const TelegramUserSchema: Schema<TelegramUser> = new Schema<TelegramUser>(
     id: { type: Number, required: true },
     username: { type: String, required: false },
     first_name: { type: String, required: false },
+    email: { type: String, required: false },
     last_name: { type: String, required: false },
     referrals_telegram: [{ type: Schema.Types.ObjectId, ref: "telegram_user" }],
     rating: { type: Number, required: true, default: 1 }, // добавлено поле "рейтинг",

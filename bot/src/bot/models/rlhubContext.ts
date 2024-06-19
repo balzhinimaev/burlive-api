@@ -25,12 +25,17 @@ interface rlhubSession extends Scenes.WizardSession<rlhubWizardSession> {
 }
 
 interface rlhubContext extends Context {
-    session: rlhubSession;
-    scene: Scenes.SceneContextScene<rlhubContext, rlhubWizardSession>;
-    wizard: Scenes.WizardContextWizard<rlhubContext>,
-    update: any,
-    message: any,
-    startPayload?: string
+  context: {
+    scene: {
+      scenes: any
+    }
+  };
+  session: rlhubSession;
+  scene: Scenes.SceneContextScene<rlhubContext, rlhubWizardSession>,
+  wizard: Scenes.WizardContextWizard<rlhubContext>;
+  update: any;
+  message: any;
+  startPayload?: string;
 }
 
 export default rlhubContext
