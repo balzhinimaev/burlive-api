@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import type { Sentence, SentencesResponse } from "@/types/sentences";
 import type { ApiError } from "@/types/error";
 import { useNotifyStore } from "@/stores/notifyStore"; // Путь может отличаться
-const apiUrl = `http://localhost:5000/backendapi`
+const apiUrl = `https://burlive.ru/backendapi`;
 
 export const useSentencesStore = defineStore("pending-sentences", {
   state: () => ({

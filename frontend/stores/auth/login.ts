@@ -6,7 +6,7 @@ interface UserPayloadInterface {
   email: string;
   password: string;
 }
-const apiUrl = "http://localhost:5000/backendapi";
+const apiUrl = "https://burlive.ru/backendapi";
 export const useAuthStore = defineStore("user-login", {
   state: () => ({
     authenticated: false,

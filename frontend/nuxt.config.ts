@@ -23,7 +23,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiUrl: "http://localhost:5000/backendapi",
+      apiUrl: "https://burlive.ru/backendapi",
     },
   },
   css: [
