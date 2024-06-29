@@ -102,11 +102,10 @@ export async function home_greeting(ctx: rlhubContext, next?: any, enter?: boole
       const createUserParse = await createUser.json();
       console.log(createUserParse);
       await ctx.reply("Поздравляю, Вы зарегистрированы!");
-      // await render_home_section(ctx, true);
+      await render_home_section(ctx, true);
     } else {
       // console.log("Пользователь зарегистрирован в бд");
-      // ctx.scene.enter("home")
-      // await render_home_section(ctx, next);
+      await render_home_section(ctx)
     }
 
     if (enter) {

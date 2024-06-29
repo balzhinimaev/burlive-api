@@ -1,15 +1,12 @@
-import axios from "axios";
 import { Composer, Scenes } from "telegraf";
 import rlhubContext from "../models/rlhubContext";
 import greeting from "./vocabularView/greeting";
 import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
 import { IUser, User } from "../../models/IUser";
-import { ObjectId } from "mongoose";
 import { buryatWordModel } from "../../models/vocabular/IBuryatWord";
 import { russianWordModel } from "../../models/vocabular/IRussianWord";
 import { translationPairModel } from "../../models/IVocabular";
 import { loginBurlive } from "./home.scene";
-import { saveSceneMiddleware } from "../utlis/saveSceneMiddleware";
 
 const handler = new Composer<rlhubContext>();
 const vocabular = new Scenes.WizardScene(
@@ -181,22 +178,26 @@ async function translate_word(ctx: rlhubContext) {
 
       if (data === "back") {
         ctx.wizard.selectStep(0);
-        await saveSceneMiddleware(ctx);
         await greeting(ctx);
       }
     }
 
     if (ctx.updateType === "message" && ctx.message?.text) {
-      
       const word = ctx.message.text;
 
       if (word === "/dictionary") {
-        return ctx.scene.enter("vocabular")
+        return ctx.scene.enter("vocabular");
       }
       if (word === "/home") {
-        return ctx.scene.enter("home")
+        return ctx.scene.enter("home");
       }
-      
+      if (word === "/start") {
+        return ctx.scene.enter("home");
+      }
+      if (word === "/premium") {
+        return ctx.scene.enter("home");
+      }
+
       const language = ctx.session.language;
 
       const data = await loginBurlive();
@@ -216,25 +217,47 @@ async function translate_word(ctx: rlhubContext) {
         }
       );
 
+      let message = `<b>Словарь 📖</b>\n\n`;
+
       if (query.ok) {
         const response = await query.json();
-        console.log(response)
-        const translations = response.translations;
-        let message = `<b>Словарь</b>\n\n`
-        if (translations.length > 0) {
-          message += translations
+        console.log(response);
+        const burliveT = response.translations;
+        const burlangT = response.burlang_api?.translations;
+
+        if (burliveT.length > 0) {
+          message += burliveT
             .map(
               (item: any) =>
                 `${word} - ${item.text} (${item.language}, ${item.dialect})`
             )
             .join("\n");
 
-          await ctx.reply(message, { parse_mode: 'HTML' });
-          // ctx.wizard.selectStep(0);
-        } else {
-          await ctx.reply("Переводов не найдено");
           // ctx.wizard.selectStep(0);
         }
+        if (burlangT && burlangT.length > 0) {
+          message += burlangT
+            .map((item: any) => `${word} - ${item.value}`)
+            .join("\n");
+
+          // ctx.wizard.selectStep(0);
+        }
+
+        if (burliveT.length === 0 && (!burlangT || burlangT.length === 0)) {
+          const variants = [
+            `К сожалению, переводов не найдено. Ваше слово "${word}" добавлено в базу для будущего перевода сообществом. Спасибо за ваш вклад!`,
+            `Переводы отсутствуют. Слово "${word}" успешно сохранено в базе данных для дальнейшего перевода нашим сообществом. Благодарим за помощь!`,
+            `Пока что переводов не обнаружено. Ваше слово "${word}" занесено в базу данных для последующего перевода участниками сообщества. Спасибо за ваше содействие!`,
+          ];
+          message += variants[Math.floor(Math.random() * variants.length)];
+        }
+
+        message += `\n\nМожете отправить еще слова на перевод`;
+        await ctx.reply(message, { parse_mode: "HTML", reply_markup: {
+          inline_keyboard: [[{ text: 'Назад', callback_data: 'back' }]]
+        } });
+      } else {
+        await ctx.reply("Возникла ошибка");
       }
     }
   } catch (error) {
@@ -242,15 +265,6 @@ async function translate_word(ctx: rlhubContext) {
     ctx.wizard.selectStep(0); // Вернемся к шагу 0 в случае ошибки
   }
 }
-
-handler.command("start", async (ctx: rlhubContext) => {
-  try {
-    await greeting(ctx);
-  } catch (error) {
-    console.error(error);
-    ctx.wizard.selectStep(0); // Вернемся к шагу 0 в случае ошибки
-  }
-});
 
 vocabular.enter(async (ctx: rlhubContext) => {
   try {
@@ -295,7 +309,7 @@ vocabular.action(/selectlanguage (.+)/, async (ctx: rlhubContext) => {
           selectedLanguage === "russian" ? "русский" : "бурятский"
         } успешно выбран.`
       );
-      await render_translate_section(ctx);
+      return await render_translate_section(ctx);
     } else {
       console.error("Error saving language:", result);
       await ctx.answerCbQuery("Ошибка при сохранении языка. Попробуйте снова.");
@@ -327,12 +341,43 @@ async function render_translate_section(ctx: rlhubContext) {
       },
     });
     ctx.wizard.selectStep(1);
+    console.log("Первый шаг выбран");
   } catch (err) {
     console.log(err);
     ctx.wizard.selectStep(0); // Вернемся к шагу 0 в случае ошибки
   }
 }
 
-handler.on("message", async (ctx: rlhubContext) => await greeting(ctx));
+handler.on("message", async (ctx: rlhubContext, next) => {
+  try {
+    const message = ctx.update.message.text;
+
+    if (message === "/premium") {
+      return await ctx.scene.enter("premium");
+    }
+
+    if (message === "/start") {
+      return await ctx.scene.enter("home");
+    }
+
+    if (message === "/home") {
+      return await ctx.scene.enter("home");
+    }
+
+    if (message === "/sentences") {
+      return await ctx.scene.enter("sentences");
+    }
+
+    if (message === "/dictionary") {
+      return await ctx.scene.enter("vocabular");
+    }
+
+    // next();
+    ctx.scene.enter("vocabular");
+  } catch (error) {
+    console.log(error);
+    return await ctx.reply("Возникла ошибка");
+  }
+});
 
 export default vocabular;

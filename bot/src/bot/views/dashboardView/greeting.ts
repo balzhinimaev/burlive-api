@@ -42,7 +42,7 @@ export default async function greeting(ctx: rlhubContext) {
           ],
           [
             {
-              text: "Реферальная программа",
+              text: "💰 Реферальная программа",
               callback_data: "referral",
             },
           ],

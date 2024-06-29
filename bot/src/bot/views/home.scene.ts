@@ -1,39 +1,33 @@
 import { Composer, Scenes } from "telegraf";
 import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
 import { ISentence, Sentence } from "../../models/ISentence";
-import { IUser, User } from "../../models/IUser";
 import rlhubContext from "../models/rlhubContext";
 import { home_greeting, render_home_section } from "./homeView/greeting";
 import { bot } from "../..";
 import createPayment from "../utlis/yookassa";
 import { saveSceneMiddleware } from "../utlis/saveSceneMiddleware";
 const handler = new Composer<rlhubContext>();
-const home = new Scenes.WizardScene(
-  "home",
-  handler,
-  async (ctx: rlhubContext, next) => subscribe_section_handler(ctx, next)
-);
+const home = new Scenes.WizardScene("home", handler);
 
 export async function loginBurlive() {
   try {
-    const response = await fetch(`${process.env.api_url}/users/login`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        password: process.env.telegram_user_password,
-        email: process.env.telegram_user_email,
-        username: process.env.telegram_user_username,
-      }),
-    });
+    // const response = await fetch(`${process.env.api_url}/users/login`, {
+    //   method: "post",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     password: process.env.telegram_user_password,
+    //     email: process.env.telegram_user_email,
+    //     username: process.env.telegram_user_username,
+    //   }),
+    // });
 
-    const text = await response.text(); // Сначала получаем текст ответа
+    // const text = await response.text(); // Сначала получаем текст ответа
 
-    const data = JSON.parse(text); // Затем пытаемся распарсить JSON
-    if (!response.ok) {
-      throw new Error(data.message || "Login failed");
-    }
+    const data = {
+      token: process.env.user_token,
+    }; // Затем пытаемся распарсить JSON
 
     return data;
   } catch (error) {
@@ -41,8 +35,6 @@ export async function loginBurlive() {
     throw error; // Добавляем выброс ошибки, чтобы можно было её обработать
   }
 }
-
-// home.start(async (ctx: rlhubContext, next) => await home_greeting(ctx, next));
 
 home.action("check_subscription", async (ctx) => {
   const userId = ctx.from.id;
@@ -84,10 +76,12 @@ home.action("check_subscription", async (ctx) => {
 });
 
 home.action("vocabular", async (ctx, next) => {
-  console.log("Переход в словарь");
-  ctx.answerCbQuery();
-  await ctx.scene.enter("vocabular");
-  await saveSceneMiddleware(ctx, next, true);
+  try {
+    await ctx.scene.enter("vocabular");
+    ctx.answerCbQuery()
+  } catch (error) {
+    await render_home_section(ctx);
+  }
 });
 
 home.action("sentences", async (ctx) => {
@@ -95,9 +89,11 @@ home.action("sentences", async (ctx) => {
 });
 
 home.action("to_subscribe", async (ctx) => {
-  await ctx.answerCbQuery();
-  await subscribe_section(ctx);
-  // return ctx.scene.enter("sentences");
+  try {
+    ctx.scene.enter("premium");
+  } catch (error) {
+    await render_home_section(ctx);
+  }
 });
 
 home.action("translater", async (ctx) => {
@@ -112,49 +108,6 @@ home.action("translater", async (ctx) => {
   await render_home_section(ctx, true);
   return ctx.answerCbQuery("На стадии разработки 🎯");
 });
-
-export async function subscribe_section(ctx: rlhubContext) {
-  try {
-    let message: string = `<b>💎 Премиум подписка</b> \n\n`;
-    message += `Расширяйте свои возможности. Поддержите бурятский язык. Получите доступ к материалам. \n\n`;
-
-    const extra: ExtraEditMessageText = {
-      parse_mode: "HTML",
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: "1 месяц / 199 ₽", callback_data: "rub 199" }],
-          [{ text: "6 месяцев / 837 ₽", callback_data: "rub 837" }],
-          [{ text: "12 месяцев / 1436 ₽", callback_data: "rub 1436" }],
-          [
-            {
-              text: "Назад",
-              callback_data: "back",
-            },
-          ],
-        ],
-      },
-    };
-
-    if (ctx.updateType === "callback_query") {
-      await ctx.editMessageText(message, extra);
-    } else {
-      await ctx.reply(message, extra);
-    }
-
-    ctx.wizard.selectStep(1);
-  } catch (err) {
-    console.log(err);
-  }
-}
-async function subscribe_section_handler(ctx: rlhubContext, next: any) {
-  try {
-    const data = ctx.update.callback_query.data;
-    if (data === "back") {
-      await render_home_section(ctx);
-    }
-    ctx.answerCbQuery();
-  } catch (error) {}
-}
 
 // Токен провайдера платежей от ЮKassa
 const providerToken = process.env.PROVIDER_TOKEN;
@@ -278,7 +231,7 @@ home.action("dashboard", async (ctx: rlhubContext, next) => {
 home.enter(async (ctx: rlhubContext) => {
   try {
     // await saveSceneMiddleware(ctx);
-    await render_home_section(ctx);
+    await home_greeting(ctx);
   } catch (error) {
     console.log(error);
     await ctx.reply("Ошибка сервера");
@@ -298,14 +251,19 @@ home.command("reset_activet", async (ctx) => {
   });
 });
 
-handler.on("message", async (ctx: rlhubContext, next) => {
+home.on("message", async (ctx: rlhubContext, next) => {
   const message = ctx.update.message.text;
 
   if (message === "/premium") {
-    return next();
+    return ctx.scene.enter("premium");
   }
+
+  if (message === "/start") {
+    return await home_greeting(ctx);
+  }
+
   if (message === "/dictionary") {
-    return next();
+    return await ctx.scene.enter("vocabular");
   }
   if (message === "/webapp") {
     return next();

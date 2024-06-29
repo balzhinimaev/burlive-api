@@ -10,20 +10,18 @@ import "./app";
 import "./webhook";
 import "./database";
 
-import home, { loginBurlive, subscribe_section } from "./bot/views/home.scene";
+import home, { loginBurlive } from "./bot/views/home.scene";
 import sentences from "./bot/views/sentences.scene";
 import settings from "./bot/views/settings.scene";
 import dashboard from "./bot/views/dashboard.scene";
 import vocabular from "./bot/views/vocabular.scene";
 import moderation from "./bot/views/moderation.scene";
 import study from "./bot/views/study.scene";
-import chat from "./bot/views/chat.scene";
-import { saveSceneMiddleware } from "./bot/utlis/saveSceneMiddleware";
-import { fetchSceneMiddleware } from "./bot/utlis/fetchSceneMiddleware";
-import { home_greeting } from "./bot/views/homeView/greeting";
+import premium, { subscribe_section } from "./bot/views/premium.scene";
+import chat from "./bot/views/chat.scene"; 
 const webAppUrl = process.env.webapp_url;
 const stage = new Scenes.Stage<rlhubContext>(
-  [home, study, chat, vocabular, sentences, dashboard, moderation, settings], { default: "home" }
+  [home, premium, study, chat, vocabular, sentences, dashboard, moderation, settings], { default: "home" }
 );
 
 bot.use(session());
@@ -70,7 +68,7 @@ bot.on("message", async (ctx: rlhubContext, next) => {
 })
 
 bot.command("start", async (ctx) => {
-  await ctx.scene.enter("home");
+  // await ctx.scene.enter("home");
 });
 
 bot.command("webapp", async (ctx) => {
@@ -97,9 +95,7 @@ bot.command("home", async (ctx) => {
 
 bot.command("premium", async (ctx) => {
   try {
-    console.log(ctx.scene);
-    // await ctx.scene.enter("home");
-    await subscribe_section(ctx);
+    ctx.scene.enter("premium")
   } catch (error) {
     console.log(error);
   }

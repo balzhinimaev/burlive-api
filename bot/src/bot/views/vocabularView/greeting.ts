@@ -42,7 +42,7 @@ export default async function greeting(ctx: rlhubContext) {
         ctx.updateType === 'callback_query' ? await ctx.editMessageText(message, extra) : false
 
         ctx.wizard.selectStep(0)
-        await saveSceneMiddleware(ctx)
+
         // next()
     } catch (err) {
 
