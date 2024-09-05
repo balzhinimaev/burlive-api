@@ -21,7 +21,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post(`/telegraf/burlang`, (req, res) => {
+app.post(`/telegraf/secret_path`, (req, res) => {
     bot.handleUpdate(req.body, res);
 });
 
