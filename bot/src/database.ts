@@ -5,14 +5,15 @@ dotenv.config()
 const url = process.env.database
 
 ;(async () => {
-    await mongoose.connect(url, {
-        dbName: 'burlang',
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    } as any).catch(error => { console.error(error) });
-
-    mongoose.connection.on('connected', () => {
-        console.log('Connected to MongoDB!');
+  // Подключение к базе данных
+  mongoose
+    .connect(<string>process.env.DB_CONNECTION_STRING, {
+      dbName: "burlive",
+    })
+    .then(() => {
+      console.log("Подключено к базе данных");
+    })
+    .catch((error) => {
+      console.error("Ошибка при подключении к базе данных:", error);
     });
-    
 })();

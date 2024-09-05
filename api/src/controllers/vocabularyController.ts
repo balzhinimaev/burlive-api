@@ -127,10 +127,15 @@ const vocabularyController = {
 
       const userId = new Types.ObjectId(req.user.userId);
       const results = [];
-      const wordsArray = text.split(",").map((word: string) => word.trim());
+      const wordsArray = text.split(",").map((word: string) => ({
+        normalized: word.trim().toLowerCase(),
+        original: word.trim(),
+      }));
 
-      for (const word of wordsArray) {
-        let existingWord = await SuggestedWordModel.findOne({ text: word });
+      for (const { normalized, original } of wordsArray) {
+        let existingWord = await SuggestedWordModel.findOne({
+          normalized_text: normalized,
+        });
 
         if (existingWord) {
           if (!existingWord.contributors.includes(userId)) {
@@ -144,10 +149,11 @@ const vocabularyController = {
           });
         } else {
           const newSuggestedWord = new SuggestedWordModel({
-            text: word,
+            text: original,
+            normalized_text: normalized, // Добавление нормализованного текста
             language,
             author: userId,
-            contributors: [],
+            contributors: [userId],
           });
           await newSuggestedWord.save();
           results.push({
@@ -171,9 +177,8 @@ const vocabularyController = {
     const suggestedWord = req.suggestedWord;
 
     try {
-
       if (!suggestedWord) {
-        return res.status(400).json({ message: 'suggestedWord не указан' })
+        return res.status(400).json({ message: "suggestedWord не указан" });
       }
 
       const wordToUpdate = await WordModel.findOne({
@@ -224,11 +229,10 @@ const vocabularyController = {
   ) => {
     const suggestedWord = req.suggestedWord;
     try {
-      
       if (!suggestedWord) {
-        return res.status(400).json({ message: 'SuggestedWord не указан' })
+        return res.status(400).json({ message: "SuggestedWord не указан" });
       }
-      
+
       await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
       return res.status(200).json({ message: "Слово успешно отклонено" });
     } catch (error) {

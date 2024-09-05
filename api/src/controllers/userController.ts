@@ -93,9 +93,12 @@ const userController = {
 
   login: async (req: Request, res: Response) => {
     try {
+      
       const { email, username, password } = req.body;
+
+      // проверка суеществования почты и логина
       if (!email && !username) {
-        return res.status(400).json({ message: "Укажите username или email" });
+        return res.status(400).json({ message: "Укажите username и email" });
       }
 
       const query = email ? { email } : { username };
@@ -111,7 +114,9 @@ const userController = {
         const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 3 дня
 
         await Token.deleteMany({ userId: user._id }); // Удаление старых токенов
-        await Token.create({ userId: user._id, token, expiresAt });
+        const createdToken = await Token.create({ userId: user._id, token, expiresAt });
+        
+        logger.info(`Токен создан: ${ createdToken }`)
         logger.info(`Токен создан для пользователя: ${user._id}`);
 
         return res.status(200).json({ token, userId: user._id.toString() });

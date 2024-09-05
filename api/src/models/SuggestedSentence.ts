@@ -19,7 +19,7 @@ const SuggestedSentenceSchema = new Schema(
     language: { type: String },
     context: { type: String },
     translations: [{ type: Schema.Types.ObjectId, ref: "Translation" }],
-    watchers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    watchers: [{ type: Schema.Types.ObjectId, ref: "telegram_user" }],
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
     contributors: [{ type: Schema.Types.ObjectId, ref: "User" }],
     status: {

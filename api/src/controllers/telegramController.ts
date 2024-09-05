@@ -25,7 +25,6 @@ const telegramController = {
   },
   paymentCb: async (req: Request, res: Response) => {
     try {
-
       console.log(req.body);
 
       return res.status(200);
@@ -36,24 +35,22 @@ const telegramController = {
   new_word_translate_request: async (req: Request, res: Response) => {
     try {
       const { word, language, user_id } = req.body;
-      console.log(word);
-      console.log(language);
-      console.log(user_id);
       const user = await TelegramUserModel.findOne({ id: user_id });
 
+      // Преобразование слова в нижний регистр для поиска
+      const normalizedWord = word.toLowerCase();
       let selectedLanguage = language === "russian" ? "русский" : "бурятский";
 
-      // await TelegramUserModel.find({ id: user_id })
       let translations = [];
 
       const is_exists_on_searchdata = await SearchedWordModel.findOne({
-        text: word,
+        normalized_text: normalizedWord,
       });
 
       if (is_exists_on_searchdata) {
         // Если слово существует, обновить поле users и добавить запись в search_data
         await SearchedWordModel.findOneAndUpdate(
-          { text: word },
+          { normalized_text: normalizedWord },
           {
             $addToSet: { users: user._id },
             $push: { search_data: { content: word, user_id: user._id } },
@@ -63,6 +60,7 @@ const telegramController = {
         // Если слово не существует, создать новую запись в SearchedWordModel
         await SearchedWordModel.create({
           text: word,
+          normalized_text: normalizedWord,
           language: selectedLanguage,
           users: [user._id],
           search_data: [{ content: word, user_id: user._id }],
@@ -71,7 +69,7 @@ const telegramController = {
 
       // Найти слово в WordModel и получить переводы
       const words_on_my_database = await WordModel.find({
-        text: word,
+        normalized_text: normalizedWord,
         language: selectedLanguage,
       }).populate(
         "translations",
@@ -90,7 +88,7 @@ const telegramController = {
       let selectedLanguageForBurlang =
         language === "russian" ? "russian-word" : "buryat-word";
       const burlang_fetch = await fetch(
-        `https://burlang.ru/api/v1/${selectedLanguageForBurlang}/translate?q=${word}`
+        `https://burlang.ru/api/v1/${selectedLanguageForBurlang}/translate?q=${normalizedWord}`
       );
       const burlang_response = await burlang_fetch.json();
 
@@ -107,6 +105,7 @@ const telegramController = {
       return res.status(500).json({ message: "Ошибка сервера" });
     }
   },
+
   user_is_exists: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -134,6 +133,7 @@ const telegramController = {
       return res.status(500).json({ error: "Internal server error" });
     }
   },
+  
   register_telegram_user: async (req: Request, res: Response) => {
     try {
       console.log(req.body);
@@ -153,6 +153,7 @@ const telegramController = {
       return res.status(500).json({ error: "Ошибка сервера" });
     }
   },
+
   select_language_for_vocabular: async (req: Request, res: Response) => {
     try {
       const { language, id } = req.body;
@@ -170,6 +171,7 @@ const telegramController = {
       return res.status(500).json({ error: "Ошибка сервера" });
     }
   },
+
   save: async (req: Request, res: Response) => {
     try {
       console.log(123);

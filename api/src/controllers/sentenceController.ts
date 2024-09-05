@@ -10,6 +10,7 @@ import isValidObjectIdString from "../utils/isValidObjectIdString";
 import User from "../models/User";
 import updateRating from "../utils/updateRating";
 import Sentence from "../models/AcceptedSentences";
+import Watcher from "../models/Watcher";
 
 const sentenceController = {
   getAllSentences: async (req: Request, res: Response) => {
@@ -64,19 +65,39 @@ const sentenceController = {
   // В вашем контроллере
   getAcceptedSentence: async (req: AuthRequest, res: Response) => {
     try {
-      const sentence = await AcceptedSentence.findOne()
-        .lean()
-        .populate("author", "_id firstName username email");
-      if (!sentence) {
+      const sentence = await AcceptedSentence.aggregate([
+        {
+          $addFields: {
+            watchersCount: { $size: { $ifNull: ["$watchers", []] } },
+          },
+        },
+        {
+          $sort: { watchersCount: 1 },
+        },
+        {
+          $limit: 1,
+        },
+      ]).exec();
+
+      if (sentence.length === 0) {
         return res
           .status(404)
           .json({ message: "Предложение для перевода не найдено" });
       }
+
+      const populatedSentence = await AcceptedSentence.populate(sentence[0], {
+        path: "author",
+        select: "_id firstName username email",
+      });
+
       res
         .status(200)
-        .json({ message: "Предложение для перевода получено", sentence });
+        .json({
+          message: "Предложение для перевода получено",
+          sentence: populatedSentence,
+        });
     } catch (error) {
-      logger.error(`Ошибка при получении предложения для переода: ${error}`);
+      logger.error(`Ошибка при получении предложения для перевода: ${error}`);
       res.status(500).json({ message: "Error retrieving sentence" });
     }
   },
@@ -84,20 +105,24 @@ const sentenceController = {
   getNewSentence: async (req: AuthRequest, res: Response) => {
     try {
       const sentence = await SuggestedSentence.findOne({
-        status: "new",
-      });
+        status: "pending",
+      })
+        .sort({ watchers: 1 })
+        .exec();
 
       if (sentence) {
-        // // Проверяем, есть ли пользователь уже в массиве watchers
-        // const isWatching = sentence.watchers.some((watcherId) => watcherId.equals(new ObjectId(req.user.userId)));
+        // Добавляем пользователя в массив watchers
+        await SuggestedSentence.findByIdAndUpdate(sentence._id, {
+          $addToSet: { watchers: new ObjectId(req.user.userId) },
+        });
 
-        // if (!isWatching) {
-        //     // Добавляем пользователя в массив watchers
-        //     await SuggestedSentence.findByIdAndUpdate(sentence._id, {
-        //         $addToSet: { watchers: new ObjectId(req.user.userId) }
-        //     });
+        const expiresAt = new Date(Date.now() + 5 * 1000); // 3 дня
 
-        // }
+        await new Watcher({
+          telegramUserId: new ObjectId("667310420bff561a88320643"),
+          sentenceId: new ObjectId("6672dcb652ac724f7c56dd3b"),
+          expiresAt,
+        }).save();
 
         return res
           .status(200)
@@ -226,8 +251,8 @@ const sentenceController = {
   // Создание нескольких предложений
   createSentenceMultiple: async (req: AuthRequest, res: Response) => {
     try {
-      const { sentences, language, context } = req.body;
-
+      const { sentences, language, ctx } = req.body;
+      console.log(ctx);
       if (!req.user) {
         return res.json({ message: "Вы не авторизованы!" });
       }
@@ -321,7 +346,7 @@ const sentenceController = {
             text: sentence.text,
             language,
             author,
-            context,
+            context: ctx,
           }).save();
 
           await User.findByIdAndUpdate(author, {

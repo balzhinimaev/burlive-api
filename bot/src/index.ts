@@ -67,9 +67,9 @@ bot.on("message", async (ctx: rlhubContext, next) => {
   }
 })
 
-bot.command("start", async (ctx) => {
-  // await ctx.scene.enter("home");
-});
+// bot.command("start", async (ctx) => {
+//   // await ctx.scene.enter("home");
+// });
 
 bot.command("webapp", async (ctx) => {
   await ctx.reply(

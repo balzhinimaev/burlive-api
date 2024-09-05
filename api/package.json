@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "dev": "ts-node-dev app.ts"
+    "dev": "ts-node-dev src/app.ts",
+    "start": "node dist/app.js"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +29,7 @@
     "@types/node-fetch": "^2.6.10",
     "@types/validator": "^13.11.8",
     "@types/winston": "^2.4.4",
+    "agenda": "^5.0.0",
     "array-flatten": "^3.0.0",
     "axios": "^1.6.5",
     "bcrypt": "^5.1.1",
@@ -41,6 +43,7 @@
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.4",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
     "nodemon": "^3.0.2",
     "openai": "^4.24.3",
     "pdf-parse": "^1.1.1",

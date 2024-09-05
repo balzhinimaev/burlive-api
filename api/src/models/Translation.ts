@@ -16,22 +16,39 @@ export interface ITranslation extends Document {
   status: 'new' | 'processing' | 'accepted' | 'rejected'; // Added field for status
 }
 
-const TranslationSchema = new Schema({
-  text: { type: String, required: true, unique: true },
-  language: { type: String, required: true },
-  sentenceId: { type: Schema.Types.ObjectId, required: true, ref: 'Sentence' },
+const TranslationSchema = new Schema(
+  {
+    text: { type: String, required: true, unique: true },
+    language: { type: String, required: true },
+    sentenceId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Sentence",
+    },
 
-  dialect: { type: Schema.Types.ObjectId, ref: 'Dialect' },
+    dialect: { type: Schema.Types.ObjectId, ref: "Dialect" },
 
-  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  contributors: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    contributors: [{ type: Schema.Types.ObjectId, ref: "User" }],
 
-  votes: [{ type: Schema.Types.ObjectId, ref: 'Vote' }],
-  status: { type: String, enum: ['new', 'processing', 'accepted', 'rejected'], default: 'new' },
+    watchers: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "telegram_user" },
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
 
-}, {
-    timestamps: true
-});
+    votes: [{ type: Schema.Types.ObjectId, ref: "Vote" }],
+    status: {
+      type: String,
+      enum: ["new", "processing", "accepted", "rejected"],
+      default: "new",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Translation = model<ITranslation>('Suggested_translation', TranslationSchema);
 

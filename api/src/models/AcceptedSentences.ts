@@ -1,4 +1,4 @@
-// suggestionModel.ts
+// AcceptedSentences.ts
 import { Document, Schema, Types, model } from 'mongoose';
 
 export interface ISentence extends Document {
@@ -17,7 +17,7 @@ const SentenceSchema = new Schema({
   language: { type: String },
   context: { type: String },
   translations: [{ type: Schema.Types.ObjectId, ref: 'Translation', default: [] }],
-  watchers: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
+  watchers: [{ type: Schema.Types.ObjectId, ref: 'telegram_user', default: [] }],
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   contributors: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
   // Additional fields, if needed
@@ -25,6 +25,6 @@ const SentenceSchema = new Schema({
   timestamps: true
 });
 
-const Sentence = model<ISentence>('Sentence', SentenceSchema);
+const Sentence = model<ISentence>('accepted_sentence', SentenceSchema);
 
 export default Sentence;

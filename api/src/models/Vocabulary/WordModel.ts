@@ -1,8 +1,8 @@
-// wordModel.ts
 import { Document, Schema, Types, model } from "mongoose";
 
 export interface IWordModel extends Document {
   text: string;
+  normalized_text: string; // Новый атрибут для нормализованного текста
   language: string;
   author: Types.ObjectId;
   contributors: Types.ObjectId[];
@@ -15,6 +15,7 @@ export interface IWordModel extends Document {
 const WordSchema = new Schema(
   {
     text: { type: String, required: true, unique: true },
+    normalized_text: { type: String, required: true, lowercase: true }, // Новый атрибут
     language: { type: String },
     dialect: { type: String },
     translations: {

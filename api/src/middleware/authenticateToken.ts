@@ -14,19 +14,32 @@ const authenticateToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.header("Authorization")?.replace("Bearer ", "");
+  
+  const authHeader = req.headers["authorization"] as string | undefined;
+
+  if (!authHeader) {
+    return res
+      .status(401)
+      .json({ error: "Access denied", message: "Access denied" });
+  }
+
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
     return res
       .status(401)
-      .json({ message: "Отсутствует токен аутентификации" });
+      .json({ error: "Access denied", message: "Access denied" });
   }
 
   try {
+    console.log(token)
+    console.log(process.env.JWT_SECRET)
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       userId: string;
       sessionId: string;
     };
+
+    logger.info(`decoded \n${decoded}`)
 
     const existingToken = await JwtTokenModel.findOne({
       userId: decoded.userId,

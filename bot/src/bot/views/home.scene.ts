@@ -11,25 +11,23 @@ const home = new Scenes.WizardScene("home", handler);
 
 export async function loginBurlive() {
   try {
-    // const response = await fetch(`${process.env.api_url}/users/login`, {
-    //   method: "post",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     password: process.env.telegram_user_password,
-    //     email: process.env.telegram_user_email,
-    //     username: process.env.telegram_user_username,
-    //   }),
-    // });
+  
+    const response = await fetch(`${process.env.api_url}/users/login`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        password: process.env.telegram_user_password,
+        email: process.env.telegram_user_email,
+        username: process.env.telegram_user_username,
+      }),
+    });
+  
+    const result = await response.json(); // Сначала получаем текст ответа
 
-    // const text = await response.text(); // Сначала получаем текст ответа
-
-    const data = {
-      token: process.env.user_token,
-    }; // Затем пытаемся распарсить JSON
-
-    return data;
+    return result;
+  
   } catch (error) {
     console.error("Error in loginBurlive:", error);
     throw error; // Добавляем выброс ошибки, чтобы можно было её обработать

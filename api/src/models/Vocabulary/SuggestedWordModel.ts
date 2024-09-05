@@ -3,6 +3,7 @@ import { Document, Schema, Types, model } from "mongoose";
 
 export interface ISuggestedWordModel extends Document {
   text: string;
+  normalized_text: string; // Новый атрибут для нормализованного текста
   language: string;
   author: Types.ObjectId;
   contributors: Types.ObjectId[];
@@ -14,7 +15,13 @@ export interface ISuggestedWordModel extends Document {
 }
 
 const SuggestedWordSchema = new Schema({
-  text: { type: String, required: true, unique: true },
+  text: { type: String, required: true },
+  normalized_text: {
+    type: String,
+    required: true,
+    lowercase: true,
+    unique: true
+  }, // Новый атрибут
   language: { type: String },
   author: { type: Schema.Types.ObjectId, ref: "User", required: true },
   contributors: [{ type: Schema.Types.ObjectId, ref: "User" }],
@@ -24,7 +31,7 @@ const SuggestedWordSchema = new Schema({
     default: "new",
   },
   dialect: { type: String },
-  pre_translations: [{ type: Schema.Types.ObjectId, ref: 'Word' }],
+  pre_translations: [{ type: Schema.Types.ObjectId, ref: "word" }],
   createdAt: { type: Date, default: Date.now },
   // Additional fields, if needed
 });
