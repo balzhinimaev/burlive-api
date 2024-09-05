@@ -2,7 +2,7 @@
 import { defineStore } from "pinia";
 import type { ApiError } from "@/types/error";
 import type { IPublicUser } from "~/types/IUser";
-const apiUrl = `https://burlive.ru/backendapi`;
+const apiUrl = `http://localhost:5000/backendapi`;
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: {} as {

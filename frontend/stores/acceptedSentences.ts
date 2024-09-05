@@ -2,7 +2,7 @@
 import { defineStore } from "pinia";
 import type { Sentence, SentencesResponse } from "@/types/sentences";
 import type { ApiError } from "@/types/error";
-const apiUrl = `https://burlive.ru/backendapi`;
+const apiUrl = `http://localhost:5000/backendapi`;
 export const useAcceptedSentencesStore = defineStore("accepted-sentences", {
   state: () => ({
     acceptedSentences: [] as Sentence[],

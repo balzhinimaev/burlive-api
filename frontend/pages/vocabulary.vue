@@ -12,8 +12,8 @@ async function updateCurrentPage(page: number) {
   // Здесь вызовите метод для получения данных новой страницы
 }
 // Вызовите fetchSentences при монтировании компонента
-onMounted(() => {
-  vocabularyStore.fetchWordsOnApproval();
+onBeforeMount(async () => {
+  await vocabularyStore.fetchWordsOnApproval();
 });
 </script>
 <template>
