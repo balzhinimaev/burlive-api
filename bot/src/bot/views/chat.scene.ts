@@ -158,7 +158,7 @@ handler.action("new_chat", async (ctx) => {
         if (user.access_tokens === 0) {
             
             const message: string = `<a href="https://telegra.ph/Kak-priobresti-tokeny-10-21">Как приобрести токены?</a>`
-            await ctx.editMessageText(message, { parse_mode: 'HTML', disable_web_page_preview: true })
+            await ctx.editMessageText(message, { parse_mode: 'HTML' })
             await greeting(ctx, true)
             return ctx.answerCbQuery("Закончились токены 🪫 😔")
         }
@@ -538,7 +538,9 @@ async function instructionRender(ctx: rlhubContext) {
                     [{ text: 'Назад', callback_data: 'back' }]
                 ]
             },
-            disable_web_page_preview: true
+            link_preview_options: {
+                is_disabled: true
+            }
         }
 
         ctx.updateType === 'callback_query' ? ctx.editMessageText(message, extra) : ctx.reply(message, extra)

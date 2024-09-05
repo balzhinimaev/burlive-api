@@ -180,7 +180,7 @@ async function reference_materials(ctx: rlhubContext) {
 
 dashboard.enter(async (ctx: rlhubContext, next) => {
   try {
-    await saveSceneMiddleware(ctx, next)
+    await saveSceneMiddleware(ctx, next);
     await greeting(ctx);
   } catch (error) {
     console.log(error);
@@ -424,7 +424,9 @@ async function about_project_section_render(ctx: rlhubContext) {
 
     let extra: ExtraEditMessageText = {
       parse_mode: "HTML",
-      disable_web_page_preview: true,
+      link_preview_options: {
+        is_disabled: true,
+      },
       reply_markup: {
         inline_keyboard: [
           [
@@ -457,9 +459,9 @@ dashboard.action("reference_materials", async (ctx) => {
 
 dashboard.action("help", async (ctx) => {
   try {
-    await ctx.reply("Поддержите проек")
+    await ctx.reply("Поддержите проек");
   } catch (error) {
-    return ctx.scene.enter("home")
+    return ctx.scene.enter("home");
   }
 });
 async function help(ctx: rlhubContext) {
