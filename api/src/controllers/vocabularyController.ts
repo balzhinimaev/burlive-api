@@ -5,6 +5,8 @@ import logger from "../utils/logger";
 import WordModel from "../models/Vocabulary/WordModel";
 import SuggestedWordModel from "../models/Vocabulary/SuggestedWordModel";
 import { ValidateSuggestedWordRequest } from "../middleware/validateSuggestedWord";
+import TelegramUserModel from "../models/TelegramUsers";
+import updateRating from "../utils/updateRatingTelegram";
 
 const vocabularyController = {
   getAllWords: async (req: Request, res: Response) => {
@@ -110,7 +112,7 @@ const vocabularyController = {
   },
 
   suggestWords: async (req: AuthRequest, res: Response) => {
-    const { text, language } = req.body;
+    const { text, language, id } = req.body;
     try {
       if (!text || !language) {
         logger.error(
@@ -125,7 +127,16 @@ const vocabularyController = {
         return res.status(400).json({ message: "Отсутствует токен" });
       }
 
-      const userId = new Types.ObjectId(req.user.userId);
+      if (!id) {
+        logger.error(`Отсутствует telegramID`);
+        return res.status(400).json({ message: "Ошибка запроса" });
+      }
+
+      // const userId = new Types.ObjectId(req.user.userId);
+      // Найти пользователя и получить только его _id
+      const user = await TelegramUserModel.findOne({ id }).select("_id");
+      const userId = user?._id; // Извлечение _id как ObjectId
+
       const results = [];
       const wordsArray = text.split(",").map((word: string) => ({
         normalized: word.trim().toLowerCase(),
@@ -141,6 +152,7 @@ const vocabularyController = {
           if (!existingWord.contributors.includes(userId)) {
             existingWord.contributors.push(userId);
             await existingWord.save();
+            await updateRating(userId)
           }
           results.push({
             message:
@@ -160,6 +172,7 @@ const vocabularyController = {
             message: "Слово успешно предложено",
             newSuggestedWord,
           });
+          await updateRating(userId, 30)
         }
       }
 
