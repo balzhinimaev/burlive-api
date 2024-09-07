@@ -8,6 +8,9 @@ const vocabularyRouter = express.Router();
 // Маршрут для получения всех слов из словаря
 vocabularyRouter.get('/', vocabularyController.getAllWords);
 
+// Маршрут для получения слов с пагинацией и сортировкой по количеству переводов
+vocabularyRouter.get('/get-words-paginated', vocabularyController.getAllWordsPaginated);
+
 // Маршрут для получения слов на рассмотрении
 vocabularyRouter.get('/get-words-on-approval', vocabularyController.getWordsOnApproval);
 

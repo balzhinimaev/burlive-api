@@ -24,7 +24,37 @@ const vocabularyController = {
       res.status(500).json({ message: "Ошибка при получении слов" });
     }
   },
+  // Контроллер для получения всех слов с пагинацией и сортировкой по количеству переводов
+  getAllWordsPaginated: async (req: Request, res: Response) => {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+      const skip = (page - 1) * limit;
 
+      // Считаем общее количество слов в базе данных
+      const totalWords = await WordModel.countDocuments();
+
+      // Получаем слова с разбивкой по страницам и сортировкой по количеству переводов
+      const words = await WordModel.find()
+        .sort({ translations: 1 }) // Сортировка по количеству переводов
+        .skip(skip)
+        .limit(limit)
+        .populate("author", "_id firstname username email")
+        .populate("translations", "_id text");
+
+      // Формируем ответ с данными
+      res.status(200).json({
+        message: "Словарь найден",
+        words,
+        totalWords, // Общее количество слов
+        currentPage: page, // Текущая страница
+        totalPages: Math.ceil(totalWords / limit), // Общее количество страниц
+      });
+    } catch (error) {
+      console.error(`Ошибка при получении слов: ${error}`);
+      res.status(500).json({ message: "Ошибка при получении слов" });
+    }
+  },
   getWordsOnApproval: async (req: Request, res: Response) => {
     try {
       const { page = 1, limit = 10 } = req.query;
@@ -169,10 +199,10 @@ const vocabularyController = {
             contributors: [userId],
           });
 
-          if (language === 'buryat') {
-            if (typeof (dialect) === 'string') {
-              newSuggestedWord.dialect = dialect
-              logger.info(`Диалект присвоен к слову`)
+          if (language === "buryat") {
+            if (typeof dialect === "string") {
+              newSuggestedWord.dialect = dialect;
+              logger.info(`Диалект присвоен к слову`);
             }
           }
 
@@ -294,12 +324,10 @@ const vocabularyController = {
       // Удалить слово из SuggestedWordModel
       await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
 
-      return res
-        .status(200)
-        .json({
-          message:
-            "Слово успешно отклонено и перенесено в архив отклонённых слов.",
-        });
+      return res.status(200).json({
+        message:
+          "Слово успешно отклонено и перенесено в архив отклонённых слов.",
+      });
     } catch (error) {
       logger.error(`Ошибка при отклонении предложенного слова: ${error}`);
       return res
