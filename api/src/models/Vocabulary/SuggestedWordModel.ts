@@ -1,4 +1,4 @@
-// wordModel.ts
+// SuggestedWordModel.ts
 import { Document, Schema, Types, model } from "mongoose";
 
 export interface ISuggestedWordModel extends Document {
@@ -20,11 +20,11 @@ const SuggestedWordSchema = new Schema({
     type: String,
     required: true,
     lowercase: true,
-    unique: true
+    unique: true,
   }, // Новый атрибут
   language: { type: String },
-  author: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  contributors: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  author: { type: Schema.Types.ObjectId, ref: "telegram_user", required: true },
+  contributors: [{ type: Schema.Types.ObjectId, ref: "telegram_user" }],
   status: {
     type: String,
     enum: ["new", "processing", "accepted", "rejected"],

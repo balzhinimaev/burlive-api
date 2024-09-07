@@ -1,7 +1,7 @@
 import { unique } from "agenda/dist/job/unique";
 import { Document, Schema, Types, model } from "mongoose";
 
-export interface IWordModel extends Document {
+export interface IDeclinedWordModel extends Document {
   text: string;
   normalized_text: string; // Новый атрибут для нормализованного текста
   language: string;
@@ -32,5 +32,5 @@ const WordSchema = new Schema(
   }
 );
 
-const WordModel = model<IWordModel>("word", WordSchema);
-export default WordModel;
+const DeclinedWordModel = model<IDeclinedWordModel>("declined_word", WordSchema);
+export default DeclinedWordModel;

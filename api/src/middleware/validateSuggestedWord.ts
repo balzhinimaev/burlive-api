@@ -6,6 +6,7 @@ import logger from "../utils/logger";
 
 export interface ValidateSuggestedWordRequest extends Request {
   suggestedWord?: ISuggestedWordModel;
+  telegram_user_id: number;
 }
 
 const validateSuggestedWord = async (
@@ -13,11 +14,11 @@ const validateSuggestedWord = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { suggestedWordId } = req.body;
-
-  if (!suggestedWordId) {
+  const { suggestedWordId, telegram_user_id } = req.body;
+  
+  if (!suggestedWordId || !telegram_user_id) {
     return res.status(400).json({
-      message: "Ошибка при принятии предложенного слова, отсутствует ID",
+      message: "Ошибка при принятии предложенного слова, отсутствует параметры",
     });
   }
 
@@ -28,6 +29,7 @@ const validateSuggestedWord = async (
     }
     // Attach the found suggested word to the request object for use in the route handler
     (req as ValidateSuggestedWordRequest).suggestedWord = suggestedWord;
+    (req as ValidateSuggestedWordRequest).telegram_user_id = telegram_user_id;
     next();
   } catch (error) {
     logger.error("Ошибка при проверке предложенного слова:", error);

@@ -7,6 +7,7 @@ import SuggestedWordModel from "../models/Vocabulary/SuggestedWordModel";
 import { ValidateSuggestedWordRequest } from "../middleware/validateSuggestedWord";
 import TelegramUserModel from "../models/TelegramUsers";
 import updateRating from "../utils/updateRatingTelegram";
+import DeclinedWordModel from "../models/Vocabulary/DeclinedWordModel";
 
 const vocabularyController = {
   getAllWords: async (req: Request, res: Response) => {
@@ -112,7 +113,7 @@ const vocabularyController = {
   },
 
   suggestWords: async (req: AuthRequest, res: Response) => {
-    const { text, language, id } = req.body;
+    const { text, language, id, dialect } = req.body;
     try {
       if (!text || !language) {
         logger.error(
@@ -152,7 +153,7 @@ const vocabularyController = {
           if (!existingWord.contributors.includes(userId)) {
             existingWord.contributors.push(userId);
             await existingWord.save();
-            await updateRating(userId)
+            await updateRating(userId);
           }
           results.push({
             message:
@@ -167,12 +168,20 @@ const vocabularyController = {
             author: userId,
             contributors: [userId],
           });
+
+          if (language === 'buryat') {
+            if (typeof (dialect) === 'string') {
+              newSuggestedWord.dialect = dialect
+              logger.info(`Диалект присвоен к слову`)
+            }
+          }
+
           await newSuggestedWord.save();
           results.push({
             message: "Слово успешно предложено",
             newSuggestedWord,
           });
-          await updateRating(userId, 30)
+          await updateRating(userId, 30);
         }
       }
 
@@ -187,7 +196,7 @@ const vocabularyController = {
     req: ValidateSuggestedWordRequest,
     res: Response
   ) => {
-    const suggestedWord = req.suggestedWord;
+    const { suggestedWord, telegram_user_id } = req;
 
     try {
       if (!suggestedWord) {
@@ -197,6 +206,8 @@ const vocabularyController = {
       const wordToUpdate = await WordModel.findOne({
         text: suggestedWord.text,
       });
+
+      let updateOrCreateWord;
 
       if (wordToUpdate) {
         wordToUpdate.language = suggestedWord.language;
@@ -210,19 +221,29 @@ const vocabularyController = {
             ...suggestedWord.pre_translations,
           ])
         );
-        await wordToUpdate.save();
+
+        updateOrCreateWord = wordToUpdate.save(); // Сохраняем слово
       } else {
-        await new WordModel({
+        updateOrCreateWord = new WordModel({
           _id: suggestedWord._id,
           text: suggestedWord.text,
+          normalized_text: suggestedWord.normalized_text,
           language: suggestedWord.language,
           dialect: suggestedWord.dialect,
           author: suggestedWord.author,
           contributors: suggestedWord.contributors,
           translations: suggestedWord.pre_translations,
-        }).save();
+        }).save(); // Создаем новое слово
       }
 
+      // Обновляем рейтинги для пользователей
+      const updateRatings = Promise.all([
+        updateRating(telegram_user_id, 10),
+        updateRating(suggestedWord.author, 10),
+      ]);
+
+      // Удаляем предложенное слово и ждем завершения всех операций
+      await Promise.all([updateOrCreateWord, updateRatings]);
       await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
 
       return res
@@ -230,7 +251,7 @@ const vocabularyController = {
         .json({ message: "Слово успешно принято и добавлено в словарь" });
     } catch (error) {
       console.error(error);
-      res
+      return res
         .status(500)
         .json({ message: "Ошибка при принятии предложенного слова" });
     }
@@ -240,17 +261,48 @@ const vocabularyController = {
     req: ValidateSuggestedWordRequest,
     res: Response
   ) => {
-    const suggestedWord = req.suggestedWord;
+    const { suggestedWord, telegram_user_id } = req;
+
     try {
       if (!suggestedWord) {
         return res.status(400).json({ message: "SuggestedWord не указан" });
       }
 
+      // Найти слово в SuggestedWordModel
+      const wordToDecline = await SuggestedWordModel.findById(
+        suggestedWord._id
+      );
+
+      if (!wordToDecline) {
+        return res.status(404).json({ message: "Слово не найдено" });
+      }
+
+      // Создать новый документ в DeclinedWordModel с теми же данными
+      const declinedWord = new DeclinedWordModel({
+        text: wordToDecline.text,
+        normalized_text: wordToDecline.normalized_text,
+        language: wordToDecline.language,
+        author: wordToDecline.author,
+        contributors: wordToDecline.contributors,
+        translations: wordToDecline.pre_translations, // предполагаю, что это соответствие переводам
+        dialect: wordToDecline.dialect,
+      });
+
+      // Сохранить отклонённое слово
+      await declinedWord.save();
+
+      // Удалить слово из SuggestedWordModel
       await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
-      return res.status(200).json({ message: "Слово успешно отклонено" });
+
+      return res
+        .status(200)
+        .json({
+          message:
+            "Слово успешно отклонено и перенесено в архив отклонённых слов.",
+        });
     } catch (error) {
       logger.error(`Ошибка при отклонении предложенного слова: ${error}`);
-      res
+      return res
         .status(500)
         .json({ message: "Ошибка при отклонении предложенного слова" });
     }
