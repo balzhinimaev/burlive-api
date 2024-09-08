@@ -7,6 +7,7 @@ interface TelegramUser extends User {
     createdAt: Date;
     updatedAt: Date;
     email: string;
+    c_username: string;
     vocabular: {
       selected_language_for_translate: 'russian' | 'buryat'
     }
@@ -16,6 +17,7 @@ const TelegramUserSchema: Schema<TelegramUser> = new Schema<TelegramUser>(
   {
     id: { type: Number, required: true },
     username: { type: String, required: false },
+    c_username: { type: String, required: false, default: '' },
     first_name: { type: String, required: false },
     email: { type: String, required: false },
     last_name: { type: String, required: false },

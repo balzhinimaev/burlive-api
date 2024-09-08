@@ -26,4 +26,7 @@ vocabularyRouter.post('/accept-suggested-word', validateSuggestedWord, vocabular
 // Маршрут для отклонения слова
 vocabularyRouter.post('/decline-suggested-word', validateSuggestedWord, vocabularyController.declineSuggestedWord);
 
+// Новый маршрут для получения одного подтверждённого слова
+vocabularyRouter.get('/get-confirmed-word', vocabularyController.getConfirmedWord);
+
 export default vocabularyRouter;

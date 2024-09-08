@@ -87,54 +87,113 @@ const vocabularyController = {
     req: AuthRequest,
     res: Response
   ): Promise<Response> => {
-    const { word_id, translate_language, translate, dialect } = req.body;
+    const { word_id, translate_language, translate, dialect, normalized_text, telegram_user_id } =
+      req.body;
+
+      
     try {
-      if (!word_id || !translate_language || !translate) {
+      // Проверка обязательных параметров
+      console.log({
+        word_id,
+        translate_language,
+        translate,
+        telegram_user_id,
+        normalized_text
+      })
+      if (!word_id || !translate_language || !translate || !telegram_user_id || !normalized_text) {
         logger.error(
-          "Ошибка при предложении перевода в словарь, отсутствует один из параметров"
+          "Ошибка при предложении перевода в словарь, отсутствует один из обязательных параметров"
         );
         return res
           .status(400)
-          .json({ message: "Отсутствует один из параметров" });
+          .json({
+            message:
+              "Ошибка при предложении перевода в словарь, отсутствует один из обязательных параметров",
+          });
       }
 
+      // Поиск исходного слова в базе данных
       const existingWord = await WordModel.findById(word_id);
       if (!existingWord) {
         return res.status(400).json({ message: "Исходное слово не найдено" });
       }
 
+      // Проверка на существование перевода (предложенного слова)
       const existingSuggestedWord = await SuggestedWordModel.findOne({
-        text: translate,
+        normalized_text: translate.trim().toLowerCase(),
+        language: translate_language, // Проверяем также язык перевода
       });
+
       if (existingSuggestedWord) {
+        logger.info(`Предложенное слово уже существует в коллекции`)
+
+        // Если предложенное слово уже существует, 
+        // добавляем его в поле непринятых к принятому слову
         await WordModel.findByIdAndUpdate(word_id, {
-          $addToSet: { translations: existingSuggestedWord._id },
+          $addToSet: { translations_u: existingSuggestedWord._id }, // Обновляем исходное слово
         });
+        logger.info(`_id предложенного слова добавлен к принятому слову`)
+
+        // Добавляем айди принятого слова в массив pre_translations у предложенного слова на голосование
         await SuggestedWordModel.findByIdAndUpdate(existingSuggestedWord._id, {
-          $addToSet: { pre_translations: existingWord._id },
+          $addToSet: { pre_translations: existingWord._id }, // Связываем перевод с исходным словом
         });
+        logger.info(`_id принятого слова добавлен к предложенному слову`)
       } else {
+        // Если перевода не существует, создаем новое предложенное слово
         const newSuggestedWord = new SuggestedWordModel({
           text: translate,
           language: translate_language,
-          author: new Types.ObjectId(req.user?.userId),
+          author: new Types.ObjectId(telegram_user_id),
           dialect,
+          normalized_text: translate.toLowerCase().trim(),
         });
-        await newSuggestedWord.save();
 
-        await WordModel.findByIdAndUpdate(word_id, {
-          $addToSet: { translations: newSuggestedWord._id },
+        // Сохраняем новое предложенное слово
+        await newSuggestedWord.save().then(async(savedSuggestedWord) => {
+          try {
+            if (!savedSuggestedWord) {
+              logger.error("Ошибка при сохранении предложенного слова");
+              return res
+                .status(500)
+                .json({ message: "Ошибка при сохранении слова" });
+            }
+
+            logger.info(
+              `Предложенное слово успешно сохранено с ID: ${savedSuggestedWord._id}`
+            );
+
+            // Обновляем исходное слово, добавляя ID нового предложенного слова
+            await WordModel.findByIdAndUpdate(
+              word_id,
+              {
+                $addToSet: { translations_u: savedSuggestedWord._id },
+              },
+              { new: true }
+            );
+
+            logger.info(`Исходное слово успешно обновлено`);
+
+          } catch (error) {
+            logger.error(error)
+          }
         });
+
+        // Связываем новое предложенное слово с исходным словом
         await SuggestedWordModel.findByIdAndUpdate(newSuggestedWord._id, {
           $addToSet: { pre_translations: existingWord._id },
         });
+        
       }
 
+      // Сохраняем обновленное исходное слово
       await existingWord.save();
+
       return res
         .status(200)
         .json({ message: "Перевод успешно предложен и добавлен в словарь" });
     } catch (error) {
+      // Логируем и возвращаем ошибку, если что-то пошло не так
       logger.error(`Ошибка при предложении перевода: ${error}`);
       return res
         .status(500)
@@ -333,6 +392,41 @@ const vocabularyController = {
       return res
         .status(500)
         .json({ message: "Ошибка при отклонении предложенного слова" });
+    }
+  },
+
+  // Новый метод для получения одного подтверждённого слова
+  getConfirmedWord: async (req: Request, res: Response) => {
+    try {
+      const { wordId } = req.query;
+
+      // Если указан ID, ищем по ID
+      let word;
+      if (wordId) {
+        word = await WordModel.findById(wordId)
+          .populate("author", "_id firstname username email")
+          .populate("translations", "_id text");
+      } else {
+        // Если ID не указан, получаем случайное слово
+        const count = await WordModel.countDocuments();
+        const random = Math.floor(Math.random() * count);
+        word = await WordModel.findOne()
+          .skip(random)
+          .populate("author", "_id firstname username email")
+          .populate("translations", "_id text");
+      }
+
+      if (!word) {
+        return res.status(404).json({ message: "Слово не найдено" });
+      }
+
+      return res.status(200).json({
+        message: "Подтверждённое слово найдено",
+        word,
+      });
+    } catch (error) {
+      console.error(`Ошибка при получении слова: ${error}`);
+      res.status(500).json({ message: "Ошибка при получении слова" });
     }
   },
 };

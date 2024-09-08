@@ -110,7 +110,7 @@ const telegramController = {
     try {
       const { id } = req.params;
       const user = await TelegramUserModel.findOne({ id }).select(
-        "email createdAt first_name rating"
+        "_id c_username email createdAt first_name rating"
       );
 
       if (!user) {
@@ -123,6 +123,8 @@ const telegramController = {
         is_exists: true,
         message: "Пользователь существует",
         user: {
+          _id: user._id,
+          c_username: user.c_username,
           createdAt: user.createdAt,
           first_name: user.first_name,
           rating: user.rating,
