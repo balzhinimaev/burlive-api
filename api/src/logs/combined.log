@@ -18131,3 +18131,278 @@
 {"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:09:34.227Z"}
 {"level":"info","message":"Предложенное слово успешно сохранено с ID: 66dd3f9e533655c7228d6357","timestamp":"2024-09-08T06:09:34.255Z"}
 {"level":"info","message":"Исходное слово успешно обновлено: {\n  _id: new ObjectId('66dafb9ceba5c1429c49456b'),\n  text: 'завтра',\n  normalized_text: 'завтра',\n  language: 'русский',\n  translations: [],\n  author: new ObjectId('66d9c95b3ed0a7722ecd2bf1'),\n  contributors: [ new ObjectId('66d9c95b3ed0a7722ecd2bf1') ],\n  createdAt: 2024-09-06T21:27:16.812Z,\n  updatedAt: 2024-09-08T06:09:34.256Z,\n  __v: 0,\n  translations_u: [ new ObjectId('66dafb9ceba5c1429c49456b') ]\n}","timestamp":"2024-09-08T06:09:34.264Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:11:59.501Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:11:59.525Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:12:00.911Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:12:00.922Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:12:02.391Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:12:02.394Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:12:02.416Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:12:02.420Z"}
+{"level":"info","message":"Предложенное слово успешно сохранено с ID: 66dd40326c9b0d67f5bc269b","timestamp":"2024-09-08T06:12:02.451Z"}
+{"level":"info","message":"Исходное слово успешно обновлено","timestamp":"2024-09-08T06:12:02.462Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:12:25.207Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:12:25.213Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:12:27.881Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:12:27.885Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:12:29.250Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:12:29.254Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:12:29.265Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:12:29.272Z"}
+{"level":"info","message":"Предложенное слово уже существует в коллекции","timestamp":"2024-09-08T06:12:29.284Z"}
+{"level":"info","message":"_id предложенного слова добавлен к принятому слову","timestamp":"2024-09-08T06:12:29.291Z"}
+{"level":"info","message":"_id принятого слова добавлен к предложенному слову","timestamp":"2024-09-08T06:12:29.296Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:12:56.141Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:12:56.146Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:13:01.970Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:13:01.974Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:28.416Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:28.439Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:30.331Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:30.336Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:30.361Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:30.366Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:31.484Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:31.487Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:31.512Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:31.522Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:33.771Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:33.775Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:34.773Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:34.778Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:36.363Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:36.367Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:40.167Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:40.172Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:57:40.186Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:57:40.190Z"}
+{"level":"error","message":"Ошибка при предложении перевода: MongoServerError: E11000 duplicate key error collection: burlive.suggested_words index: normalized_text_1 dup key: { normalized_text: \"углоо\" }","timestamp":"2024-09-08T06:57:40.213Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:06.342Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:06.346Z"}
+{"level":"info","message":"Рейтинг пользователя обновлён!, 2921","timestamp":"2024-09-08T06:58:06.365Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:08.718Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:08.721Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:08.741Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:10.132Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:10.136Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:10.147Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:10.154Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:10.158Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:10.172Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:10.975Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:10.981Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:10.998Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:11.007Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:11.014Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:11.030Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:11.904Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:11.907Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:11.919Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:11.925Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:11.930Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:11.945Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:12.874Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:12.878Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:12.887Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:12.895Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:12.899Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:12.913Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:13.777Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:13.780Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:13.796Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:13.804Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:13.808Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:13.821Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:15.323Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:15.328Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:15.338Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:15.346Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:15.351Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:15.367Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:16.277Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:16.280Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:16.293Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:16.300Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:16.305Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:16.322Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:17.380Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:17.384Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:17.396Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:17.405Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:17.411Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:17.425Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:19.588Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:19.591Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:19.604Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:22.214Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:22.217Z"}
+{"level":"error","message":"Ошибка при обновлении рейтинга пользователя, CastError: Cast to ObjectId failed for value \"1272270574\" (type number) at path \"_id\" for model \"telegram_user\"","timestamp":"2024-09-08T06:58:22.232Z"}
+{"level":"info","message":"Рейтинг пользователя обновлён!, 2931","timestamp":"2024-09-08T06:58:22.235Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:22.466Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:22.470Z"}
+{"level":"info","message":"Все предложенные слова получены!","timestamp":"2024-09-08T06:58:22.484Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:26.613Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:26.617Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:28.640Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:28.644Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:28.664Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:28.668Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:30.175Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:30.178Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:30.196Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:30.200Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:32.723Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:32.727Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:33.812Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:33.815Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:38.606Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:38.610Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:41.023Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:41.029Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:41.052Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:41.056Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:43.691Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:43.695Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:43.714Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:43.720Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:47.499Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:47.502Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:52.252Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:52.255Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T06:58:52.265Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T06:58:52.269Z"}
+{"level":"error","message":"Ошибка при предложении перевода: MongoServerError: E11000 duplicate key error collection: burlive.suggested_words index: normalized_text_1 dup key: { normalized_text: \"углоо\" }","timestamp":"2024-09-08T06:58:52.280Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:07:36.567Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:07:36.593Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:07:39.147Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:07:39.150Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:07:47.665Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:07:47.669Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:07:47.697Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:07:47.700Z"}
+{"level":"info","message":"Предложенное слово уже существует в коллекции","timestamp":"2024-09-08T07:07:47.710Z"}
+{"level":"info","message":"_id предложенного слова добавлен к принятому слову","timestamp":"2024-09-08T07:07:47.726Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:11:22.607Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:11:22.633Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:11:25.847Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:11:25.852Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:11:47.532Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:11:47.536Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:11:47.563Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:11:47.567Z"}
+{"level":"info","message":"Предложенное слово уже существует в коллекции","timestamp":"2024-09-08T07:11:47.578Z"}
+{"level":"info","message":"_id предложенного слова добавлен к принятому слову","timestamp":"2024-09-08T07:11:47.590Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:19:49.272Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:19:49.296Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:19:56.249Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:19:56.253Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:19:59.598Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:19:59.601Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:19:59.625Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:19:59.628Z"}
+{"level":"info","message":"Предложенное слово уже существует в коллекции","timestamp":"2024-09-08T07:19:59.639Z"}
+{"level":"info","message":"_id предложенного слова добавлен к принятому слову","timestamp":"2024-09-08T07:19:59.655Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:21:28.090Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:21:28.114Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:21:32.039Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:21:32.044Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:21:35.453Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:21:35.457Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:21:35.483Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:21:35.491Z"}
+{"level":"info","message":"Предложенное слово уже существует в коллекции","timestamp":"2024-09-08T07:21:35.506Z"}
+{"level":"info","message":"_id предложенного слова добавлен к принятому слову","timestamp":"2024-09-08T07:21:35.524Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:22:44.574Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:22:44.598Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:23:02.010Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:23:02.035Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:27:34.900Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:27:34.963Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:28:55.536Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:28:55.555Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:29:51.467Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:29:51.489Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:30:31.302Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:30:31.329Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:30:44.038Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:30:44.056Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:30:48.458Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:30:48.462Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:30:52.332Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:30:52.336Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:30:52.378Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:30:52.383Z"}
+{"level":"info","message":"Предложенное слово уже существует в коллекции","timestamp":"2024-09-08T07:30:52.396Z"}
+{"level":"info","message":"_id предложенного слова добавлен к принятому слову","timestamp":"2024-09-08T07:30:52.407Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:31:32.687Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:31:32.691Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:37:21.173Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:37:21.191Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:39:19.578Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:39:19.583Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:39:21.177Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:39:21.180Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:46:25.759Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:46:25.764Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:46:27.172Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:46:27.176Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:46:43.091Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:46:43.094Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:46:43.131Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:46:43.135Z"}
+{"level":"info","message":"Предложенное слово успешно сохранено с ID: 66dd5663e2cc04e7826f84bf","timestamp":"2024-09-08T07:46:43.158Z"}
+{"level":"info","message":"Исходное слово успешно обновлено","timestamp":"2024-09-08T07:46:43.168Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:46:46.294Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:46:46.299Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:46:48.832Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:46:48.837Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:47:12.130Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:47:12.137Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:47:14.094Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:47:14.097Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:48:13.040Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:48:13.043Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:48:14.559Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:48:14.563Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:50:09.298Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:50:09.301Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:50:10.793Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:50:10.797Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:51:49.812Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:51:49.815Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:51:51.398Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:51:51.401Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:52:47.948Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:52:47.951Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:52:49.024Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:52:49.027Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:57:14.416Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:57:14.420Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:57:15.613Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:57:15.617Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:57:44.088Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:57:44.092Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:57:45.062Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:57:45.065Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:58:25.847Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:58:25.850Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:58:26.864Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:58:26.868Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:58:48.987Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:58:48.991Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:58:50.541Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:58:50.545Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:58:59.650Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:58:59.656Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:59:00.722Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:59:00.725Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:59:34.813Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:59:34.816Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:59:34.834Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:59:34.838Z"}
+{"level":"info","message":"Предложенное слово уже существует в коллекции","timestamp":"2024-09-08T07:59:34.844Z"}
+{"level":"info","message":"_id предложенного слова добавлен к принятому слову","timestamp":"2024-09-08T07:59:34.847Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:59:37.492Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:59:37.496Z"}
+{"level":"info","message":"decoded \n[object Object]","timestamp":"2024-09-08T07:59:38.974Z"}
+{"level":"info","message":"Токен верифицирован для пользователя: 66d9c56d3ed0a7722ecd2bd3","timestamp":"2024-09-08T07:59:38.977Z"}

@@ -8,6 +8,7 @@ import { ValidateSuggestedWordRequest } from "../middleware/validateSuggestedWor
 import TelegramUserModel from "../models/TelegramUsers";
 import updateRating from "../utils/updateRatingTelegram";
 import DeclinedWordModel from "../models/Vocabulary/DeclinedWordModel";
+import { ObjectId } from "mongodb";
 
 const vocabularyController = {
   getAllWords: async (req: Request, res: Response) => {
@@ -40,7 +41,7 @@ const vocabularyController = {
         .skip(skip)
         .limit(limit)
         .populate("author", "_id firstname username email")
-        .populate("translations", "_id text");
+        .populate("translations", "_id text")
 
       // Формируем ответ с данными
       res.status(200).json({
@@ -93,13 +94,6 @@ const vocabularyController = {
       
     try {
       // Проверка обязательных параметров
-      console.log({
-        word_id,
-        translate_language,
-        translate,
-        telegram_user_id,
-        normalized_text
-      })
       if (!word_id || !translate_language || !translate || !telegram_user_id || !normalized_text) {
         logger.error(
           "Ошибка при предложении перевода в словарь, отсутствует один из обязательных параметров"
@@ -120,25 +114,70 @@ const vocabularyController = {
 
       // Проверка на существование перевода (предложенного слова)
       const existingSuggestedWord = await SuggestedWordModel.findOne({
-        normalized_text: translate.trim().toLowerCase(),
-        language: translate_language, // Проверяем также язык перевода
+        normalized_text,
+        // language: translate_language, // Проверяем также язык перевода
       });
 
       if (existingSuggestedWord) {
-        logger.info(`Предложенное слово уже существует в коллекции`)
 
-        // Если предложенное слово уже существует, 
+        if (existingSuggestedWord.language !== translate_language) {
+          console.log("Надо посмотреть!")
+        }
+
+        logger.info(`Предложенное слово уже существует в коллекции`);
+
+        // Если предложенное слово уже существует,
         // добавляем его в поле непринятых к принятому слову
         await WordModel.findByIdAndUpdate(word_id, {
           $addToSet: { translations_u: existingSuggestedWord._id }, // Обновляем исходное слово
         });
-        logger.info(`_id предложенного слова добавлен к принятому слову`)
+        logger.info(`_id предложенного слова добавлен к принятому слову`);
 
+        // Обнолвние контрибьютора в words
+        if (existingWord.author._id.toString() !== telegram_user_id) {
+          let finded = false;
+          for (let i = 0; i < existingWord.contributors.length; i++) {
+            if (
+              existingWord.contributors[i].toString() ===
+              telegram_user_id
+            ) {
+              finded = true;
+            }
+          }
+          if (!finded) {
+            existingWord.contributors.push(
+              new ObjectId(telegram_user_id)
+            );
+          }
+        }
+
+        // Обновлние контрибьютора в suggested_words
         // Добавляем айди принятого слова в массив pre_translations у предложенного слова на голосование
         await SuggestedWordModel.findByIdAndUpdate(existingSuggestedWord._id, {
           $addToSet: { pre_translations: existingWord._id }, // Связываем перевод с исходным словом
         });
-        logger.info(`_id принятого слова добавлен к предложенному слову`)
+
+        // Обнолвние контрибьютора
+        if (existingSuggestedWord.author._id.toString() !== telegram_user_id) {
+          let finded = false;
+          for (let i = 0; i < existingSuggestedWord.contributors.length; i++) {
+            console.log(existingSuggestedWord.contributors[i].toString);
+            console.log(telegram_user_id);
+            if (
+              existingSuggestedWord.contributors[i].toString() ===
+              telegram_user_id
+            ) {
+              finded = true;
+            }
+          }
+          if (!finded) {
+            existingSuggestedWord.contributors.push(
+              new ObjectId(telegram_user_id)
+            );
+          }
+        }
+
+        await existingSuggestedWord.save();
       } else {
         // Если перевода не существует, создаем новое предложенное слово
         const newSuggestedWord = new SuggestedWordModel({
@@ -183,7 +222,7 @@ const vocabularyController = {
         await SuggestedWordModel.findByIdAndUpdate(newSuggestedWord._id, {
           $addToSet: { pre_translations: existingWord._id },
         });
-        
+
       }
 
       // Сохраняем обновленное исходное слово
@@ -405,7 +444,11 @@ const vocabularyController = {
       if (wordId) {
         word = await WordModel.findById(wordId)
           .populate("author", "_id firstname username email")
-          .populate("translations", "_id text");
+          .populate("translations", "_id text")
+          .populate(
+            "translations_u",
+            "_id text language dialect createdAt pre_translations normalized_text author contributors"
+          );
       } else {
         // Если ID не указан, получаем случайное слово
         const count = await WordModel.countDocuments();
@@ -413,7 +456,14 @@ const vocabularyController = {
         word = await WordModel.findOne()
           .skip(random)
           .populate("author", "_id firstname username email")
-          .populate("translations", "_id text");
+          .populate(
+            "translations",
+            "_id text language dialect createdAt pre_translations normalized_text author contributors"
+          )
+          .populate(
+            "translations_u",
+            "_id text language dialect createdAt pre_translations normalized_text author contributors"
+          );
       }
 
       if (!word) {
