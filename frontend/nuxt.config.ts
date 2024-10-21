@@ -19,6 +19,12 @@ export default defineNuxtConfig({
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
         // Добавьте другие ресурсы, которые должны быть предварительно загружены или подключены глобально
       ],
+      script: [
+        {
+          src: 'https://telegram.org/js/telegram-web-app.js',
+          async: true,
+        },
+      ],
     },
   },
   runtimeConfig: {
@@ -27,8 +33,11 @@ export default defineNuxtConfig({
     },
   },
   css: [
-    "@/node_modules/bootstrap/scss/bootstrap.scss",
-    `@/node_modules/bootstrap-icons/font/bootstrap-icons.min.css`,
+    'bootstrap/scss/bootstrap.scss',
+    '@fortawesome/fontawesome-free/css/all.css',
+    'bootstrap-icons/font/bootstrap-icons.css',
+    '@/assets/scss/textStyles.scss',
+    'swiper/css', // Используем swiper/css вместо swiper-bundle.min.css
   ],
   vite: {
     css: {

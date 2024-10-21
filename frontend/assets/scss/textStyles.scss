@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200..1000&display=swap');
+
+:root {
+    --font-family-primary: 'Nunito', sans-serif;
+    --font-size-heading: 32px;
+    --font-size-body: 16px;
+    --font-size-small: 14px;
+    --line-height-body: 1.5;
+    --letter-spacing: -0.05em;
+}
+
+/* Заголовки */
+.heading {
+    font-family: var(--font-family-primary);
+    font-weight: 700;
+    font-size: var(--font-size-heading);
+    letter-spacing: var(--letter-spacing);
+    line-height: 1.2;
+}
+
+/* Основной текст */
+.typography-body {
+    font-family: var(--font-family-primary);
+    font-weight: 400;
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    letter-spacing: var(--letter-spacing);
+    margin-bottom: 24px;
+}
+
+/* Маленький текст */
+.typography-small {
+    font-family: var(--font-family-primary);
+    font-weight: 400;
+    font-size: var(--font-size-small);
+    line-height: var(--line-height-body);
+    letter-spacing: var(--letter-spacing);
+}

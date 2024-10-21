@@ -2,92 +2,138 @@
   <div class="page home-page">
     <header>
       <div class="container-fluid">
-        <h2 class="mb-0">Погрузитесь в мир бурятской культуры с BurLive!</h2>
-        <p>
-          Наша платформа предлагает уникальную возможность изучения языка и
-          вовлечения в создание его будущего.
+        <h2 class="heading">Самоучитель <br />бурятского языка</h2>
+        <p class="typography-body" style="margin-top: 16px;">
+          Каждое ваше взаимодействие с уроками <br />
+          помогает сохранять и развивать бурятский язык.
         </p>
-        <!-- <button class="btn btn-dark">Присоединиться</button> -->
       </div>
     </header>
 
     <main>
-      <section id="advantages">
-        <div class="advantages-content">
-          <div class="custom-card">
-            <h6 class="card-heading mb-2">Сбор переводов</h6>
-            <p class="small mb-2">
-              Пользователи могут добавлять переводы для предложений, помогая нам
-              расширить базу знаний и улучшить качество нашей
-              <b>языковой модели</b>
-            </p>
-            <!-- <button class="btn btn-dark btn-sm my-2">Добавить переводы</button> -->
+      <Swiper :modules="[Autoplay, Pagination]" autoplay loop :pagination="{ clickable: true }" class="mySwiper">
+        <SwiperSlide v-for="(card, index) in cards" :key="index">
+          <div class="new-customcard">
+            <p class="card-title">{{ card.title }}</p>
+            <p class="card-body">{{ card.body }}</p>
+            <button class="card-button" @click="card.action()">
+              {{ card.buttonText }}
+            </button>
           </div>
-          <div class="custom-card">
-            <h6 class="card-heading mb-2">Сбор материалов</h6>
-            <p class="small mb-2">
-              Благодаря вашим материалам мы расширим наш языковой корпус, что
-              откроет новые горизонты для изучения и понимания бурятского языка.
-            </p>
-            <!-- <button class="btn btn-dark btn-sm my-2">Добавить материалы</button> -->
-          </div>
-          <div class="custom-card">
-            <h6 class="card-heading mb-2">Сообщество</h6>
-            <p class="small mb-2">
-              Присоединяйтесь к нам, чтобы общаться с людьми, которые разделяют
-              ваш интерес и готовы делиться с вами своим опытом, взглядами и
-              идеями
-            </p>
-            <!-- <button class="btn btn-dark btn-sm my-2">Добавить материалы</button> -->
-          </div>
-        </div>
-      </section>
-      <section></section>
+        </SwiperSlide>
+      </Swiper>
     </main>
   </div>
 </template>
 
-<style lang="scss" scoped>
-header {
-  padding: 50px 0;
+<script lang="ts" setup>
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/autoplay';
+import 'swiper/css/pagination';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const cards = [
+  {
+    title: '📚 Уроки',
+    body: 'Начни своё обучение с уроков, которые помогут тебе освоить основы бурятского языка.',
+    buttonText: 'Перейти к урокам',
+    action: () => router.push('/modules'),
+  },
+  {
+    title: '📖 Словарь',
+    body: 'Ищи и изучай слова на бурятском языке. Добавляй новые слова в личный список для повторения.',
+    buttonText: 'Открыть словарь',
+    action: () => router.push('/'),
+  },
+  {
+    title: '📝 Тесты и упражнения',
+    body: 'Проверь свои знания и закрепи изученное с помощью тестов. Получай баллы и соревнуйся с друзьями.',
+    buttonText: 'Начать тест',
+    action: () => console.log('Начать тест'),
+  },
+];
+</script>
+<style scoped lang="scss">
+.page {
+  margin: 32px 0;
+
+  main {
+    margin: 0 16px;
+  }
 }
 
-.advantages-content {
-  padding: 1rem;
-  background: var(--custom-wrapper-background-color);
-  width: fit-content;
-  border-radius: 5px;
+.mySwiper {
+  width: 100%;
+  height: autob ;
+  padding-bottom: 30px;
+  /* Отступ для пагинации */
+}
+
+.swiper-pagination {
+  position: absolute;
+  bottom: 10px;
+  /* Положение точек ближе к слайдеру */
+  left: 0;
+  width: 100%;
   display: flex;
-  gap: 1rem;
-  .custom-card {
-    padding: 1rem;
-    min-height: 150px;
-    border-radius: 8px;
-    background: var(--custom-wrapper-inner-background-color);
-    width: 350px;
-  }
+  justify-content: center;
+  gap: 8px;
 }
 
-@media screen and (max-width: 1200px) {
-  .advantages-content {
-    .custom-card {
-      width: 30%
-    }
-  }
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background-color: #ddd;
+  border-radius: 50%;
+  transition: background-color 0.3s;
 }
 
-@media screen and (max-width: 768px) {
-  .advantages-content {
-    flex-wrap: wrap;
-    .custom-card {
-      width: 350px;
-    }
+.swiper-pagination-bullet-active {
+  background-color: #007bff;
+}
+
+.new-customcard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.card-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.card-body {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.card-button {
+  padding: 10px 16px;
+  background-color: #323232;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #454545;
   }
 }
-// footer {
-//   padding: 30px 0;
-//   background-color: #111;
-//   color: #fff;
-//   min-height: 400px;
-// }
 </style>
