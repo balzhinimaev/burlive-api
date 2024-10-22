@@ -2,8 +2,8 @@
 
 :root {
     --font-family-primary: 'Nunito', sans-serif;
-    --font-size-heading: 32px;
-    --font-size-body: 16px;
+    --font-size-heading: 24px;
+    --font-size-body: 14px;
     --font-size-small: 14px;
     --line-height-body: 1.5;
     --letter-spacing: -0.05em;
@@ -15,7 +15,9 @@
     font-weight: 700;
     font-size: var(--font-size-heading);
     letter-spacing: var(--letter-spacing);
-    line-height: 1.2;
+    line-height: 28px;
+    color: #606060;
+    margin-bottom: 12px;
 }
 
 /* Основной текст */
@@ -23,9 +25,10 @@
     font-family: var(--font-family-primary);
     font-weight: 400;
     font-size: var(--font-size-body);
-    line-height: var(--line-height-body);
+    line-height: 18px;
     letter-spacing: var(--letter-spacing);
     margin-bottom: 24px;
+    color: #BFBFBF;
 }
 
 /* Маленький текст */

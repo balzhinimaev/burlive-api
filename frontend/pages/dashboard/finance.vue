@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useUserStore } from "@/stores/userStore";
+import { useUserStore } from "~/stores/userStore2";
 const userStore = useUserStore();
 onBeforeMount(() => {
     userStore.fetchWalletData()

@@ -1,140 +1,91 @@
-// stores/sentencesStore.ts
-import { defineStore } from "pinia";
-import type { ApiError } from "@/types/error";
-import type { IPublicUser } from "~/types/IUser";
-const apiUrl = `http://localhost:5000/backendapi`;
-export const useUserStore = defineStore("user", {
-  state: () => ({
-    user: {} as {
-      isLoading: boolean;
-      firstName?: string;
-      lastName?: string;
-      _id?: string;
-      username?: string;
-      rating: number;
-    },
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
-    wallet: {} as {
-      walletAddress: string;
-      walletBalance: number;
-    },
+interface User {
+  id: string;
+  email?: string;
+  c_username?: string;
+  first_name?: string;
+  rating?: number;
+  createdAt?: string;
+}
 
-    loadedPubicProfile: {} as IPublicUser,
+interface UserExistsResponse {
+  is_exists: boolean;
+  user?: User;
+}
 
-    isLoading: true,
-    isLoadingWalletData: true,
-    isLoadingPubicProfile: true,
+interface CreateUserResponse {
+  message: string;
+}
 
-    isError: false,
-    isErrorLoadingWalletData: false,
-    isErrorLoadingPublicProfile: false,
+// Ваш заранее сгенерированный токен
+const JWT_TOKEN = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmZiZGYyN2E2NjhjYmZhNzFlNzdjY2QiLCJzZXNzaW9uSWQiOiJhMWU3YWIyNS04OGJkLTRhYTQtOGE4MS1mYThiMWI4MTc2NWQiLCJpYXQiOjE3Mjk1Mzg5MjEsImV4cCI6MTcyOTc5ODEyMX0.BFNaCtVsQGCHpS8hFPDPBOMv7fW79bjbqssmDmUfeiY`;
 
-    error: null as ApiError | null,
-    errorLoadingWalletData: null as any,
-    errorLoadingPublicProfile: null as any,
-  }),
-  actions: {
-    async fetchUser(token?: string) {
-      this.isLoading = true;
-      try {
-        let response;
+export const useUserStore = defineStore('user', () => {
+  const user = ref<User | null>(null);
 
-        if (token) {
-          response = await fetch(`${apiUrl}/users/getMe`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          });
-        } else {
-          response = await fetch(`${apiUrl}/users/getMe`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${useCookie("token").value}`,
-              "Content-Type": "application/json",
-            },
-          });
-        }
+  // Инициализация пользователя через Telegram API
+  const initializeUser = async () => {
+    const tg = (window as any).Telegram.WebApp;
+    const tgUser = tg.initDataUnsafe?.user;
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          //   throw new Error();
-        } else {
-          this.user = data.user;
-          console.log(this.user);
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          this.error = { message: error.message };
-          this.isError = true;
-        } else {
-          this.error = { message: "Неизвестная ошибка" };
-        }
-      } finally {
-        this.isLoading = false;
-      }
-    },
-    async fetchWalletData() {
-      this.isLoadingWalletData = true;
-      try {
-        if (!this.user._id) {
-          await this.fetchUser();
-        }
-        const response = await fetch(`${apiUrl}/finance/${this.user._id}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${useCookie("token").value}`,
-            "Content-Type": "application/json",
-          },
+    if (tgUser) {
+      console.log(tgUser)
+      const userExists = await checkUserExists(tgUser.id);
+      if (!userExists) {
+        await createUser({
+          id: tgUser.id,
+          username: tgUser.username || '',
+          first_name: tgUser.first_name || '',
+          email: tgUser.email || '',
         });
-
-        const data = await response.json();
-        console.log(data);
-        if (!response.ok) {
-        } else {
-          this.wallet = data.walletData;
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          this.errorLoadingWalletData.message = error.message;
-          this.isErrorLoadingWalletData = true;
-        }
-      } finally {
-        this.isLoadingWalletData = false;
       }
-    },
-    async fetchPublicProfileByUsername(username: string) {
-      this.isLoadingPubicProfile = true;
-      try {
-        if (!this.user._id) {
-          await this.fetchUser();
-        }
-        const response = await fetch(`${apiUrl}/users/public/${username}`, {
-          method: "GET",
+    }
+  };
+
+  // Проверка существования пользователя
+  const checkUserExists = async (telegramId: number): Promise<boolean> => {
+    try {
+      const response = await $fetch<UserExistsResponse>(
+        `http://localhost:5000/backendapi/telegram/user/is-exists/${telegramId}`,
+        {
           headers: {
-            Authorization: `Bearer ${useCookie("token").value}`,
-            "Content-Type": "application/json",
+            Authorization: JWT_TOKEN, // Передача токена в заголовке
+            method: 'GET'
           },
-        });
-
-        const data = await response.json();
-        console.log(data.message);
-        if (!response.ok) {
-          useRouter().push("/users/");
-        } else {
-          this.loadedPubicProfile = data.publicProfile;
         }
-      } catch (error) {
-        if (error instanceof Error) {
-          this.errorLoadingPublicProfile.message = error.message;
-          this.isErrorLoadingPublicProfile = true;
-        }
-      } finally {
-        this.isLoadingPubicProfile = false;
+      );
+      console.log(response)
+      if (response.is_exists && response.user) {
+        user.value = response.user;
+        return true;
       }
-    },
-    // Дополнительные actions для удаления, добавления, принятия предложений...
-  },
+      return false;
+    } catch (error) {
+      console.error('Ошибка при проверке существования пользователя:', error);
+      return false;
+    }
+  };
+
+  // Создание пользователя на сервере
+  const createUser = async (telegramUser: { id: number; username: string; first_name: string; email: string }) => {
+    try {
+      const response = await $fetch<CreateUserResponse>(
+        `http://localhost:5000/backendapi/telegram/create-user`,
+        {
+          method: 'POST',
+          body: telegramUser,
+          headers: {
+            Authorization: JWT_TOKEN, // Передача токена в заголовке
+          },
+        }
+      );
+      console.log(response.message); // Успешная регистрация
+    } catch (error) {
+      console.error('Ошибка при создании пользователя:', error);
+    }
+  };
+
+  return { user, initializeUser };
 });

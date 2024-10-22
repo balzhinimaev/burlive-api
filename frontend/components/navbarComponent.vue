@@ -88,7 +88,7 @@
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"; // import storeToRefs helper hook from pinia
-import { useUserStore } from "@/stores/userStore";
+import { useUserStore } from "~/stores/userStore2";
 import { useThemeStore } from "@/stores/themeStore"; // Импортируем наше новое хранилище
 import { useAuthStore } from "@/stores/auth/login"; // Импортируем наше новое хранилище
 const userAuthStore = useAuthStore();

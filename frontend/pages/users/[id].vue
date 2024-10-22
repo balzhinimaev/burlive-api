@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useUserStore } from "@/stores/userStore";
+import { useUserStore } from "~/stores/userStore2";
 const userStore = useUserStore();
 import { storeToRefs } from "pinia"; // import storeToRefs helper hook from pinia
 

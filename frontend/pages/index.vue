@@ -1,17 +1,15 @@
 <template>
   <div class="page home-page">
     <header>
-      <div class="container-fluid">
-        <h2 class="heading">Самоучитель <br />бурятского языка</h2>
-        <p class="typography-body" style="margin-top: 16px;">
-          Каждое ваше взаимодействие с уроками <br />
-          помогает сохранять и развивать бурятский язык.
-        </p>
-      </div>
+      <h2 class="heading">Самоучитель <br />бурятского языка</h2>
+      <p class="typography-body" style="margin-top: 12px; margin-bottom: 0;">
+        Каждое ваше взаимодействие с уроками <br />
+        помогает сохранять и развивать бурятский язык.
+      </p>
     </header>
 
     <main>
-      <Swiper :modules="[Autoplay, Pagination]" autoplay loop :pagination="{ clickable: true }" class="mySwiper">
+      <Swiper :modules="[Autoplay]" autoplay loop :pagination="{ clickable: true }" :spaceBetween="20" class="mySwiper">
         <SwiperSlide v-for="(card, index) in cards" :key="index">
           <div class="new-customcard">
             <p class="card-title">{{ card.title }}</p>
@@ -47,7 +45,7 @@ const cards = [
     title: '📖 Словарь',
     body: 'Ищи и изучай слова на бурятском языке. Добавляй новые слова в личный список для повторения.',
     buttonText: 'Открыть словарь',
-    action: () => router.push('/'),
+    action: () => router.push('/vocabulary'),
   },
   {
     title: '📝 Тесты и упражнения',
@@ -57,18 +55,14 @@ const cards = [
   },
 ];
 </script>
+
 <style scoped lang="scss">
-.page {
-  margin: 32px 0;
-
-  main {
-    margin: 0 16px;
-  }
+header {
+  margin-bottom: 30px;
 }
-
 .mySwiper {
   width: 100%;
-  height: autob ;
+  height: auto;
   padding-bottom: 30px;
   /* Отступ для пагинации */
 }
@@ -76,7 +70,6 @@ const cards = [
 .swiper-pagination {
   position: absolute;
   bottom: 10px;
-  /* Положение точек ближе к слайдеру */
   left: 0;
   width: 100%;
   display: flex;
@@ -94,6 +87,10 @@ const cards = [
 
 .swiper-pagination-bullet-active {
   background-color: #007bff;
+}
+
+.swiper-slide {
+  padding: 5px;
 }
 
 .new-customcard {
