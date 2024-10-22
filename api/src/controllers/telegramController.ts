@@ -138,18 +138,30 @@ const telegramController = {
   
   register_telegram_user: async (req: Request, res: Response) => {
     try {
-      console.log(req.body);
-      const { id, username, first_name, last_name } = req.body;
-      await new TelegramUserModel({
+      const { id, username, first_name, last_name, email } = req.body;
+      logger.info("create user")
+      // Проверка на существование пользователя
+      const existingUser = await TelegramUserModel.findOne({ id });
+      if (existingUser) {
+        return res.status(409).json({ 
+          message: "Пользователь уже зарегистрирован!" 
+        });
+      }
+
+      // Сохранение нового пользователя
+      const newUser = new TelegramUserModel({
         id,
         username,
         first_name,
         last_name,
-      }).save();
+        email: email || "", // Обработка возможного отсутствия email
+      });
 
-      return res
-        .status(200)
-        .json({ message: "Пользователь успешно зарегистрирован!" });
+      await newUser.save();
+
+      return res.status(201).json({ 
+        message: "Пользователь успешно зарегистрирован!" 
+      });
     } catch (error) {
       logger.error(`Ошибка при регистрации телеграмм пользователя: ${error}`);
       return res.status(500).json({ error: "Ошибка сервера" });
