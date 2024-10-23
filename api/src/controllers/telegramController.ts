@@ -110,7 +110,7 @@ const telegramController = {
     try {
       const { id } = req.params;
       const user = await TelegramUserModel.findOne({ id }).select(
-        "_id c_username email createdAt first_name rating"
+        "_id id c_username email createdAt first_name rating"
       );
 
       if (!user) {
@@ -124,6 +124,7 @@ const telegramController = {
         message: "Пользователь существует",
         user: {
           _id: user._id,
+          id: user.id,
           c_username: user.c_username,
           createdAt: user.createdAt,
           first_name: user.first_name,
@@ -225,6 +226,44 @@ const telegramController = {
     } catch (error) {
       logger.error(`Error fetching user state: ${error}`);
       return res.status(500).json({ error: "Internal server error" });
+    }
+  },
+  // Получение текущей темы пользователя
+  getUserTheme: async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const user = await TelegramUserModel.findOne({ id });
+
+      if (!user) {
+        return res.status(404).json({ message: "Пользователь не найден" });
+      }
+
+      return res.status(200).json({ theme: user.theme });
+    } catch (error) {
+      logger.error("Ошибка при получении темы пользователя:", error);
+      return res.status(500).json({ error: "Ошибка сервера" });
+    }
+  },
+
+  // Обновление темы пользователя
+  updateUserTheme: async (req: Request, res: Response) => {
+    try {
+      const { id, theme } = req.body;
+
+      const user = await TelegramUserModel.findOneAndUpdate(
+        { id },
+        { theme },
+        { new: true }
+      );
+
+      if (!user) {
+        return res.status(404).json({ message: "Пользователь не найден" });
+      }
+
+      return res.status(200).json({ message: "Тема успешно обновлена" });
+    } catch (error) {
+      logger.error("Ошибка при обновлении темы пользователя:", error);
+      return res.status(500).json({ error: "Ошибка сервера" });
     }
   },
 };

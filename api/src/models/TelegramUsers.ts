@@ -8,6 +8,7 @@ interface TelegramUser extends User {
     updatedAt: Date;
     email: string;
     c_username: string;
+    theme: "light" | "dark";
     vocabular: {
       selected_language_for_translate: 'russian' | 'buryat'
     }
@@ -20,9 +21,8 @@ const TelegramUserSchema: Schema<TelegramUser> = new Schema<TelegramUser>(
     c_username: { type: String, required: false, default: '' },
     first_name: { type: String, required: false },
     email: { type: String, required: false },
-    last_name: { type: String, required: false },
     referrals_telegram: [{ type: Schema.Types.ObjectId, ref: "telegram_user" }],
-    rating: { type: Number, required: true, default: 1 }, // добавлено поле "рейтинг",
+    rating: { type: Number, required: true, default: 1 },
     vocabular: {
       selected_language_for_translate: {
         type: String,
@@ -30,6 +30,11 @@ const TelegramUserSchema: Schema<TelegramUser> = new Schema<TelegramUser>(
         required: true,
         default: "russian",
       },
+    },
+    theme: {
+      type: String,
+      enum: ["light", "dark"],
+      default: "light",
     },
   },
   {

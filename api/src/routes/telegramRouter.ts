@@ -26,4 +26,7 @@ telegramRouter.post(
   telegramController.new_word_translate_request
 );
 
+telegramRouter.get("/user/theme/:id", telegramController.getUserTheme);
+telegramRouter.post("/user/theme", telegramController.updateUserTheme);
+
 export default telegramRouter;
