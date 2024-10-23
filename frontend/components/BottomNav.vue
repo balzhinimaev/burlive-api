@@ -36,13 +36,8 @@ function isActive(route: string) {
     background-color: #1f1f1f;
     padding: 12px 16px;
     border-radius: 32px;
-    position: fixed;
-    bottom: 8px;
-    left: 8px;
-    right: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    max-width: 420px;
-    margin: 0 auto;
+    margin: 16px;
 }
 
 .nav-icon {

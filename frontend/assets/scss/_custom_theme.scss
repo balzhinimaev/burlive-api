@@ -1,0 +1,25 @@
+// _custom_theme.scss
+
+@use 'variables' as *;
+@use 'custom_variables' as *;
+:root {
+    --background-color: #{$custom-light-background};
+    --text-color: #{$custom-text-color-light};
+    --background-component-color: #{$custom-shadow-color-light};
+    --shadow-color: #{$custom-shadow-color-light};
+    --primary-color: #{$custom-primary-color-light};
+    --bs-body-bg: #{$custom-bs-body-bg-light};
+    --single-page-bg: #{$single-page-background-color-light};
+    --inner-component-shadow: #{$inner-shadow-color-light};
+}
+
+body[data-theme='dark'] {
+    --background-color: #{$custom-dark-background};
+    --background-component-color: #{$custom-dark-secondary-background};
+    --text-color: #{$custom-text-color-dark};
+    --shadow-color: #{$custom-shadow-color-dark};
+    --primary-color: #{$custom-primary-color-dark};
+    --bs-body-bg: #{$custom-bs-body-bg-dark};
+    --single-page-bg: #{$single-page-background-color-dark};
+    --inner-component-shadow: #{$inner-shadow-color-dark};
+}

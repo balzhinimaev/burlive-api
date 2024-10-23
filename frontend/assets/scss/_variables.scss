@@ -318,3 +318,27 @@ $link-shade-percentage: 20% !default;
 $light: #cacaca;
 
 $font-size-base: .85rem !default; // Assumes the browser default, typically `16px`
+/* styles/_variables.scss */
+
+/* Стили для минималистичного скроллбара в WebKit-браузерах */
+body::-webkit-scrollbar {
+  width: 6px;
+  /* Тонкий скроллбар */
+}
+
+body::-webkit-scrollbar-track {
+  background: #222;
+  /* Прозрачный или минимальный фон для трека */
+}
+
+body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  /* Темный полупрозрачный цвет для "бегунка" */
+  border-radius: 10px;
+  /* Скругленные углы, чтобы скроллбар выглядел мягче */
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+  /* Немного более заметный при наведении */
+}

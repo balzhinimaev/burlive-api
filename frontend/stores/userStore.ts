@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { useRuntimeConfig } from '#app';
 
 interface User {
-  id: string;
+  id: number;
   email?: string;
   c_username?: string;
   first_name?: string;
@@ -13,79 +13,93 @@ interface User {
 interface UserExistsResponse {
   is_exists: boolean;
   user?: User;
+  message: string;
 }
 
 interface CreateUserResponse {
   message: string;
 }
 
-// Ваш заранее сгенерированный токен
-const JWT_TOKEN = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmZiZGYyN2E2NjhjYmZhNzFlNzdjY2QiLCJzZXNzaW9uSWQiOiJhMWU3YWIyNS04OGJkLTRhYTQtOGE4MS1mYThiMWI4MTc2NWQiLCJpYXQiOjE3Mjk1Mzg5MjEsImV4cCI6MTcyOTc5ODEyMX0.BFNaCtVsQGCHpS8hFPDPBOMv7fW79bjbqssmDmUfeiY`;
+export const useUserStore = defineStore({
+  id: 'user',
 
-export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null);
+  // Состояние хранилища
+  state: () => ({
+    user: null as User | null,
+    fetch_user_result: '' as string,
+    on_fetching_user_result: false as boolean,
+    error: null as string | null, // Состояние ошибки
+  }),
 
-  // Инициализация пользователя через Telegram API
-  const initializeUser = async () => {
-    const tg = (window as any).Telegram.WebApp;
-    const tgUser = tg.initDataUnsafe?.user;
+  // Геттеры
+  getters: {
+    isFetching: (state) => state.on_fetching_user_result,
+    getUser: (state) => state.user,
+    fetchMessage: (state) => state.fetch_user_result,
+    hasError: (state) => !!state.error,
+  },
 
-    if (tgUser) {
-      console.log(tgUser)
-      const userExists = await checkUserExists(tgUser.id);
-      if (!userExists) {
-        await createUser({
-          id: tgUser.id,
-          username: tgUser.username || '',
-          first_name: tgUser.first_name || '',
-          email: tgUser.email || '',
-        });
-      }
-    }
-  };
+  // Действия
+  actions: {
+    // Проверка существования пользователя
+    async checkUserExists(telegramId: number): Promise<boolean> {
+      this.on_fetching_user_result = true;
+      this.error = null;
 
-  // Проверка существования пользователя
-  const checkUserExists = async (telegramId: number): Promise<boolean> => {
-    try {
-      const response = await $fetch<UserExistsResponse>(
-        `http://localhost:5000/backendapi/telegram/user/is-exists/${telegramId}`,
-        {
-          headers: {
-            Authorization: JWT_TOKEN, // Передача токена в заголовке
-            method: 'GET'
-          },
+      const config = useRuntimeConfig();
+      const apiUrl = config.public.apiUrl; // Получаем API URL из конфигурации
+      const jwtToken = config.public.jwtToken; // Получаем JWT токен из конфигурации
+
+      try {
+        const response = await $fetch<UserExistsResponse>(
+          `${apiUrl}/telegram/user/is-exists/${telegramId}`,
+          {
+            headers: {
+              Authorization: jwtToken,
+            },
+          }
+        );
+        if (response.is_exists && response.user) {
+          this.user = response.user; // Сохраняем данные пользователя в хранилище
+          this.fetch_user_result = response.message;
+          this.on_fetching_user_result = false;
+          return true;
+        } else {
+          this.on_fetching_user_result = false;
+          return false;
         }
-      );
-      console.log(response)
-      if (response.is_exists && response.user) {
-        user.value = response.user;
-        return true;
+      } catch (error: any) {
+        this.on_fetching_user_result = false;
+        this.error = 'Ошибка при проверке существования пользователя: ' + error.message;
+        console.error(this.error);
+        return false;
       }
-      return false;
-    } catch (error) {
-      console.error('Ошибка при проверке существования пользователя:', error);
-      return false;
-    }
-  };
+    },
 
-  // Создание пользователя на сервере
-  const createUser = async (telegramUser: { id: number; username: string; first_name: string; email: string }) => {
-    try {
-      const response = await $fetch<CreateUserResponse>(
-        `http://localhost:5000/backendapi/telegram/create-user`,
-        {
-          method: 'POST',
-          body: telegramUser,
-          headers: {
-            Authorization: JWT_TOKEN, // Передача токена в заголовке
-          },
-        }
-      );
-      console.log(response.message); // Успешная регистрация
-    } catch (error) {
-      console.error('Ошибка при создании пользователя:', error);
-    }
-  };
+    // Создание пользователя на сервере
+    async createUser(telegramUser: { id: number; username: string; first_name: string; email: string }) {
+      this.error = null;
 
-  return { user, initializeUser };
+      const config = useRuntimeConfig();
+      const apiUrl = config.public.apiUrl; // Получаем API URL из конфигурации
+      const jwtToken = config.public.jwtToken; // Получаем JWT токен из конфигурации
+
+      try {
+        const response = await $fetch<CreateUserResponse>(
+          `${apiUrl}/telegram/create-user`,
+          {
+            method: 'POST',
+            body: telegramUser,
+            headers: {
+              Authorization: jwtToken,
+            },
+          }
+        );
+        console.log(response.message); // Успешная регистрация
+      } catch (error: any) {
+        this.error = 'Ошибка при создании пользователя: ' + error.message;
+        console.error(this.error);
+      }
+    },
+  },
 });

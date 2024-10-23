@@ -1,0 +1,12 @@
+.single-page {
+    flex: 1;
+    background-color: var(--single-page-bg) !important;
+    height: 100%;
+    overflow: auto;
+    padding: 16px;
+    // &.home-page {
+    //     margin: 16px;
+    //     padding: 16px;
+    //     border-radius: $border-radius;
+    // }
+}

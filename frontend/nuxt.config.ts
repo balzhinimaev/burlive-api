@@ -29,7 +29,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiUrl: "http://localhost:5000/backendapi",
+      apiUrl: process.env.API_URL || 'http://localhost:5000/backendapi',
+      jwtToken: process.env.JWT_TOKEN || '',
     },
   },
   css: [
@@ -38,16 +39,20 @@ export default defineNuxtConfig({
     'bootstrap-icons/font/bootstrap-icons.css',
     '@/assets/scss/textStyles.scss',
     'swiper/css', // Используем swiper/css вместо swiper-bundle.min.css
+    '@/assets/scss/styles.scss'
   ],
-  vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          additionalData: '@use "~/assets/scss/_variables.scss" as *;',
-        },
+vite: {
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+          @use "~/assets/scss/_custom_variables.scss" as *;
+          @use "~/assets/scss/_custom_theme.scss" as *;
+        `,
       },
     },
   },
+},
   alias: {
     "/analytics": "/dashboard/analytics",
   },

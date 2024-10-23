@@ -1,114 +1,92 @@
-import { defineStore } from 'pinia';
-import { ref, onMounted } from 'vue';
-interface User {
-  id: string;
-  email?: string;
-  c_username?: string;
-  first_name?: string;
-  rating?: number;
-  createdAt?: string;
-}
+export const useThemeStore = defineStore({
+  id: 'theme',
 
-interface UserExistsResponse {
-  is_exists: boolean;
-  user?: User;
-}
+  state: () => ({
+    theme: 'dark' as 'light' | 'dark',
+    loading: false as boolean,
+    error: null as string | null,
+  }),
 
-interface CreateUserResponse {
-  message: string;
-}
+  getters: {
+    isDarkMode: (state) => state.theme === 'dark',
+    isLoading: (state) => state.loading,
+    hasError: (state) => !!state.error,
+  },
 
-// Ваш заранее сгенерированный токен
-const JWT_TOKEN = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmZiZGYyN2E2NjhjYmZhNzFlNzdjY2QiLCJzZXNzaW9uSWQiOiJhMWU3YWIyNS04OGJkLTRhYTQtOGE4MS1mYThiMWI4MTc2NWQiLCJpYXQiOjE3Mjk1Mzg5MjEsImV4cCI6MTcyOTc5ODEyMX0.BFNaCtVsQGCHpS8hFPDPBOMv7fW79bjbqssmDmUfeiY`;
+  actions: {
+    // Загружаем текущую тему пользователя с сервера
+    async loadTheme() {
+      this.loading = true;
+      this.error = null;
 
-export const useThemeStore = defineStore('theme', () => {
-  const theme = ref<'light' | 'dark'>('light'); // Оборачиваем в ref для реактивности
-  const user = ref<User | null>(null);
+      const userStore = useUserStore();
+      const userId = userStore.user?.id;
 
-  // Инициализация пользователя через Telegram API
-  const initializeUser = async () => {
-    const tg = (window as any).Telegram.WebApp;
-    const tgUser = tg.initDataUnsafe?.user;
+      if (!userId) {
+        this.error = 'ID пользователя не найден';
+        this.loading = false;
+        return;
+      }
 
-    if (tgUser) {
-      console.log(tgUser)
-      const userExists = await checkUserExists(tgUser.id);
-      if (!userExists) {
-        await createUser({
-          id: tgUser.id,
-          username: tgUser.username || '',
-          first_name: tgUser.first_name || '',
-          email: tgUser.email || '',
+      const config = useRuntimeConfig();
+      const apiUrl = config.public.apiUrl; // Используем API URL из конфигурации
+      const jwtToken = config.public.jwtToken; // Используем JWT токен из конфигурации
+
+      try {
+        const response = await fetch(`${apiUrl}/telegram/user/theme/${userId}`, {
+          headers: {
+            Authorization: jwtToken, // Токен для авторизации
+          },
+          method: 'GET',
         });
-      }
-    }
-  };
 
-  // Проверка существования пользователя
-  const checkUserExists = async (telegramId: number): Promise<boolean> => {
-    try {
-      const response = await $fetch<UserExistsResponse>(
-        `http://localhost:5000/backendapi/telegram/user/is-exists/${telegramId}`,
-        {
-          headers: {
-            Authorization: JWT_TOKEN, // Передача токена в заголовке
-            method: 'GET'
-          },
+        if (response.ok) {
+          const data = await response.json();
+          this.theme = data.theme || 'light';
+        } else {
+          this.error = 'Ошибка получения темы';
         }
-      );
-      console.log(response)
-      if (response.is_exists && response.user) {
-        user.value = response.user;
-        return true;
+      } catch (error: any) {
+        this.error = 'Ошибка загрузки темы: ' + error.message;
+      } finally {
+        this.loading = false;
       }
-      return false;
-    } catch (error) {
-      console.error('Ошибка при проверке существования пользователя:', error);
-      return false;
-    }
-  };
-  const loadTheme = async () => {
-    try {
-      const response = await fetch('/api/theme');
-      const data = await response.json();
-      theme.value = data.theme || 'light';
-    } catch (error) {
-      console.error('Ошибка загрузки темы:', error);
-    }
-  };
+    },
 
-  const saveTheme = async (newTheme: 'light' | 'dark') => {
-    try {
-      await fetch('/api/theme', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme: newTheme }),
-      });
-      theme.value = newTheme; // Обновляем значение темы
-    } catch (error) {
-      console.error('Ошибка сохранения темы:', error);
-    }
-  };
+    // Сохраняем тему пользователя
+    async saveTheme(newTheme: 'light' | 'dark') {
+      this.loading = true;
+      this.error = null;
 
-  // Создание пользователя на сервере
-  const createUser = async (telegramUser: { id: number; username: string; first_name: string; email: string }) => {
-    try {
-      const response = await $fetch<CreateUserResponse>(
-        `http://localhost:5000/backendapi/telegram/create-user`,
-        {
+      const userStore = useUserStore();
+      const userId = userStore.user?.id;
+
+      if (!userId) {
+        this.error = 'ID пользователя не найден';
+        this.loading = false;
+        return;
+      }
+
+      const config = useRuntimeConfig();
+      const apiUrl = config.public.apiUrl;
+      const jwtToken = config.public.jwtToken;
+
+      try {
+        await fetch(`${apiUrl}/telegram/user/theme`, {
           method: 'POST',
-          body: telegramUser,
           headers: {
-            Authorization: JWT_TOKEN, // Передача токена в заголовке
+            'Content-Type': 'application/json',
+            Authorization: jwtToken,
           },
-        }
-      );
-      console.log(response.message); // Успешная регистрация
-    } catch (error) {
-      console.error('Ошибка при создании пользователя:', error);
-    }
-  };
-  onMounted(loadTheme); // Загружаем тему при старте
+          body: JSON.stringify({ id: userId, theme: newTheme }),
+        });
 
-  return { theme, saveTheme, initializeUser };
+        this.theme = newTheme;
+      } catch (error: any) {
+        this.error = 'Ошибка сохранения темы: ' + error.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
 });
