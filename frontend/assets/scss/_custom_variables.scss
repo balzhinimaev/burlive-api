@@ -1,10 +1,13 @@
 // _custom_variables.scss
 
-$light: #e0e0e0;
+$light: #cfcfcf;
 $dark: #1f1f1f;
 
 $darkness-dark: #1c1c1c;
 $darkness-shadow: #1e1e1e;
+$dark-hover: #121212;
+$light-hover: $light;
+
 // Переопределяем переменные Bootstrap, если нужно
 $body-bg: #f5f5f5;
 $primary-color: #3498db;
@@ -15,8 +18,10 @@ $border-radius: 10px;
 $custom-light-background: #ffffff;
 $custom-dark-background: #2c2c2c;
 $custom-dark-secondary-background: #0000002b;
+
 $custom-text-color-light: #1f2937;
-$custom-text-color-dark: #e0e0e0;
+$custom-text-color-dark: $light;
+
 $custom-transition: background-color 0.3s ease, color 0.3s ease;
 
 $custom-primary-color-light: $dark;
@@ -27,6 +32,11 @@ $custom-bs-body-bg-dark: $dark;
 
 $single-page-background-color-light: $body-bg;
 $single-page-background-color-dark: $darkness-dark;
+
+// Buttons
+$button-hover-background-color-dark: $dark-hover;
+$button-hover-background-color-light: $light-hover;
+
 
 // Shadows
 

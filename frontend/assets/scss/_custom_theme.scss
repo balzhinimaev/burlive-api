@@ -11,6 +11,7 @@
     --bs-body-bg: #{$custom-bs-body-bg-light};
     --single-page-bg: #{$single-page-background-color-light};
     --inner-component-shadow: #{$inner-shadow-color-light};
+    --button-hover-background: #{$button-hover-background-color-light};
 }
 
 body[data-theme='dark'] {
@@ -22,4 +23,5 @@ body[data-theme='dark'] {
     --bs-body-bg: #{$custom-bs-body-bg-dark};
     --single-page-bg: #{$single-page-background-color-dark};
     --inner-component-shadow: #{$inner-shadow-color-dark};
+    --button-hover-background: #{$button-hover-background-color-dark};
 }
