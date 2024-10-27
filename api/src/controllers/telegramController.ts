@@ -110,7 +110,7 @@ const telegramController = {
     try {
       const { id } = req.params;
       const user = await TelegramUserModel.findOne({ id }).select(
-        "_id id c_username email createdAt first_name rating"
+        "_id id c_username email createdAt first_name rating theme"
       );
 
       if (!user) {
@@ -129,6 +129,7 @@ const telegramController = {
           createdAt: user.createdAt,
           first_name: user.first_name,
           rating: user.rating,
+          theme: user.theme
         },
       });
     } catch (error) {
@@ -231,7 +232,10 @@ const telegramController = {
   // Получение текущей темы пользователя
   getUserTheme: async (req: Request, res: Response) => {
     try {
+      
+      
       const { id } = req.params;
+      logger.info(`Запрос на получении темы пользователя ${id}`)
       const user = await TelegramUserModel.findOne({ id });
 
       if (!user) {
@@ -249,6 +253,8 @@ const telegramController = {
   updateUserTheme: async (req: Request, res: Response) => {
     try {
       const { id, theme } = req.body;
+      
+      logger.info(`Запрос на сохранение пользовательской темы WebApp telegram bot`)
 
       const user = await TelegramUserModel.findOneAndUpdate(
         { id },

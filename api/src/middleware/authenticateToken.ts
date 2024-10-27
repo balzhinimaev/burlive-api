@@ -32,14 +32,10 @@ const authenticateToken = async (
   }
 
   try {
-    console.log(token)
-    console.log(process.env.JWT_SECRET)
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       userId: string;
       sessionId: string;
     };
-
-    logger.info(`decoded \n${decoded}`)
 
     const existingToken = await JwtTokenModel.findOne({
       userId: decoded.userId,
@@ -52,10 +48,9 @@ const authenticateToken = async (
     }
 
     req.user = { userId: decoded.userId };
-    logger.info(
-      `Токен верифицирован для пользователя: ${existingToken.userId}`
-    );
+    
     next();
+
   } catch (error) {
     console.error(error);
     logger.error(`Ошибка при проверке токена: ${error.message}`);

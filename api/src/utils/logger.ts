@@ -11,6 +11,7 @@ if (!existsSync(logsDir)) {
     mkdirSync(logsDir);
 }
 
+// Получение текущей даты в формате для имени файла
 const getDateForFileNameFull = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -31,13 +32,20 @@ const getDateForDirNameYear = () => {
     return `${year}`;
 };
 
-
+// Формат для консоли с человеко-понятным временем по улан-удэнскому времени
+const humanReadableConsoleFormat = winston.format.printf(({ level, message, timestamp }) => {
+    const localTime = new Date(timestamp).toLocaleString('ru-RU', { timeZone: 'Asia/Ulaanbaatar' });
+    return `${localTime} [${level}]: ${message}`;
+});
 
 // Создание логгера Winston с настройкой файлов для каждого дня в отдельных папках для каждого месяца
 const logger = winston.createLogger({
     transports: [
         new winston.transports.Console({
-            format: winston.format.simple(),
+            format: winston.format.combine(
+                winston.format.timestamp(),
+                humanReadableConsoleFormat
+            ),
             level: 'info'
         }),
         new winston.transports.File({
@@ -53,7 +61,11 @@ const logger = winston.createLogger({
             datePattern: 'YYYY-MM-DD',
             zippedArchive: true,
             maxSize: '20m',
-            maxFiles: '14d'
+            maxFiles: '14d',
+            format: winston.format.combine(
+                winston.format.timestamp(),
+                winston.format.json()
+            )
         })
     ],
     format: winston.format.combine(
