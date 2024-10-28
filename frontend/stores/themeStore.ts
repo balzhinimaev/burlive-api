@@ -30,7 +30,7 @@ export const useThemeStore = defineStore({
 
       const config = useRuntimeConfig();
       const apiUrl = config.public.apiUrl; // Используем API URL из конфигурации
-      const jwtToken = config.public.jwtToken; // Используем JWT токен из конфигурации
+      const jwtToken = config.jwtToken;; // Используем JWT токен из конфигурации
 
       try {
         const response = await fetch(`${apiUrl}/telegram/user/theme/${userId}`, {
@@ -69,7 +69,7 @@ export const useThemeStore = defineStore({
 
       const config = useRuntimeConfig();
       const apiUrl = config.public.apiUrl;
-      const jwtToken = config.public.jwtToken;
+      const jwtToken = config.jwtToken;;
 
       try {
         await fetch(`${apiUrl}/telegram/user/theme`, {

@@ -1,9 +1,7 @@
 <template>
   <div ref="appContainer" :class="['app-container', themeClass]">
     <div class="page-wrapper">
-      <div>
-        <!-- Место для информации о пользователе или контента -->
-      </div>
+      <!-- Display user information -->
       <NuxtPage class="single-page" />
     </div>
 
@@ -22,7 +20,7 @@ import { computed, ref, onMounted } from 'vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { useNotifyStore } from '@/stores/notifyStore';
-
+const user = ref(null);
 // Подключение хранилищ
 const themeStore = useThemeStore();
 const userStore = useUserStore();
@@ -40,9 +38,40 @@ const updateBodyTheme = () => {
   const theme = themeStore.isDarkMode ? 'dark' : 'light';
   document.body.setAttribute('data-theme', theme);
 };
-
+// Wait for the Telegram Web App to be initialized
+const waitForTelegramWebApp = () => {
+  return new Promise<void>((resolve) => {
+    if (window.Telegram?.WebApp) {
+      resolve();
+    } else {
+      const interval = setInterval(() => {
+        if (window.Telegram?.WebApp) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 100);
+    }
+  });
+};
 // Инициализация пользователя и установка начальной темы
 onMounted(async () => {
+  await waitForTelegramWebApp();
+  if (window.Telegram?.WebApp) {
+    console.log('Telegram Web App initialized:', window.Telegram.WebApp);
+    console.log('Init data unsafe:', window.Telegram.WebApp.initDataUnsafe);
+
+    user.value = window.Telegram.WebApp.initDataUnsafe?.user;
+
+    if (user.value) {
+      console.log('User data:', user.value);
+      const telegram_id = user.value.id;
+      await userStore.checkUserExists(telegram_id);
+    } else {
+      console.warn('No user data available from Telegram Web App.');
+    }
+  } else {
+    console.error('Telegram Web App is not available.');
+  }
   const telegram_id = 1640959206;
   await userStore.checkUserExists(telegram_id);
   await themeStore.loadTheme();

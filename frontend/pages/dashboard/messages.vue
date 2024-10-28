@@ -99,7 +99,6 @@ section {
       height: 30px;
       path {
         fill: transparent;
-        stroke: $green;
       }
     }
   }
