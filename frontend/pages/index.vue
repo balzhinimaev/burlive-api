@@ -1,6 +1,7 @@
 <template>
   <div class="page home-page">
     <header>
+      {{ user }}
       <h2 class="heading">Самоучитель <br />бурятского языка</h2>
       <p class="typography-body" style="margin-top: 12px; margin-bottom: 0;">
         Каждое ваше взаимодействие с уроками <br />
@@ -27,13 +28,14 @@
 <script lang="ts" setup>
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Autoplay, Pagination } from 'swiper/modules';
+import { useUserStore } from '@/stores/userStore';
 import 'swiper/css';
 import 'swiper/css/autoplay';
 import 'swiper/css/pagination';
 import { useRouter } from 'vue-router';
-
+const userStore = useUserStore();
 const router = useRouter();
-
+const user = ref()
 const cards = [
   {
     title: '📚 Уроки',
@@ -54,11 +56,18 @@ const cards = [
     action: () => console.log('Начать тест'),
   },
 ];
+onMounted(async () => {
+  user.value = userStore.getUser
+})
 </script>
 
 <style scoped lang="scss">
 header {
   margin-bottom: 30px;
+  padding: 16px;
+  border-radius: $border-radius;
+  background-color: var(--background-component-color);
+  overflow: hidden;
 }
 .mySwiper {
   width: 100%;
@@ -133,5 +142,8 @@ header {
   &:hover {
     background-color: #454545;
   }
+}
+.page {
+  padding: 16px;
 }
 </style>

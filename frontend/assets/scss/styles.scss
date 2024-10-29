@@ -1,12 +1,27 @@
 .single-page {
     flex: 1;
-    background-color: var(--single-page-bg) !important;
     height: 100%;
     overflow: auto;
-    padding: 16px;
     // &.home-page {
     //     margin: 16px;
     //     padding: 16px;
     //     border-radius: $border-radius;
     // }
+}
+
+:root {
+  --tg-theme-bg-color: #222;
+  --tg-theme-text-color: #{$custom-text-color-dark};
+  --tg-theme-hint-color: #777;
+  --tg-theme-link-color: #444;
+  --tg-theme-button-color: #dc5757;
+  --tg-theme-button-text-color: #eee;
+  --tg-theme-secondary-bg-color: #222;
+  --tg-theme-header-bg-color: #222;
+  --tg-theme-bottom-bar-bg-color: #aaa;
+  --tg-theme-accent-text-color: #aaa;
+  --tg-theme-section-bg-color: #444;
+  --tg-theme-section-separator-color: #222;
+  --tg-theme-subtitle-text-color: #555;
+  --tg-theme-destructive-text-color: #444;
 }

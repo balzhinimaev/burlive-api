@@ -25,6 +25,7 @@ export const useUserStore = defineStore({
 
   // Состояние хранилища
   state: () => ({
+    userData: null,
     user: null as User | null,
     fetch_user_result: '' as string,
     on_fetching_user_result: false as boolean,
@@ -48,7 +49,7 @@ export const useUserStore = defineStore({
 
       const config = useRuntimeConfig();
       const apiUrl = config.public.apiUrl; // Получаем API URL из конфигурации
-      const jwtToken = config.public.jwtToken; // Получаем JWT токен из конфигурации
+      const jwtToken = config.jwtToken;; // Получаем JWT токен из конфигурации
 
       try {
         const response = await $fetch<UserExistsResponse>(
@@ -82,7 +83,7 @@ export const useUserStore = defineStore({
 
       const config = useRuntimeConfig();
       const apiUrl = config.public.apiUrl; // Получаем API URL из конфигурации
-      const jwtToken = config.public.jwtToken; // Получаем JWT токен из конфигурации
+      const jwtToken = config.jwtToken;; // Получаем JWT токен из конфигурации
 
       try {
         const response = await $fetch<CreateUserResponse>(

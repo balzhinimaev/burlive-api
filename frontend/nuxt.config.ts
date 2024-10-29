@@ -2,6 +2,9 @@
 export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ["@pinia/nuxt", "@nuxt/image"],
+  routeRules: {
+    '/api/**': { ssr: false }
+  },
   app: {
     head: {
       title: "Заголовок по умолчанию для всего сайта",
@@ -28,9 +31,9 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
+    jwtToken: process.env.JWT_TOKEN || '',
     public: {
       apiUrl: process.env.API_URL || 'http://localhost:5000/backendapi',
-      jwtToken: process.env.JWT_TOKEN || '',
     },
   },
   css: [

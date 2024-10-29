@@ -21311,3 +21311,14 @@
 {"level":"info","message":"Запрос на сохранение пользовательской темы WebApp telegram bot","timestamp":"2024-10-25T15:00:18.088Z"}
 {"level":"info","message":"Запрос на получении темы пользователя 1640959206","timestamp":"2024-10-26T15:17:30.295Z"}
 {"level":"info","message":"Запрос на сохранение пользовательской темы WebApp telegram bot","timestamp":"2024-10-26T15:18:59.986Z"}
+{"level":"info","message":"create user","timestamp":"2024-10-28T10:22:05.424Z"}
+{"level":"error","message":"Ошибка при регистрации телеграмм пользователя: ValidationError: id: Path `id` is required.","timestamp":"2024-10-28T10:22:05.463Z"}
+{"level":"info","message":"create user","timestamp":"2024-10-28T10:23:02.281Z"}
+{"level":"error","message":"Ошибка при регистрации телеграмм пользователя: ValidationError: id: Path `id` is required.","timestamp":"2024-10-28T10:23:02.286Z"}
+{"level":"info","message":"create user","timestamp":"2024-10-28T10:23:18.315Z"}
+{"level":"info","message":"create user","timestamp":"2024-10-28T10:33:16.693Z"}
+{"level":"info","message":"Запрос на получении темы пользователя 1640959206","timestamp":"2024-10-28T10:33:16.927Z"}
+{"level":"info","message":"Запрос на сохранение пользовательской темы WebApp telegram bot","timestamp":"2024-10-28T10:33:27.029Z"}
+{"level":"info","message":"Запрос на сохранение пользовательской темы WebApp telegram bot","timestamp":"2024-10-28T10:33:27.849Z"}
+{"level":"info","message":"Запрос на сохранение пользовательской темы WebApp telegram bot","timestamp":"2024-10-28T10:33:31.650Z"}
+{"level":"info","message":"create user","timestamp":"2024-10-28T11:42:18.138Z"}
