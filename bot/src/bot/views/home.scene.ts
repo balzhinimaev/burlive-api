@@ -1,6 +1,4 @@
 import { Composer, Scenes } from "telegraf";
-import { ExtraEditMessageText } from "telegraf/typings/telegram-types";
-import { ISentence, Sentence } from "../../models/ISentence";
 import rlhubContext from "../models/rlhubContext";
 import { home_greeting, render_home_section } from "./homeView/greeting";
 import { bot } from "../..";
@@ -11,7 +9,15 @@ const home = new Scenes.WizardScene("home", handler);
 
 export async function loginBurlive() {
   try {
-  
+    const mytoken = process.env.mytoken;
+
+    if (mytoken) {
+      return {
+        token: mytoken,
+        userId: "66d9c56d3ed0a7722ecd2bd3",
+      };
+    }
+
     const response = await fetch(`${process.env.api_url}/users/login`, {
       method: "post",
       headers: {
@@ -23,11 +29,10 @@ export async function loginBurlive() {
         username: process.env.telegram_user_username,
       }),
     });
-  
+
     const result = await response.json(); // Сначала получаем текст ответа
 
     return result;
-  
   } catch (error) {
     console.error("Error in loginBurlive:", error);
     throw error; // Добавляем выброс ошибки, чтобы можно было её обработать
@@ -38,10 +43,25 @@ home.action("check_subscription", async (ctx) => {
   const userId = ctx.from.id;
 
   try {
+    if (
+      !process.env.telegram_channel_username ||
+      typeof process.env.telegram_channel_username !== "string"
+    ) {
+      return false;
+    }
+
+    if (
+      !process.env.telegram_channel_link ||
+      typeof process.env.telegram_channel_link !== "string"
+    ) {
+      return false;
+    }
+
     const chatMember = await bot.telegram.getChatMember(
       process.env.telegram_channel_username,
       userId
     );
+
     const isMember =
       chatMember.status !== "left" && chatMember.status !== "kicked";
 
@@ -76,7 +96,7 @@ home.action("check_subscription", async (ctx) => {
 home.action("vocabular", async (ctx, next) => {
   try {
     await ctx.scene.enter("vocabular");
-    ctx.answerCbQuery()
+    ctx.answerCbQuery();
   } catch (error) {
     await render_home_section(ctx);
   }
@@ -115,6 +135,11 @@ const providerToken = process.env.PROVIDER_TOKEN;
 // Функция для отправки счета
 async function sendInvoice(ctx: rlhubContext) {
   try {
+
+    if (!ctx.chat || typeof(ctx.chat) === 'undefined') {
+      return false
+    } 
+
     const invoice = {
       chat_id: ctx.chat.id,
       provider_token: providerToken,
@@ -128,6 +153,7 @@ async function sendInvoice(ctx: rlhubContext) {
       need_email: true,
     };
     await ctx.deleteMessage();
+    // @ts-ignore
     await ctx.replyWithInvoice(invoice);
   } catch (error) {
     console.log("Ошибка при отправке счета:", error);
@@ -140,7 +166,9 @@ home.action("rub 199", async (ctx) => {
   const description = `Подписка на сервис по изучению и развитию бурятского языка`;
   const amount = `199.00`;
   try {
+    // @ts-ignore
     const payment = await createPayment(ctx, amount, description, returnUrl);
+    // @ts-ignore
     const confirmationUrl = payment.confirmation.confirmation_url;
     await ctx.answerCbQuery("Счет сгенерирован");
     await ctx.reply(
@@ -158,7 +186,9 @@ home.action("rub 837", async (ctx) => {
   const description = `Подписка на сервис по изучению и развитию бурятского языка`;
   const amount = `837.00`;
   try {
+    // @ts-ignore
     const payment = await createPayment(ctx, amount, description, returnUrl);
+    // @ts-ignore
     const confirmationUrl = payment.confirmation.confirmation_url;
     await ctx.answerCbQuery("Счет сгенерирован");
     await ctx.reply(
@@ -176,7 +206,9 @@ home.action("rub 1436", async (ctx) => {
   const description = `Подписка на сервис по изучению и развитию бурятского языка \nСрок подписки: 12 месяцев`;
   const amount = `1436.00`;
   try {
+    // @ts-ignore
     const payment = await createPayment(ctx, amount, description, returnUrl);
+    // @ts-ignore
     const confirmationUrl = payment.confirmation.confirmation_url;
     await ctx.answerCbQuery("Счет сгенерирован");
     await ctx.reply(

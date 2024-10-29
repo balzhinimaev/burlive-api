@@ -20,7 +20,7 @@ export async function home_greeting(ctx: rlhubContext, next?: any, enter?: boole
     }
 
     const data = await loginBurlive();
-    console.log(data)
+
     const response = await fetch(
       `${process.env.api_url}/telegram/user/is-exists/${ctx.from.id}`,
       {

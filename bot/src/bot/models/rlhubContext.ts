@@ -30,6 +30,7 @@ interface rlhubContext extends Context {
       scenes: any
     }
   };
+  from: any;
   session: rlhubSession;
   scene: Scenes.SceneContextScene<rlhubContext, rlhubWizardSession>,
   wizard: Scenes.WizardContextWizard<rlhubContext>;

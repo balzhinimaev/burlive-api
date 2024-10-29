@@ -14,15 +14,67 @@ const vocabular = new Scenes.WizardScene(
   handler,
   async (ctx: rlhubContext) => await translate_word(ctx),
   async (ctx: rlhubContext) => await add_pair_handler(ctx),
-  async (ctx: rlhubContext) => await add_translate_handler(ctx)
+  async (ctx: rlhubContext) => await add_translate_handler(ctx),
+  async (ctx: rlhubContext) => await suggesWordHandler(ctx)
 );
+async function suggesWordHandler(ctx: rlhubContext) {
+  try {
+    if (ctx.updateType === "callback_query") {
+      const data = ctx.update.callback_query.data as
+        | "back"
+        | "suggest-words-russian"
+        | "suggest-words-buryat";
 
+      if (data === "back") {
+        return updateVocabularSectionRender(ctx);
+      }
+      if (data === "suggest-words-buryat") {
+        ctx.reply("suggest-words-buryat");
+        // return updateVocabularSectionRender();
+      }
+      if (data === "suggest-words-russian") {
+        ctx.reply("suggest-words-buryat");
+        // return updateVocabularSectionRender();
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+async function suggestWordRender(ctx: rlhubContext) {
+  try {
+    const message: string = `✍️ Предложить слова на перевод\n\nУкажите язык, на котором хотите предложить слова для перевода`;
+    const extra: ExtraEditMessageText = {
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: "Русский", callback_data: "suggest-words-russian" },
+            { text: "Бурятский", callback_data: "suggest-words-buryat" },
+          ],
+          [{ text: "Назад", callback_data: "back" }],
+        ],
+      },
+    };
+
+    if (ctx.updateType === "callback_query") {
+      await ctx.editMessageText(message, extra);
+      ctx.wizard.selectStep(4);
+    } else {
+      await ctx.reply(message, extra);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 async function add_translate_handler(ctx: rlhubContext) {
   try {
     if (ctx.updateType === "message" && ctx.update.message?.text) {
+      // Запоминаем
       const russian_phrase = ctx.scene.session.russian_dict_word;
       const buryat_phrase = ctx.message.text;
 
+      // Если пользователь отправил команду /back, возвращаемся в шаг 0
       if (buryat_phrase === `/back`) {
         await greeting(ctx);
       } else {
@@ -114,6 +166,13 @@ async function add_pair_handler(ctx: rlhubContext) {
         ctx.wizard.selectStep(1);
         await greeting(ctx);
       }
+      if (data === "suggest-words") {
+        return suggestWordRender(ctx);
+      }
+      if (data === "suggest-words-translate") {
+        ctx.wizard.selectStep(1);
+        await greeting(ctx);
+      }
 
       ctx.answerCbQuery();
     } else if (ctx.message?.text) {
@@ -136,6 +195,7 @@ async function add_pair_handler(ctx: rlhubContext) {
   }
 }
 
+// Рендер ✍️ Внести вклад в словарь
 async function updateVocabularSectionRender(ctx: rlhubContext) {
   try {
     const message = `<b>✍️ Внести вклад в словарь</b>\n\nВы можете предложить свои варианты <b>слов и фраз</b> для их дальнейшего перевода сообществом\nТак же можете предлагать свои варианты переводов!`;
@@ -253,9 +313,12 @@ async function translate_word(ctx: rlhubContext) {
         }
 
         message += `\n\nМожете отправить еще слова на перевод`;
-        await ctx.reply(message, { parse_mode: "HTML", reply_markup: {
-          inline_keyboard: [[{ text: 'Назад', callback_data: 'back' }]]
-        } });
+        await ctx.reply(message, {
+          parse_mode: "HTML",
+          reply_markup: {
+            inline_keyboard: [[{ text: "Назад", callback_data: "back" }]],
+          },
+        });
       } else {
         await ctx.reply("Возникла ошибка");
       }
@@ -321,6 +384,10 @@ vocabular.action(/selectlanguage (.+)/, async (ctx: rlhubContext) => {
     ctx.wizard.selectStep(0); // Вернемся к шагу 0 в случае ошибки
   }
 });
+vocabular.action(
+  "update-vocabulary",
+  async (ctx: rlhubContext) => await updateVocabularSectionRender(ctx)
+);
 
 async function render_translate_section(ctx: rlhubContext) {
   try {

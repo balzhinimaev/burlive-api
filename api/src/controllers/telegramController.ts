@@ -141,6 +141,7 @@ const telegramController = {
   register_telegram_user: async (req: Request, res: Response) => {
     try {
       const { id, username, first_name, last_name, email } = req.body;
+      console.log(req.body)
       logger.info("create user")
       // Проверка на существование пользователя
       const existingUser = await TelegramUserModel.findOne({ id });
