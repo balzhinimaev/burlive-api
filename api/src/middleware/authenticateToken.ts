@@ -13,22 +13,23 @@ const authenticateToken = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
-) => {
-  
+): Promise<void> => {
   const authHeader = req.headers["authorization"] as string | undefined;
 
   if (!authHeader) {
-    return res
+    res
       .status(401)
       .json({ error: "Access denied", message: "Access denied" });
+    return;
   }
 
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return res
+    res
       .status(401)
       .json({ error: "Access denied", message: "Access denied" });
+    return;
   }
 
   try {
@@ -44,17 +45,18 @@ const authenticateToken = async (
 
     if (!existingToken) {
       logger.warn(`Токен не найден в базе данных: ${token}`);
-      return res.status(401).json({ message: "Неверный токен аутентификации" });
+      res.status(401).json({ message: "Неверный токен аутентификации" });
+      return;
     }
 
     req.user = { userId: decoded.userId };
-    
-    next();
 
-  } catch (error) {
+    next();
+  } catch (error: any) {
     console.error(error);
     logger.error(`Ошибка при проверке токена: ${error.message}`);
-    return res.status(401).json({ message: "Неверный токен аутентификации" });
+    res.status(401).json({ message: "Неверный токен аутентификации" });
+    return;
   }
 };
 

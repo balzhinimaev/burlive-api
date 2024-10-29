@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
@@ -23,7 +23,7 @@ interface RegisterRequest extends Request {
 const saltRounds = 10;
 
 const userController = {
-  register: async (req: RegisterRequest, res: Response) => {
+  register: async (req: RegisterRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { password, email } = req.body;
 
@@ -35,31 +35,31 @@ const userController = {
       // Валидация длины email и пароля
       if (email.length > maxEmailLength) {
         logger.error(`Длина email превышает максимально допустимую: ${email}`);
-        return res
+        res
           .status(400)
-          .json({ message: "Длина email превышает максимально допустимую" });
+          .json({ message: "Длина email превышает максимально допустимую" }); return
       }
 
       if (password.length < minPasswordLength) {
         logger.error(`Длина пароля меньше минимально допустимой: ${password}`);
-        return res
+        res
           .status(400)
-          .json({ message: "Длина пароля меньше минимально допустимой" });
+          .json({ message: "Длина пароля меньше минимально допустимой" }); return
       }
 
       // Валидация почты
       if (!validator.isEmail(email)) {
         logger.error(`Некорректный формат email: ${email}`);
-        return res.status(400).json({ message: "Некорректный формат email" });
+        res.status(400).json({ message: "Некорректный формат email" }); return
       }
 
       // Проверка наличия пользователя с таким email
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         logger.error(`Пользователь с таким email уже существует: ${email}`);
-        return res
+        res
           .status(400)
-          .json({ message: "Пользователь с таким email уже существует" });
+          .json({ message: "Пользователь с таким email уже существует" }); return
       }
 
       if (username) {
@@ -69,9 +69,9 @@ const userController = {
           logger.error(
             `Пользователь с таким username уже существует: ${username}`
           );
-          return res
+          res
             .status(400)
-            .json({ message: `Пользователь с таким username уже существует` });
+            .json({ message: `Пользователь с таким username уже существует` }); return
         }
       } else {
         username = await generateUniqueUsername(email);
@@ -88,23 +88,29 @@ const userController = {
       console.error(error);
       logger.error(`Ошибка при регистрации пользователя`);
       res.status(500).json({ message: "Ошибка при регистрации пользователя" });
+      next(error)
     }
   },
 
-  login: async (req: Request, res: Response) => {
+  login: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      
+
       const { email, username, password } = req.body;
 
       // проверка суеществования почты и логина
       if (!email && !username) {
-        return res.status(400).json({ message: "Укажите username и email" });
+        res.status(400).json({ message: "Укажите username и email" }); return
       }
 
       const query = email ? { email } : { username };
       const user = await User.findOne(query);
 
       if (user && (await bcrypt.compare(password, user.password))) {
+
+        if (!user._id) {
+          return
+        }
+
         const sessionId = uuidv4(); // Генерация уникального идентификатора сессии
         const token = jwt.sign(
           { userId: user._id.toString(), sessionId },
@@ -115,22 +121,23 @@ const userController = {
 
         await Token.deleteMany({ userId: user._id }); // Удаление старых токенов
         const createdToken = await Token.create({ userId: user._id, token, expiresAt });
-        
-        logger.info(`Токен создан: ${ createdToken }`)
+
+        logger.info(`Токен создан: ${createdToken}`)
         logger.info(`Токен создан для пользователя: ${user._id}`);
 
-        return res.status(200).json({ token, userId: user._id.toString() });
+        res.status(200).json({ token, userId: user._id.toString() });
+        return
       }
 
       res.status(401).json({ message: "Неверное имя пользователя или пароль" });
     } catch (error) {
-      console.error(error);
-      logger.error(`Ошибка при входе пользователя: ${error.message}`);
+      logger.error(`Ошибка при входе пользователя: ${error}`);
       res.status(500).json({ message: "Ошибка при входе пользователя" });
+      next(error)
     }
   },
 
-  getUser: async (req: Request, res: Response) => {
+  getUser: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
 
@@ -139,11 +146,11 @@ const userController = {
 
         if (!isValidObjectIdString(id)) {
           // Может ли преобразоваться в ObjectId
-          return res
+          res
             .status(400)
             .json({
               message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
-            });
+            }); return
         }
       }
 
@@ -151,41 +158,43 @@ const userController = {
         const user = await User.findById(new ObjectId(id));
 
         if (!user) {
-          return res
+          res
             .status(404)
-            .json({ message: "Пользователь не найден", user });
+            .json({ message: "Пользователь не найден", user }); return
         }
 
         const publicProfile = user.getPublicProfile();
-        return res
+        res
           .status(200)
-          .json({ message: "Пользователь получен!", user: publicProfile });
+          .json({ message: "Пользователь получен!", user: publicProfile }); return
       }
     } catch (error) {
       logger.error(`Ошибка при получении пользователя`);
       res.status(500).json({ message: "Ошибка при получении пользователя" });
+      next(error)
     }
   },
 
-  getAllPublicUsers: async (req: Request, res: Response) => {
+  getAllPublicUsers: async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const users = await User.find();
 
       const publicProfiles = users.map((user) => user.getPublicProfile());
 
-      return res
+      res
         .status(200)
         .json({
           message: "Публичные данные всех пользователей получены!",
           users: publicProfiles,
-        });
+        }); return
     } catch (error) {
       logger.error(error);
       res.status(500).json({ message: "Ошибка при получении пользователей" });
+      next(error)
     }
   },
 
-  getPublicUserByUsername: async (req: Request, res: Response) => {
+  getPublicUserByUsername: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { username } = req.params;
       const user = await User.findOne({
@@ -193,30 +202,31 @@ const userController = {
       });
 
       if (typeof username !== "string") {
-        return res
+        res
           .status(404)
-          .json({ message: "Неправильный параметр username" });
+          .json({ message: "Неправильный параметр username" }); return
       }
 
       if (!user) {
-        return res.status(404).json({ message: "Пользователь не найден" });
+        res.status(404).json({ message: "Пользователь не найден" }); return
       }
 
       const publicProfile = user.getPublicProfile();
 
-      return res
+      res
         .status(200)
-        .json({ message: "Публичные данные получены!", publicProfile });
+        .json({ message: "Публичные данные получены!", publicProfile }); return
     } catch (error) {
       logger.error(`Ошибка при получении пользователя`);
       res.status(500).json({ message: "Ошибка при получении пользователя" });
+      next(error)
     }
   },
 
-  setProfilePhoto: async (req: AuthRequest, res: Response) => {
+  setProfilePhoto: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       if (!req.user || !req.user.userId) {
-        return false;
+        false; return
       }
 
       if (!isValidObjectId(req.user.userId)) {
@@ -226,20 +236,20 @@ const userController = {
           // Может ли преобразоваться в ObjectId
 
           console.log(123);
-          return res
+          res
             .status(400)
             .json({
               message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
-            });
+            }); return
         }
       }
 
       const user = await User.findById(new ObjectId(req.user.userId));
 
       if (!user) {
-        return res
+        res
           .status(400)
-          .json({ message: "Пользователь не найден", user });
+          .json({ message: "Пользователь не найден", user }); return
       }
 
       await User.findByIdAndUpdate(new ObjectId(req.user.userId), {
@@ -257,15 +267,16 @@ const userController = {
     } catch (error) {
       logger.error(`Ошибка при обновлении фотографии профиля: ${error}`);
       res.status(500).json({ message: "Ошибка при обновлении данных" });
+      next(error)
     }
   },
 
-  updateName: async (req: AuthRequest, res: Response) => {
+  updateName: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { firstName, lastName } = req.body;
 
       if (!req.user || !req.user.userId) {
-        return false;
+        false; return
       }
 
       if (!isValidObjectId(req.user.userId)) {
@@ -274,20 +285,20 @@ const userController = {
         if (!isValidObjectIdString(req.user.userId)) {
           // Может ли преобразоваться в ObjectId
 
-          return res
+          res
             .status(400)
             .json({
               message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
-            });
+            }); return
         }
       }
 
       const user = await User.findById(new ObjectId(req.user.userId));
 
       if (!user) {
-        return res
+        res
           .status(400)
-          .json({ message: "Пользователь не найден", user });
+          .json({ message: "Пользователь не найден", user }); return
       }
 
       await User.findByIdAndUpdate(new ObjectId(req.user.userId), {
@@ -298,19 +309,20 @@ const userController = {
       });
 
       logger.info("Данные пользователя обновлены!");
-      return res
+      res
         .status(200)
-        .json({ message: `Данные пользователя обновлены!` });
+        .json({ message: `Данные пользователя обновлены!` }); return
     } catch (error) {
       logger.error(`Ошибка при обновлении данных пользователя: ${error}`);
-      return res.status(500).json({ message: "Ошибка при обнлвении данных" });
+      res.status(500).json({ message: "Ошибка при обнлвении данных" }); next(error)
     }
   },
 
-  getMe: async (req: AuthRequest, res: Response) => {
+  getMe: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       if (!req.user || !req.user.userId) {
-        return false;
+        res.status(400)
+        return
       }
 
       if (!isValidObjectId(req.user.userId)) {
@@ -321,55 +333,57 @@ const userController = {
 
           console.log(req.user.userId);
 
-          return res
+          res
             .status(400)
             .json({
               message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
             });
+          return
         }
       }
 
       const user = await User.findById(new ObjectId(req.user.userId));
 
       if (!user) {
-        return res
+        res
           .status(400)
-          .json({ message: "Пользователь не найден", user });
+          .json({ message: "Пользователь не найден", user }); return
       }
 
       logger.info(`Пользователь получен`);
-      return res.status(200).json({ message: "Пользователь найден!", user });
+      res.status(200).json({ message: "Пользователь найден!", user }); return
     } catch (error) {
       logger.error(`Ошибка при обновлении фотографии профиля: ${error}`);
       res.status(500).json({ message: "Ошибка при обновлении данных" });
+      next(error)
     }
   },
 };
 
-async function usernameChecker(username: string, index: number) {
-  try {
-    if (index == 0) {
-      const user = await User.findOne({ username: username });
+// async function usernameChecker(username: string, index: number,) {
+//   try {
+//     if (index == 0) {
+//       const user = await User.findOne({ username: username });
 
-      if (user) {
-        return usernameChecker(username, index++);
-      } else {
-        return username;
-      }
-    } else {
-      const user = await User.findOne({ username: username + index });
+//       if (user) {
+//         return usernameChecker(username, index++);
+//       } else {
+//         return username;
+//       }
+//     } else {
+//       const user = await User.findOne({ username: username + index });
 
-      if (user) {
-        return usernameChecker(username, index++);
-      } else {
-        return `${username}${index}`;
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    logger.error("Ошибка в функции usernameChecker");
-  }
-}
+//       if (user) {
+//         return usernameChecker(username, index++);
+//       } else {
+//         return `${username}${index}`;
+//       }
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     logger.error("Ошибка в функции usernameChecker");
+//   }
+// }
 
 async function generateUniqueUsername(email: string, suffix = 0) {
   let username = email.split("@", 1)[0];

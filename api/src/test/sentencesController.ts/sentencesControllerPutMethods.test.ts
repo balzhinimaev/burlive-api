@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 import app from '../../app'; // Укажите путь к вашему основному файлу приложения
 import Sentence from '../../models/SuggestedSentence';
 import User from '../../models/User';
-import { ObjectId } from 'mongodb';
 import Translation from '../../models/Translation';
 
 describe('Sentence Controller Put methods Tests', () => {
@@ -107,7 +106,6 @@ describe('Sentence Controller Put methods Tests', () => {
     });
 
     it('should return 400 if invalid contributorId is provided', async () => {
-        const invalidContributorId = 'invalid_id';
 
         // Create a test sentence
         const createdSentence = await Sentence.create({

@@ -112,6 +112,7 @@ describe('User Registration Tests', () => {
         const invalidEmails = ['invalidemail1', '@jdqw', 'test@example', "gmail.com"];
 
         for (const email of invalidEmails) {
+            console.log(email)
             const response = await request(app)
                 .post('/api/users/login')
                 .send({

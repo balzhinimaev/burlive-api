@@ -1,14 +1,15 @@
 // telegramController.ts
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import logger from "../utils/logger";
 import { DialogModel } from "../models/Dialog";
 import TelegramUserModel from "../models/TelegramUsers";
 import WordModel from "../models/Vocabulary/WordModel";
 import SearchedWordModel from "../models/Vocabulary/SearchedWordModel";
 import TelegramUserState from "../models/Telegram/UserState";
+import { Types } from "mongoose";
 
 const telegramController = {
-  create: async (req: Request, res: Response) => {
+  create: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { messages } = req.body;
 
@@ -18,30 +19,36 @@ const telegramController = {
         .save()
         .then((result) => console.log(result));
 
-      return res.status(200).json({ messages });
-    } catch {
+      res.status(200).json({ messages });
+      return
+    } catch (error) {
       logger.error("error");
+      next(error)
     }
   },
-  paymentCb: async (req: Request, res: Response) => {
+  paymentCb: async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      console.log(req.body);
-
-      return res.status(200);
-    } catch {
+      res.status(200);
+      return
+    } catch (error) {
       logger.error("error");
+      next(error)
     }
   },
-  new_word_translate_request: async (req: Request, res: Response) => {
+  new_word_translate_request: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { word, language, user_id } = req.body;
       const user = await TelegramUserModel.findOne({ id: user_id });
+
+      if (!user) {
+        return
+      }
 
       // Преобразование слова в нижний регистр для поиска
       const normalizedWord = word.toLowerCase();
       let selectedLanguage = language === "russian" ? "русский" : "бурятский";
 
-      let translations = [];
+      let translations: Types.ObjectId[] = [];
 
       const is_exists_on_searchdata = await SearchedWordModel.findOne({
         normalized_text: normalizedWord,
@@ -94,19 +101,22 @@ const telegramController = {
 
       if (burlang_fetch.status == 200) {
         console.log(burlang_response);
-        return res
+        res
           .status(200)
           .json({ translations, burlang_api: burlang_response });
+        return
       } else {
-        return res.status(200).json({ translations });
+        res.status(200).json({ translations });
+        return
       }
     } catch (error) {
       logger.error(`Ошибка при переводе слова: \n${error}`);
-      return res.status(500).json({ message: "Ошибка сервера" });
+      res.status(500).json({ message: "Ошибка сервера" });
+      next(error)
     }
   },
 
-  user_is_exists: async (req: Request, res: Response) => {
+  user_is_exists: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       const user = await TelegramUserModel.findOne({ id }).select(
@@ -114,12 +124,13 @@ const telegramController = {
       );
 
       if (!user) {
-        return res
+        res
           .status(200)
           .json({ is_exists: false, message: "Пользователь не существует" });
+        return
       }
 
-      return res.status(200).json({
+      res.status(200).json({
         is_exists: true,
         message: "Пользователь существует",
         user: {
@@ -132,13 +143,15 @@ const telegramController = {
           theme: user.theme
         },
       });
+      return
     } catch (error) {
       logger.error("Error in user_is_exists:", error);
-      return res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: "Internal server error" });
+      next(error)
     }
   },
-  
-  register_telegram_user: async (req: Request, res: Response) => {
+
+  register_telegram_user: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       console.log(req.body)
       const { id, username, first_name, last_name, email } = req.body;
@@ -147,9 +160,10 @@ const telegramController = {
       // Проверка на существование пользователя
       const existingUser = await TelegramUserModel.findOne({ id });
       if (existingUser) {
-        return res.status(409).json({ 
-          message: "Пользователь уже зарегистрирован!" 
+        res.status(409).json({
+          message: "Пользователь уже зарегистрирован!"
         });
+        return
       }
 
       // Сохранение нового пользователя
@@ -163,16 +177,18 @@ const telegramController = {
 
       await newUser.save();
 
-      return res.status(201).json({ 
-        message: "Пользователь успешно зарегистрирован!" 
+      res.status(201).json({
+        message: "Пользователь успешно зарегистрирован!"
       });
+      return
     } catch (error) {
       logger.error(`Ошибка при регистрации телеграмм пользователя: ${error}`);
-      return res.status(500).json({ error: "Ошибка сервера" });
+      res.status(500).json({ error: "Ошибка сервера" });
+      next(error)
     }
   },
 
-  select_language_for_vocabular: async (req: Request, res: Response) => {
+  select_language_for_vocabular: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { language, id } = req.body;
       await TelegramUserModel.findOneAndUpdate(
@@ -183,26 +199,30 @@ const telegramController = {
           },
         }
       );
-      return res.status(200).json({ message: "Язык выбран" });
+      res.status(200).json({ message: "Язык выбран" });
+      return
     } catch (error) {
       logger.error(`Ошибка при сохранении выбора языка для словаря, ${error}`);
-      return res.status(500).json({ error: "Ошибка сервера" });
+      res.status(500).json({ error: "Ошибка сервера" });
+      next(error)
     }
   },
 
-  save: async (req: Request, res: Response) => {
+  save: async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       console.log(123);
       const dialogs = await DialogModel.find();
       console.log(dialogs);
 
-      return res.status(200);
+      res.status(200);
+      return
     } catch (error) {
       logger.error("error");
+      next(error)
     }
   },
 
-  save_user_state: async (req: Request, res: Response) => {
+  save_user_state: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       console.log("сохранение стейта");
       const { userId, scene, stateData } = req.body;
@@ -211,51 +231,54 @@ const telegramController = {
         { scene, stateData },
         { upsert: true }
       );
-      return res.status(200).json({ message: "State saved successfully" });
+      res.status(200).json({ message: "State saved successfully" }); return
     } catch (error) {
       logger.error(`Error saving user state: ${error}`);
-      return res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: "Internal server error" });
+      next(error)
     }
   },
-  get_user_state: async (req: Request, res: Response) => {
+  get_user_state: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       console.log(id);
       const userState = await TelegramUserState.findOne({ userId: id });
       if (!userState) {
-        return res.status(404).json({ message: "User state not found" });
+        res.status(404).json({ message: "User state not found" }); return
       }
-      return res.status(200).json(userState);
+      res.status(200).json(userState); return
     } catch (error) {
       logger.error(`Error fetching user state: ${error}`);
-      return res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: "Internal server error" });
+      next(error)
     }
   },
   // Получение текущей темы пользователя
-  getUserTheme: async (req: Request, res: Response) => {
+  getUserTheme: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      
-      
+
+
       const { id } = req.params;
       logger.info(`Запрос на получении темы пользователя ${id}`)
       const user = await TelegramUserModel.findOne({ id });
 
       if (!user) {
-        return res.status(404).json({ message: "Пользователь не найден" });
+        res.status(404).json({ message: "Пользователь не найден" }); return
       }
 
-      return res.status(200).json({ theme: user.theme });
+      res.status(200).json({ theme: user.theme }); return
     } catch (error) {
       logger.error("Ошибка при получении темы пользователя:", error);
-      return res.status(500).json({ error: "Ошибка сервера" });
+      res.status(500).json({ error: "Ошибка сервера" });
+      next(error)
     }
   },
 
   // Обновление темы пользователя
-  updateUserTheme: async (req: Request, res: Response) => {
+  updateUserTheme: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id, theme } = req.body;
-      
+
       logger.info(`Запрос на сохранение пользовательской темы WebApp telegram bot`)
 
       const user = await TelegramUserModel.findOneAndUpdate(
@@ -265,16 +288,17 @@ const telegramController = {
       );
 
       if (!user) {
-        return res.status(404).json({ message: "Пользователь не найден" });
+        res.status(404).json({ message: "Пользователь не найден" }); return
       }
 
-      return res.status(200).json({ message: "Тема успешно обновлена" });
+      res.status(200).json({ message: "Тема успешно обновлена" }); return
     } catch (error) {
       logger.error("Ошибка при обновлении темы пользователя:", error);
-      return res.status(500).json({ error: "Ошибка сервера" });
+      res.status(500).json({ error: "Ошибка сервера" });
+      next(error)
     }
   },
-  
+
 };
 
 export default telegramController;

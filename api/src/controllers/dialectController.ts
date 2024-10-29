@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import logger from '../utils/logger';
 import Dialect from '../models/Dialect';
 
@@ -13,7 +13,7 @@ interface DialectRequest extends Request {
 }
 
 const dialectController = {
-    create: async (req: DialectRequest, res: Response) => {
+    create: async (req: DialectRequest, res: Response, next: NextFunction): Promise<void> => {
         
         try {
 
@@ -27,7 +27,7 @@ const dialectController = {
 
                 })
 
-            return true
+            return
 
         } catch (error) {
             
@@ -35,7 +35,7 @@ const dialectController = {
             logger.error(`Ошибка при создании диалекта, ${error}`)
             res.status(500).json({ message: 'Ошибка при создании диалекта' })
 
-            return false
+            next(error)
 
         }
     

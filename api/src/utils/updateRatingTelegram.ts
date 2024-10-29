@@ -1,4 +1,3 @@
-import { ObjectId } from "mongoose";
 import logger from "./logger";
 import TelegramUserModel from "../models/TelegramUsers";
 

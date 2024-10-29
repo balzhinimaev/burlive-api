@@ -1,7 +1,7 @@
 // sentenceController.ts
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import SuggestedSentence from "../models/SuggestedSentence";
-import AcceptedSentence, { ISentence } from "../models/AcceptedSentences";
+import AcceptedSentence from "../models/AcceptedSentences";
 import { AuthRequest } from "../middleware/authenticateToken";
 import { ObjectId } from "mongodb";
 import { isValidObjectId } from "mongoose";
@@ -63,7 +63,7 @@ const sentenceController = {
   },
 
   // В вашем контроллере
-  getAcceptedSentence: async (req: AuthRequest, res: Response) => {
+  getAcceptedSentence: async (_req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const sentence = await AcceptedSentence.aggregate([
         {
@@ -80,9 +80,9 @@ const sentenceController = {
       ]).exec();
 
       if (sentence.length === 0) {
-        return res
+        res
           .status(404)
-          .json({ message: "Предложение для перевода не найдено" });
+          .json({ message: "Предложение для перевода не найдено" }); return
       }
 
       const populatedSentence = await AcceptedSentence.populate(sentence[0], {
@@ -95,15 +95,22 @@ const sentenceController = {
         .json({
           message: "Предложение для перевода получено",
           sentence: populatedSentence,
-        });
+        }); return
     } catch (error) {
       logger.error(`Ошибка при получении предложения для перевода: ${error}`);
       res.status(500).json({ message: "Error retrieving sentence" });
+      next(error)
     }
   },
 
-  getNewSentence: async (req: AuthRequest, res: Response) => {
+  getNewSentence: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+
+      if (typeof (req.user) === 'undefined') {
+        res.status(400)
+        return
+      }
+
       const sentence = await SuggestedSentence.findOne({
         status: "pending",
       })
@@ -124,22 +131,25 @@ const sentenceController = {
           expiresAt,
         }).save();
 
-        return res
+        res
           .status(200)
           .json({ message: "Предложение для рассмотрения получено", sentence });
+        return
       }
 
-      return res
+      res
         .status(404)
         .json({ message: `Предложения для рассмотрения не найдены` });
+      return
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Error retrieving sentence" });
+      next(error)
     }
   },
 
   // Получение предлождения по ID
-  getSentence: async (req: Request, res: Response) => {
+  getSentence: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       console.log(req.params);
@@ -147,48 +157,52 @@ const sentenceController = {
         // return res.status(400).json({ message: 'Неверные входные данные' });
 
         if (!isValidObjectIdString(id)) {
-          return res.status(400).json({
+          res.status(400).json({
             message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
           });
+          return 
         }
       }
 
       const sentence = await SuggestedSentence.findById(new ObjectId(id));
 
       if (sentence) {
-        return res.status(200).json(sentence);
+        res.status(200).json(sentence);
+        return 
       }
 
-      return res.status(404).json({ message: "Предложение не найдено" });
+      res.status(404).json({ message: "Предложение не найдено" });
+      return 
     } catch (error) {
       console.error(error);
       logger.error(`Ошибка при получении предложения: ${req.params.id}`);
       res.status(500).json({ message: `Ошибка при получении предложения` });
+      next(error)
     }
   },
 
   // Создание одного предложения
-  createSentence: async (req: AuthRequest, res: Response) => {
+  createSentence: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { text, language } = req.body;
 
       if (!req.user) {
-        return res.json({ message: "Вы не авторизованы!" });
+        res.json({ message: "Вы не авторизованы!" }); return
       }
 
       const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
 
       if (!text || !language || !author) {
         logger.error(`Пожалуйста, предоставьте текст, язык и автора`);
-        return res
+         res
           .status(400)
-          .json({ message: "Пожалуйста, предоставьте текст, язык и автора" });
+          .json({ message: "Пожалуйста, предоставьте текст, язык и автора" }); return
       }
 
       // Валидация текста
       if (!text || typeof text !== "string" || text.trim().length === 0) {
         logger.error(`Неверный формат текста`);
-        return res.status(400).json({ message: "Неверный формат текста" });
+        res.status(400).json({ message: "Неверный формат текста" }); return
       }
 
       // Валидация языка
@@ -198,7 +212,7 @@ const sentenceController = {
         language.trim().length === 0
       ) {
         logger.error(`Неверный формат языка`);
-        return res.status(400).json({ message: "Неверный формат языка" });
+        res.status(400).json({ message: "Неверный формат языка" }); return
       }
 
       const isExists = await SuggestedSentence.findOne({ text });
@@ -217,10 +231,10 @@ const sentenceController = {
           })
           .catch((error) => console.log(error));
 
-        return res.status(200).json({
+         res.status(200).json({
           message: "Такое предложение существует, вы добавлены в контрибьютеры",
           isExists,
-        });
+         }); return
       }
 
       const newSentence = await new SuggestedSentence({
@@ -238,38 +252,38 @@ const sentenceController = {
       const updateR = await updateRating(author);
       logger.info(`typeof(updateR) ${typeof updateR}`);
 
-      res.status(201).json({
+       res.status(201).json({
         message: "Предложение успешно создано",
         sentenceId: newSentence._id,
-      });
+       }); return
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Ошибка при создании предложения" });
+       res.status(500).json({ message: "Ошибка при создании предложения" }); next(error)
     }
   },
 
   // Создание нескольких предложений
-  createSentenceMultiple: async (req: AuthRequest, res: Response) => {
+  createSentenceMultiple: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { sentences, language, ctx } = req.body;
       console.log(ctx);
       if (!req.user) {
-        return res.json({ message: "Вы не авторизованы!" });
+        res.json({ message: "Вы не авторизованы!" }); return
       }
 
       const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
 
       if (!sentences || !Array.isArray(sentences) || sentences.length === 0) {
-        return res
+         res
           .status(400)
-          .json({ message: "Поле sentences должно быть непустым массивом!" });
+          .json({ message: "Поле sentences должно быть непустым массивом!" }); return
       }
 
       if (!language || !author) {
         logger.error(`Пожалуйста, предоставьте текст, язык и автора`);
-        return res
+         res
           .status(400)
-          .json({ message: "Пожалуйста, предоставьте текст, язык и автора" });
+          .json({ message: "Пожалуйста, предоставьте текст, язык и автора" }); return
       }
 
       // Валидация языка
@@ -279,7 +293,7 @@ const sentenceController = {
         language.trim().length === 0
       ) {
         logger.error(`Неверный формат языка`);
-        return res.status(400).json({ message: "Неверный формат языка" });
+        res.status(400).json({ message: "Неверный формат языка" }); return
       }
 
       let addedSentences: any[] = [];
@@ -299,7 +313,7 @@ const sentenceController = {
           sentence.text.trim().length === 0
         ) {
           logger.error(`Неверный формат текста`);
-          return res.status(400).json({ message: "Неверный формат текста" });
+          res.status(400).json({ message: "Неверный формат текста" }); return
         }
 
         const isExists = await SuggestedSentence.findOne({
@@ -362,29 +376,29 @@ const sentenceController = {
         }
       }
 
-      return res.status(200).json({
+       res.status(200).json({
         message: `Предложения успешно добавлены!`,
         existsTranslations,
         addedSentences,
         existsSentences,
         authorIsAuthor,
-      });
+       }); return
     } catch (error) {
       console.error(error);
       logger.error(error);
-      res.status(500).json({ message: "Ошибка при создании предложения" });
+       res.status(500).json({ message: "Ошибка при создании предложения" }); next(error)
     }
   },
 
   //  Принятие предложения
-  acceptSentence: async (req: Request, res: Response) => {
+  acceptSentence: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
 
       // Поиск предложенного предложения
       const sentence = await SuggestedSentence.findById(id);
       if (!sentence) {
-        return res.status(404).json({ message: "Предложение не найдено" });
+        res.status(404).json({ message: "Предложение не найдено" }); return
       }
 
       // Создание и сохранение принятого предложения
@@ -402,24 +416,24 @@ const sentenceController = {
       await SuggestedSentence.findByIdAndDelete(id);
       logger.info(`Предложенное предложение удалено! ${id}`);
 
-      res.json({ message: "Предложение принято для перевода", sentence });
+      res.json({ message: "Предложение принято для перевода", sentence }); return
     } catch (error) {
       console.error(error);
-      res
+       res
         .status(500)
-        .json({ message: "Ошибка при принятии предложения для перевода" });
+        .json({ message: "Ошибка при принятии предложения для перевода" }); next(error)
     }
   },
 
   // Отклонение предложения
-  rejectSentence: async (req: Request, res: Response) => {
+  rejectSentence: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
 
       const isExists = await SuggestedSentence.findById(id);
 
       if (!isExists) {
-        return res.status(404).json({ message: "Предложение на найдено" });
+        res.status(404).json({ message: "Предложение на найдено" }); return
       }
 
       const sentence = await SuggestedSentence.findByIdAndUpdate(
@@ -429,26 +443,26 @@ const sentenceController = {
       );
 
       if (!sentence) {
-        return res.status(404).json({ message: "Предложение не найдено" });
+        res.status(404).json({ message: "Предложение не найдено" }); return
       }
 
       logger.info(`Предложение отклонено: ${sentence._id}`);
-      res.json({ message: "Предложение отклонено", sentence });
+      res.json({ message: "Предложение отклонено", sentence }); return
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Ошибка при отклонении предложения" });
+       res.status(500).json({ message: "Ошибка при отклонении предложения" }); next(error)
     }
   },
 
   // Удаление предложений
-  deleteSentences: async (req: Request, res: Response) => {
+  deleteSentences: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { sentences } = req.body;
 
       if (!sentences || !sentences.length) {
-        return res
+         res
           .status(400)
-          .json({ message: "Параметр предложений отсутствует или пуст!" });
+          .json({ message: "Параметр предложений отсутствует или пуст!" }); return
       }
 
       // Создаем массив для хранения всех _id
@@ -457,19 +471,20 @@ const sentenceController = {
         .filter((id: any) => isValidObjectId(id));
 
       if (ids.length !== sentences.length) {
-        return res.status(400).json({ message: "Некоторые _id невалидны!" });
+         res.status(400).json({ message: "Некоторые _id невалидны!" }); return
       }
 
       // Удаление всех предложений с валидными _id одним запросом
       await SuggestedSentence.deleteMany({ _id: { $in: ids } });
 
-      return res.json({
+       res.json({
         message: "Предложения удалены!",
         deletedCount: ids.length,
       });
+      return
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Ошибка при удалении предложений!" });
+       res.status(500).json({ message: "Ошибка при удалении предложений!" }); next(error)
     }
   },
 };

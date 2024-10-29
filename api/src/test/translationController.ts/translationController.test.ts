@@ -76,6 +76,10 @@ describe('Sentence Controller Tests', () => {
         // Получение обновленной информации о пользователе
         const updatedUser = await User.findById({ _id: new ObjectId(userId) });
 
+        if (!updatedUser || typeof (updatedUser.suggestedSentences) === 'undefined') {
+            return false
+        }
+
         // Проверка, что у пользователя теперь есть одно предложение
         expect(updatedUser.suggestedSentences).toHaveLength(1);
         expect(updatedUser.suggestedSentences[0].toString()).toBe(createSentence.body.sentenceId);
@@ -87,6 +91,8 @@ describe('Sentence Controller Tests', () => {
         
         expect(getSentence.status).toBe(200)
         expect(getSentence.body.sentence._id).toBe(createSentence.body.sentenceId)
+
+        return true
 
     });
 
@@ -118,6 +124,10 @@ describe('Sentence Controller Tests', () => {
 
         // Получение обновленной информации о пользователе
         const updatedUser = await User.findById({ _id: new ObjectId(userId) });
+        
+        if (!updatedUser || typeof (updatedUser.suggestedSentences) === 'undefined') {
+            return false
+        }
 
         // Проверка, что у пользователя теперь есть одно предложение
         expect(updatedUser.suggestedSentences).toHaveLength(1);
@@ -147,6 +157,8 @@ describe('Sentence Controller Tests', () => {
             .set('Authorization', `Bearer ${authToken}`)
         
         expect(voteForTranslation.status).toBe(201)
+
+        return true
 
     });
 

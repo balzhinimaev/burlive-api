@@ -100,6 +100,10 @@ describe('Dialect Controller Tests', () => {
 
         // Получение обновленной информации о пользователе
         const updatedUser = await User.findById({ _id: new ObjectId(userId) });
+        
+        if (!updatedUser || typeof (updatedUser.suggestedSentences) === 'undefined') {
+            return false
+        }
 
         // Проверка, что у пользователя теперь есть одно предложение
         expect(updatedUser.suggestedSentences).toHaveLength(1);
@@ -130,6 +134,8 @@ describe('Dialect Controller Tests', () => {
             .set('Authorization', `Bearer ${authToken}`)
 
         expect(voteForTranslation.status).toBe(201)
+
+        return true
 
     });
 

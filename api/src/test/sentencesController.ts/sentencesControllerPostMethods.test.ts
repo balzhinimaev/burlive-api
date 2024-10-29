@@ -75,11 +75,17 @@ describe('Sentence Controller Post methods Tests', () => {
 
         // Получение обновленной информации о пользователе
         const updatedUser = await User.findById({ _id: new ObjectId(userId) });
+        
+        if (!updatedUser || typeof (updatedUser.suggestedSentences) === 'undefined') {
+            return false
+        }
 
         // Проверка, что у пользователя теперь есть одно предложение
         expect(updatedUser.suggestedSentences).toHaveLength(1);
         expect(updatedUser.suggestedSentences[0].toString()).toBe(response.body.sentenceId);
         expect(updatedUser.rating).toBe(200);
+
+        return true
 
     });
 

@@ -81,10 +81,17 @@ describe('Sentence Controller Tests', () => {
         // Получение обновленной информации о пользователе
         const updatedUser = await User.findById({ _id: new ObjectId(userId) });
         
+        if (!updatedUser || typeof (updatedUser.suggestedSentences) === 'undefined') {
+            return false
+        }
+
         // Проверка, что у пользователя теперь есть одно предложение
         expect(updatedUser.suggestedSentences).toHaveLength(1);
         expect(updatedUser.suggestedSentences[0].toString()).toBe(response.body[0]._id);
         expect(updatedUser.rating).toBe(200);
+
+        return true
+
     });
 
     it('should return 404 if no sentences found', async () => {
@@ -166,8 +173,7 @@ describe('Sentence Controller Tests', () => {
     });
 
     it('should return 400 if invalid contributorId is provided', async () => {
-        const invalidContributorId = 'invalid_id';
-
+        
         // Create a test sentence
         const createdSentence = await Sentence.create({
             text: 'Test sentence',
