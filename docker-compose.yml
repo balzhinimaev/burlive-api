@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # nuxt:
+  #   build: ./frontend
+  #   container_name: nuxt-app
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - api
+  #   environment:
+  #     - API_URL=${API_URL}
+  #   env_file:
+  #     - .env
+
+  api:
+    build: ./api
+    container_name: express-api
+    restart: always
+    environment:
+      - MONGO_URL=${MONGO_URL}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo/mongod.conf:/etc/mongo/mongod.conf:ro
+      - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    command: mongod --config /etc/mongo/mongod.conf
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - BURLIVE_DB_USER=${BURLIVE_DB_USER}
+      - BURLIVE_DB_PASSWORD=${BURLIVE_DB_PASSWORD}
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: nginx
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - /etc/letsencrypt:/etc/letsencrypt:ro
+  #   depends_on:
+  #     - nuxt
+  #     - api
+
+volumes:
+  mongo_data:
