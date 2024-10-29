@@ -140,6 +140,7 @@ const telegramController = {
   
   register_telegram_user: async (req: Request, res: Response) => {
     try {
+      console.log(req.body)
       const { id, username, first_name, last_name, email } = req.body;
       logger.info("create user")
       // Проверка на существование пользователя
@@ -272,6 +273,7 @@ const telegramController = {
       return res.status(500).json({ error: "Ошибка сервера" });
     }
   },
+  
 };
 
 export default telegramController;

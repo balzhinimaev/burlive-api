@@ -180,7 +180,7 @@ const userController = {
           users: publicProfiles,
         });
     } catch (error) {
-      logger.error(`Ошибка при получении пользователей`);
+      logger.error(error);
       res.status(500).json({ message: "Ошибка при получении пользователей" });
     }
   },
