@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Test SSH Connection
+        run: |
+          ssh -vvv -o StrictHostKeyChecking=no deployer@195.133.31.15 'echo "SSH connection successful"'
+
       - name: Checkout code
         uses: actions/checkout@v3
 
