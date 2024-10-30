@@ -35,10 +35,10 @@ const themeClass = computed(() => themeStore.isDarkMode ? 'dark-mode' : 'light-m
 
 // Функция для обновления атрибута темы на body
 const updateBodyTheme = () => {
-  const theme = themeStore.isDarkMode ? 'dark' : 'light';
   const colorScheme = window.Telegram.WebApp.colorScheme;
   document.body.setAttribute('data-theme', colorScheme);
 };
+
 // Wait for the Telegram Web App to be initialized
 const waitForTelegramWebApp = () => {
   return new Promise<void>((resolve) => {
@@ -58,14 +58,24 @@ const waitForTelegramWebApp = () => {
 onMounted(async () => {
   await waitForTelegramWebApp();
   if (window.Telegram?.WebApp) {
+    
     console.log('Telegram Web App initialized:', window.Telegram.WebApp);
     console.log('Init data unsafe:', window.Telegram.WebApp.initDataUnsafe);
-
     user.value = window.Telegram.WebApp.initDataUnsafe?.user;
-    window.Telegram.WebApp.setHeaderColor('#222'); // Устанавливает синий цвет заголовка
+
+    // Получаем значение цвета из CSS-переменной
+    const rootStyles = getComputedStyle(document.documentElement);
+    let backgroundColor = rootStyles.getPropertyValue('--background-component-color').trim();
+
+    // Устанавливаем цвет шапки
+    window.Telegram.WebApp.setHeaderColor(backgroundColor);
+
+    // Устанавливаем цвет фона
+    window.Telegram.WebApp.setBackgroundColor(backgroundColor);
+    window.Telegram.WebApp.setBottomBarColor(backgroundColor);
+
     const themeParams = window.Telegram.WebApp.themeParams;
-    window.Telegram.WebApp.BackButton.isVisible = false
-    window.Telegram.WebApp.setBottomBarColor("#222");
+    
     viewThemeParam.value = themeParams
     if (user.value) {
       console.log('User data:', user.value);
@@ -74,27 +84,13 @@ onMounted(async () => {
     } else {
       console.warn('No user data available from Telegram Web App.');
     }
+
   } else {
     console.error('Telegram Web App is not available.');
   }
-  const telegram_id = 1640959206;
-  await userStore.checkUserExists(telegram_id);
-  await themeStore.loadTheme();
-  // window.Telegram.WebApp.MainButton.show();
-  window.Telegram.WebApp.MainButton.setText('Далее');
-  window.Telegram.WebApp.MainButton.setParams({
-    color: '#444', // Красный цвет кнопки
-    text_color: '#eee', // Белый цвет текста
-  });
-  window.Telegram.WebApp.MainButton.onClick(() => {
-    // Ваш код при нажатии на кнопку
-    alert('Главная кнопка нажата!');
-  });
+
   updateBodyTheme(); // Присваиваем тему после загрузки
 });
-
-// Следим за изменением темы и обновляем атрибут на body
-watch(() => themeStore.theme, updateBodyTheme);
 
 </script>
 

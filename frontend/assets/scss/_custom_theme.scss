@@ -12,6 +12,7 @@
     --single-page-bg: #{$single-page-background-color-light};
     --inner-component-shadow: #{$inner-shadow-color-light};
     --button-hover-background: #{$button-hover-background-color-light};
+    --description-color: #{$light-description-color};
 }
 
 body[data-theme='dark'] {
@@ -24,4 +25,5 @@ body[data-theme='dark'] {
     --single-page-bg: #{$single-page-background-color-dark};
     --inner-component-shadow: #{$inner-shadow-color-dark};
     --button-hover-background: #{$button-hover-background-color-dark};
+    --description-color: #{$dark-description-color};
 }

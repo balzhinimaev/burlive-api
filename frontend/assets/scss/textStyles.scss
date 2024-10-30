@@ -22,13 +22,18 @@
 
 /* Основной текст */
 .typography-body {
-    font-family: var(--font-family-primary);
+    // font-family: var(--font-family-primary);
+    // font-weight: 400;
+    // font-size: var(--font-size-body);
+    // line-height: 18px;
+    // letter-spacing: var(--letter-spacing);
+    // margin-bottom: 24px;
+    // color: #BFBFBF;
     font-weight: 400;
-    font-size: var(--font-size-body);
-    line-height: 18px;
-    letter-spacing: var(--letter-spacing);
-    margin-bottom: 24px;
-    color: #BFBFBF;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 4px;
+    color: var(--description-color);
 }
 
 /* Маленький текст */

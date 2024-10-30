@@ -1,8 +1,6 @@
 mongo
-
 .env
 node_modules
-mongo
 .log
 dist
 output.log

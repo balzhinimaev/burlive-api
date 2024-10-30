@@ -1,10 +1,11 @@
 <template>
     <div class="page module-page">
         <header>
-            <h2 class="heading">Основы бурятского языка</h2>
-            <p class="typography-body">
+            <h2>Основы бурятского языка</h2>
+            <p>
                 Изучите базовые фразы и попрактикуйтесь в приветствиях.
             </p>
+            {{ useRouter().options.history.state.back }}
         </header>
 
         <main>
@@ -34,13 +35,25 @@ const lessons: Lesson[] = [
     { id: 1, title: 'Урок 1: Приветствие', description: 'Основные приветствия на бурятском.' },
     { id: 2, title: 'Урок 2: Знакомство', description: 'Фразы для знакомства.' },
 ];
+onMounted(() => {
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.BackButton.show();
+        window.Telegram.WebApp.BackButton.onClick(() => {
+            router.push({ path: "/selectmodule" }); // Или другой маршрут по умолчанию
+        });
+    }
+});
+
+onBeforeUnmount(() => {
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.BackButton.hide();
+        window.Telegram.WebApp.BackButton.offClick();
+    }
+});
+
 </script>
 
 <style scoped lang="scss">
-.page {
-    margin: 32px 16px;
-}
-
 .lesson-card {
     display: flex;
     justify-content: space-between;

@@ -10,6 +10,7 @@
 }
 
 :root {
+  --background-component-color: #1a1a1a;
   --tg-theme-bg-color: #222;
   --tg-theme-text-color: #{$custom-text-color-dark};
   --tg-theme-hint-color: #777;
@@ -24,4 +25,19 @@
   --tg-theme-section-separator-color: #222;
   --tg-theme-subtitle-text-color: #555;
   --tg-theme-destructive-text-color: #444;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+}
+header {
+    // border-radius: $border-radius;
+    // background-color: var(--background-component-color);
+    overflow: hidden;
+    padding: 32px 8px 0;
+    color: var(--text-color);
+}
+
+.single-page {
+  padding: 0 16px;
 }

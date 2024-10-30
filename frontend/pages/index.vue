@@ -2,8 +2,8 @@
   <div class="page home-page">
     <header>
       {{ user }}
-      <h2 class="heading">Самоучитель <br />бурятского языка</h2>
-      <p class="typography-body" style="margin-top: 12px; margin-bottom: 0;">
+      <h2>Самоучитель <br />бурятского языка</h2>
+      <p class="typography-body">
         Каждое ваше взаимодействие с уроками <br />
         помогает сохранять и развивать бурятский язык.
       </p>
@@ -41,7 +41,7 @@ const cards = [
     title: '📚 Уроки',
     body: 'Начни своё обучение с уроков, которые помогут тебе освоить основы бурятского языка.',
     buttonText: 'Перейти к урокам',
-    action: () => router.push('/modules'),
+    action: () => router.push({ path: "/selectmodule" }),
   },
   {
     title: '📖 Словарь',
@@ -62,13 +62,6 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-header {
-  margin-bottom: 30px;
-  padding: 16px;
-  border-radius: $border-radius;
-  background-color: var(--background-component-color);
-  overflow: hidden;
-}
 .mySwiper {
   width: 100%;
   height: auto;
@@ -127,6 +120,7 @@ header {
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 16px;
+  color: #aaa;
 }
 
 .card-button {
@@ -142,8 +136,5 @@ header {
   &:hover {
     background-color: #454545;
   }
-}
-.page {
-  padding: 16px;
 }
 </style>

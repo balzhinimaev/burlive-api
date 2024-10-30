@@ -91,8 +91,10 @@ onBeforeUnmount(() => {
 header {
     margin-bottom: 10px;
 }
+
 #modules-list {
     padding: 0 32px 32px;
+
     .modules-list {
         list-style: none;
         /* Убираем стандартные маркеры списка */
@@ -103,15 +105,18 @@ header {
             margin-bottom: 16px;
             transition: background-color 0.3s;
             color: #aaa;
+
             a {
                 text-decoration: none;
                 display: flex;
                 align-items: center;
                 color: #eee;
             }
+
             a:hover .module-title {
                 text-decoration: underline;
             }
+
             .module-number {
                 font-weight: 600;
                 font-size: 18px;
