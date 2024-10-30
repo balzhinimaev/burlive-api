@@ -22,7 +22,7 @@ jobs:
 
       - name: Deploy to VPS via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no root@195.133.31.15 '
+          ssh -o StrictHostKeyChecking=no deployer@195.133.31.15 '
             cd /home/burlive &&
             git pull &&
             docker compose down &&
