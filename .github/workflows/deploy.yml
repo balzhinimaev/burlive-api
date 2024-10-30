@@ -31,7 +31,7 @@ jobs:
       - name: Deploy to VPS via SSH
         run: |
           ssh deployer@195.133.31.15 '
-            cd /home/burlive &&
+            cd /home/deployer/burlive &&
             git pull &&
             docker compose down &&
             docker compose up -d --build
