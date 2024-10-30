@@ -14,10 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Add server to known_hosts
-        run: |
-          ssh-keyscan -H 195.133.31.15 >> ~/.ssh/known_hosts
-
       - name: Test SSH Connection
         run: |
           ssh deployer@195.133.31.15 'echo "SSH connection successful"'
