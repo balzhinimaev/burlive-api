@@ -13,6 +13,19 @@ services:
   #     - API_URL=${API_URL}
   #   env_file:
   #     - .env
+  bot:
+    build: ../burlang-
+    container_name: telegram-bot
+    restart: always
+    environment:
+      - API_URL=http://express-api:5000
+      - BOT_TOKEN=${BOT_TOKEN}
+    depends_on:
+      - api
+    env_file:
+      - .env
+    networks:
+      - burlive_default
 
   api:
     build: ./api
