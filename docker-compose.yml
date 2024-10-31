@@ -1,16 +1,18 @@
 services:
-  # nuxt:
-  #   build: ./frontend
-  #   container_name: nuxt-app
-  #   restart: always
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - api
-  #   environment:
-  #     - API_URL=${API_URL}
-  #   env_file:
-  #     - .env
+  nuxt:
+    build: ./frontend
+    container_name: nuxt-app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    environment:
+      - API_URL=http://express-api:5000
+    env_file:
+      - .env
+    networks:
+      - burlive
 
   bot:
     build: ../burlang-
@@ -63,20 +65,6 @@ services:
       - .env
     networks:
       - burlive
-
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: nginx
-  #   restart: always
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #     - /etc/letsencrypt:/etc/letsencrypt:ro
-  #   depends_on:
-  #     - nuxt
-  #     - api
 
 networks:
   burlive:
