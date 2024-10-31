@@ -19,7 +19,8 @@ services:
     environment:
       - API_URL=http://express-api:5000
       - BOT_TOKEN=${BOT_TOKEN}
-    ports: "1337:1337"
+    ports: 
+      - "1337:1337"
     depends_on:
       - api
     env_file:
