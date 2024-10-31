@@ -10,7 +10,7 @@ services:
     environment:
       - API_URL=http://express-api:5000
     env_file:
-      - .env
+      - ./frontend/.env
     networks:
       - burlive
 
