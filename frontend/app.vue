@@ -20,7 +20,7 @@ import { computed, ref, onMounted } from 'vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { useNotifyStore } from '@/stores/notifyStore';
-const user = ref(null);
+const user = ref();
 // Подключение хранилищ
 const themeStore = useThemeStore();
 const userStore = useUserStore();
@@ -34,9 +34,12 @@ const appContainer = ref<HTMLElement | null>(null);
 const themeClass = computed(() => themeStore.isDarkMode ? 'dark-mode' : 'light-mode');
 
 // Функция для обновления атрибута темы на body
-const updateBodyTheme = () => {
-  const colorScheme = window.Telegram.WebApp.colorScheme;
-  document.body.setAttribute('data-theme', colorScheme);
+const updateBodyTheme = async () => {
+  await waitForTelegramWebApp();
+  if (window.Telegram) {
+    const colorScheme = window.Telegram.WebApp.colorScheme;
+    document.body.setAttribute('data-theme', colorScheme);
+  }
 };
 
 // Wait for the Telegram Web App to be initialized
@@ -61,11 +64,25 @@ onMounted(async () => {
     
     console.log('Telegram Web App initialized:', window.Telegram.WebApp);
     console.log('Init data unsafe:', window.Telegram.WebApp.initDataUnsafe);
-    user.value = window.Telegram.WebApp.initDataUnsafe?.user;
+    if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+      user.value = window.Telegram.WebApp.initDataUnsafe.user;
+    }
+
+    const themeParams = window.Telegram.WebApp.themeParams;
+
+    viewThemeParam.value = themeParams
+    await updateBodyTheme(); // Присваиваем тему после загрузки
+    if (user.value) {
+      const telegram_id = user.value.id;
+      await userStore.checkUserExists(telegram_id);
+
+    } else {
+      console.warn('No user data available from Telegram Web App.');
+    }
 
     // Получаем значение цвета из CSS-переменной
     const rootStyles = getComputedStyle(document.documentElement);
-    let backgroundColor = rootStyles.getPropertyValue('--background-component-color').trim();
+    let backgroundColor = rootStyles.getPropertyValue('--background-color').trim();
 
     // Устанавливаем цвет шапки
     window.Telegram.WebApp.setHeaderColor(backgroundColor);
@@ -73,17 +90,6 @@ onMounted(async () => {
     // Устанавливаем цвет фона
     window.Telegram.WebApp.setBackgroundColor(backgroundColor);
     window.Telegram.WebApp.setBottomBarColor(backgroundColor);
-
-    const themeParams = window.Telegram.WebApp.themeParams;
-    
-    viewThemeParam.value = themeParams
-    if (user.value) {
-      console.log('User data:', user.value);
-      const telegram_id = user.value.id;
-      await userStore.checkUserExists(telegram_id);
-    } else {
-      console.warn('No user data available from Telegram Web App.');
-    }
 
   } else {
     console.error('Telegram Web App is not available.');
