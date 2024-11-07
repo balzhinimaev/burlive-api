@@ -27,4 +27,19 @@
 const lessons = [
     { id: 3, title: 'Урок 3: Прощание', description: 'Фразы для прощания.' },
 ];
+onMounted(() => {
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.BackButton.show();
+        window.Telegram.WebApp.BackButton.onClick(() => {
+            useRouter().push({ path: "/selectmodule" }); // Или другой маршрут по умолчанию
+        });
+    }
+});
+
+onBeforeUnmount(() => {
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.BackButton.hide();
+        window.Telegram.WebApp.BackButton.offClick();
+    }
+});
 </script>

@@ -1,26 +1,31 @@
 <template>
     <div class="page home-page">
         <header>
-            <div class="container-fluid">
-                <h2 class="heading">Выберите модуль</h2>
-                <p class="typography-body">
-                    Выберите тему или модуль, который хотите изучать.
-                </p>
-                {{ useRouter().options.history.state.back }}
+            <div class="container">
+                <div class="header-inner">
+                    <h2 class="heading">Выберите модуль</h2>
+                    <p class="breadcrumb"><nuxt-link to="/">Главная</nuxt-link><span class="split">/</span><nuxt-link
+                            to="/selectmodule">Модули</nuxt-link></p>
+                    <p class="typography-body">
+                        Выберите тему или модуль, который хотите изучать.
+                    </p>
+                </div>
             </div>
         </header>
 
         <main>
             <section id="modules-list">
-                <ul class="modules-list">
-                    <li v-for="(module, index) in modules" :key="module.id">
-                        <a href="#" @click.prevent="goToModule(module.route)">
-                            <span class="module-number">{{ index + 1 }}.</span>
-                            <span class="module-title">{{ module.title }}</span>
-                        </a>
-                        <p class="module-description">{{ module.description }}</p>
-                    </li>
-                </ul>
+                <div class="container">
+                    <ul class="modules-list">
+                        <li v-for="(module, index) in modules" :key="module.id">
+                            <a href="#" @click.prevent="goToModule(module.route)">
+                                <span class="module-number">{{ index + 1 }}.</span>
+                                <span class="module-title">{{ module.title }}</span>
+                            </a>
+                            <p class="module-description">{{ module.description }}</p>
+                        </li>
+                    </ul>
+                </div>
             </section>
         </main>
     </div>
@@ -89,11 +94,14 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 header {
-    margin-bottom: 10px;
+    .header-inner {
+        padding: 16px 0;
+    }
 }
-
+h2 {
+    margin-bottom: 0;
+}
 #modules-list {
-    padding: 0 32px 32px;
 
     .modules-list {
         list-style: none;

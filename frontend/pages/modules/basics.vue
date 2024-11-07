@@ -39,7 +39,7 @@ onMounted(() => {
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.BackButton.show();
         window.Telegram.WebApp.BackButton.onClick(() => {
-            router.push({ path: "/selectmodule" }); // Или другой маршрут по умолчанию
+            useRouter().push({ path: "/selectmodule" }); // Или другой маршрут по умолчанию
         });
     }
 });

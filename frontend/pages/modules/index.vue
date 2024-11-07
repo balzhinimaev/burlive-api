@@ -3,10 +3,10 @@
         <header>
             <div class="container-fluid">
                 <h2 class="heading">Выберите модуль</h2>
+                <p>Главная</p>
                 <p class="typography-body">
                     Выберите тему или модуль, который хотите изучать.
                 </p>
-                {{ useRouter().options.history.state.back }}
             </div>
         </header>
 

@@ -1,26 +1,33 @@
 <template>
   <div class="page home-page">
     <header>
-      {{ user }}
-      <h2>Самоучитель <br />бурятского языка</h2>
-      <p class="typography-body">
-        Каждое ваше взаимодействие с уроками <br />
-        помогает сохранять и развивать бурятский язык.
-      </p>
+      <div class="container">
+        <div class="header-inner">
+          {{ user }}
+          <h2>Самоучитель <br />бурятского языка</h2>
+          <p class="typography-body">
+            Каждое ваше взаимодействие с уроками <br />
+            помогает сохранять и развивать бурятский язык.
+          </p>
+        </div>
+      </div>
     </header>
 
     <main>
-      <Swiper :modules="[Autoplay]" autoplay loop :pagination="{ clickable: true }" :spaceBetween="20" class="mySwiper">
-        <SwiperSlide v-for="(card, index) in cards" :key="index">
-          <div class="new-customcard">
-            <p class="card-title">{{ card.title }}</p>
-            <p class="card-body">{{ card.body }}</p>
-            <button class="card-button" @click="card.action()">
-              {{ card.buttonText }}
-            </button>
-          </div>
-        </SwiperSlide>
-      </Swiper>
+      <div class="container">
+        <Swiper :modules="[Autoplay]" autoplay loop :pagination="{ clickable: true }" :spaceBetween="20"
+          class="mySwiper">
+          <SwiperSlide v-for="(card, index) in cards" :key="index">
+            <div class="new-customcard">
+              <p class="card-title">{{ card.title }}</p>
+              <p class="card-body">{{ card.body }}</p>
+              <button class="card-button" @click="card.action()">
+                {{ card.buttonText }}
+              </button>
+            </div>
+          </SwiperSlide>
+        </Swiper>
+      </div>
     </main>
   </div>
 </template>
@@ -53,7 +60,7 @@ const cards = [
     title: '📝 Тесты и упражнения',
     body: 'Проверь свои знания и закрепи изученное с помощью тестов. Получай баллы и соревнуйся с друзьями.',
     buttonText: 'Начать тест',
-    action: () => console.log('Начать тест'),
+    action: () => router.push('/tests'),
   },
 ];
 onMounted(async () => {
@@ -62,6 +69,11 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+header {
+  .header-inner {
+    padding: 16px 0;
+  }
+}
 .mySwiper {
   width: 100%;
   height: auto;

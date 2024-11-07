@@ -20,6 +20,7 @@ interface TelegramWebApp {
     setHeaderColor(color: string): void;
     setBackgroundColor(color: string): void;
     setBottomBarColor(color: string): void;
+    setFooterColor(color: string): void;
     themeParams: {
         background_color?: string;
         text_color?: string;

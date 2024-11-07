@@ -1,6 +1,11 @@
 <template>
   <div ref="appContainer" :class="['app-container', themeClass]">
     <div class="page-wrapper">
+      <!-- <div style="color: var(--text-color); padding: 1rem;">
+        <p>
+          {{ backgroundColorValue }}
+        </p>
+      </div> -->
       <!-- Display user information -->
       <NuxtPage class="single-page" />
     </div>
@@ -29,6 +34,8 @@ const viewThemeParam = ref();
 // Реактивные переменные
 const notifications = computed(() => notifyStore.notifications);
 const appContainer = ref<HTMLElement | null>(null);
+
+const backgroundColorValue = ref()
 
 // Вычисляемый класс для темы
 const themeClass = computed(() => themeStore.isDarkMode ? 'dark-mode' : 'light-mode');
@@ -72,6 +79,7 @@ onMounted(async () => {
 
     viewThemeParam.value = themeParams
     await updateBodyTheme(); // Присваиваем тему после загрузки
+    await nextTick();  // Wait for DOM to apply changes
     if (user.value) {
       const telegram_id = user.value.id;
       await userStore.checkUserExists(telegram_id);
@@ -81,9 +89,9 @@ onMounted(async () => {
     }
 
     // Получаем значение цвета из CSS-переменной
-    const rootStyles = getComputedStyle(document.documentElement);
+    const rootStyles = getComputedStyle(document.body);
     let backgroundColor = rootStyles.getPropertyValue('--background-color').trim();
-
+    backgroundColorValue.value = backgroundColor
     // Устанавливаем цвет шапки
     window.Telegram.WebApp.setHeaderColor(backgroundColor);
 
