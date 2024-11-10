@@ -1,6 +1,7 @@
 import { Document, Schema, Types, model } from "mongoose";
 
-interface IUser extends Document {
+export interface IUser extends Document {
+  _id: string;
   username?: string;
   password: string;
   firstName?: string;
@@ -16,7 +17,7 @@ interface IUser extends Document {
     zipCode?: string;
     country?: string;
   };
-  role?: string;
+  role: string;
   isActive?: boolean;
   gender?: string;
   socialLinks?: {
