@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { AuthRequest } from "../middleware/authenticateToken";
 import { Types } from "mongoose";
 import logger from "../utils/logger";
 import WordModel from "../models/Vocabulary/WordModel";
@@ -83,7 +82,7 @@ const vocabularyController = {
     }
   },
 
-  suggestWordTranslate: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  suggestWordTranslate: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { word_id, translate_language, translate, dialect, normalized_text, telegram_user_id } = req.body;
 
     try {
@@ -165,7 +164,7 @@ const vocabularyController = {
     }
   },
 
-  suggestWords: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  suggestWords: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { text, language, id, dialect } = req.body;
     try {
       if (!text || !language) {

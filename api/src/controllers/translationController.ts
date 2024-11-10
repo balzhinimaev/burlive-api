@@ -1,39 +1,37 @@
-// translationController.ts
+// src/controllers/translationController.ts
+
 import { NextFunction, Request, Response } from "express";
 import Translation from "../models/Translation";
-import { AuthRequest } from "../middleware/authenticateToken";
+import User from "../models/User";
 import { ObjectId } from "mongodb";
 import { isValidObjectId } from "mongoose";
 import logger from "../utils/logger";
 import isValidObjectIdString from "../utils/isValidObjectIdString";
-import User from "../models/User";
 import updateRating from "../utils/updateRating";
 import Sentence from "../models/SuggestedSentence";
 import Vote from "../models/Vote";
+
 const translationController = {
   getAllTranslations: async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const translations = await Translation.find();
 
       if (!translations.length) {
-        res
-          .status(404)
-          .json({ message: "Переводов не найдено", translations }); return
+        res.status(404).json({ message: "Переводов не найдено", translations });
+        return;
       }
 
-      res
-        .status(200)
-        .json({
-          message: `Переводы получены`,
-          translations,
-          count: translations.length,
-        });
-      return
+      res.status(200).json({
+        message: `Переводы получены`,
+        translations,
+        count: translations.length,
+      });
+      return;
     } catch (error) {
       logger.error(`Ошибка при получении переводов: ${error}`);
       console.error(error);
       res.status(500).json({ message: "Error retrieving translation" });
-      next(error)
+      next(error);
     }
   },
 
@@ -42,58 +40,43 @@ const translationController = {
       const suggestedTranslation = await Translation.findOne();
 
       if (suggestedTranslation) {
-        res
-          .status(200)
-          .json({ message: "Перевод получен", suggestedTranslation });
-        return
+        res.status(200).json({ message: "Перевод получен", suggestedTranslation });
+        return;
       } else {
-        res
-          .status(404)
-          .json({ message: `Предложенные переводы не найдены` });
-        return
+        res.status(404).json({ message: `Предложенные переводы не найдены` });
+        return;
       }
     } catch (error) {
       console.error(error);
       logger.error(`Error retrieving suggestedTranslation, ${error}`);
-      res
-        .status(500)
-        .json({ message: "Error retrieving suggestedTranslation" });
-      next(error)
+      res.status(500).json({ message: "Error retrieving suggestedTranslation" });
+      next(error);
     }
   },
 
-  createTranslation: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  createTranslation: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { text, language, sentenceId, dialect } = req.body;
-      if (!req.user) {
-        res.json({ message: "Вы не авторизованы!" });
-        return
+      if (!req.user || !req.user._id) { // Заменено на _id
+        res.status(401).json({ message: "Вы не авторизованы!" });
+        return;
       }
-      const author = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
+      const author = new ObjectId(req.user._id); // Заменено на _id
 
       if (!text || !language || !author || !sentenceId) {
-        logger.error(
-          `Пожалуйста, предоставьте текст, язык, автора и айди предложения`
-        );
-        res
-          .status(400)
-          .json({
-            message:
-              "Пожалуйста, предоставьте текст, язык, автора и айди предложения",
-          });
-        return
+        logger.error(`Пожалуйста, предоставьте текст, язык, автора и айди предложения`);
+        res.status(400).json({
+          message: "Пожалуйста, предоставьте текст, язык, автора и айди предложения",
+        });
+        return;
       }
 
       if (!isValidObjectId(sentenceId)) {
-        // return res.status(400).json({ message: 'Неверные входные данные' });
-
         if (!isValidObjectIdString(sentenceId)) {
-          res
-            .status(400)
-            .json({
-              message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
-            });
-          return
+          res.status(400).json({
+            message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
+          });
+          return;
         }
       }
 
@@ -101,38 +84,31 @@ const translationController = {
 
       if (!sentence) {
         res.status(404).json({ message: `Предложение не существует` });
-        return
+        return;
       }
 
       const sentenceTranslations = sentence.translations;
 
-      // existsing translations
+      // Проверка существующих переводов
+      let existingTranslations: string[] = [];
 
-      let existsingTranslations = [];
-
-      if (sentenceTranslations && sentence.translations.length) {
+      if (sentenceTranslations && sentenceTranslations.length) {
         console.log("is running");
 
         for (let i = 0; i < sentenceTranslations.length; i++) {
-          const translation = await Translation.findById(
-            sentenceTranslations[i]
-          );
+          const translation = await Translation.findById(sentenceTranslations[i]);
 
           if (translation) {
-            existsingTranslations.push(translation.text);
+            existingTranslations.push(translation.text);
           }
-
         }
       }
 
-      console.log(existsingTranslations);
+      console.log(existingTranslations);
 
-      if (existsingTranslations.indexOf(text) !== -1) {
-        res
-          .status(409)
-          .json({ message: "Такой перевод уже существует" });
-
-        return
+      if (existingTranslations.includes(text)) {
+        res.status(409).json({ message: "Такой перевод уже существует" });
+        return;
       }
 
       const translation = await new Translation({
@@ -144,9 +120,7 @@ const translationController = {
       })
         .save()
         .then(async (document) => {
-          logger.info(
-            `Перевод успешно добавлен. translationId: ${document._id}`
-          );
+          logger.info(`Перевод успешно добавлен. translationId: ${document._id}`);
 
           await updateRating(author);
 
@@ -155,9 +129,7 @@ const translationController = {
               suggestedTranslations: document._id,
             },
           }).then(() => {
-            logger.info(
-              `Поле suggestedTranslations у пользователя обновлён. ${document._id}`
-            );
+            logger.info(`Поле suggestedTranslations у пользователя обновлён. ${document._id}`);
           });
 
           await Sentence.findByIdAndUpdate(new ObjectId(sentenceId), {
@@ -169,17 +141,15 @@ const translationController = {
           return document;
         });
 
-      res
-        .status(201)
-        .json({
-          message: "Перевод успешно добавлен",
-          translationId: translation._id,
-        });
-      return
+      res.status(201).json({
+        message: "Перевод успешно добавлен",
+        translationId: translation._id,
+      });
+      return;
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Ошибка при создании перевода" });
-      next(error)
+      next(error);
     }
   },
 
@@ -195,44 +165,36 @@ const translationController = {
       ];
 
       if (!isValidObjectId(id)) {
-        // return res.status(400).json({ message: 'Неверные входные данные' });
-
         if (!isValidObjectIdString(id)) {
-          res
-            .status(400)
-            .json({
-              message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
-            });
-          return
+          res.status(400).json({
+            message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
+          });
+          return;
         }
       }
 
       if (contributorId && !isValidObjectId(contributorId)) {
         res.status(400).json({ message: `Неверный contributorId` });
-        return
+        return;
       } else if (contributorId) {
-        const contributorIsExists = await User.findOne({ _id: contributorId });
+        const contributorExists = await User.findById(contributorId);
 
-        if (!contributorIsExists) {
-          res
-            .status(404)
-            .json({ message: `Контрибьютора не существует` });
-          return
+        if (!contributorExists) {
+          res.status(404).json({ message: `Контрибьютора не существует` });
+          return;
         }
       }
 
       if (!validStatuses.includes(status)) {
         res.status(400).json({ message: "Неверный статус" });
-        return
+        return;
       }
 
-      const translation = await Translation.findById({ _id: new ObjectId(id) });
+      const translation = await Translation.findById(new ObjectId(id));
 
-      if (translation === null) {
-        res
-          .status(404)
-          .json({ message: "Перевод не найден", translation });
-        return
+      if (!translation) {
+        res.status(404).json({ message: "Перевод не найден", translation });
+        return;
       }
 
       // Добавление нового участника, если статус 'accepted' и передан contributorId
@@ -243,16 +205,12 @@ const translationController = {
       translation.status = status;
       await translation.save();
 
-      res
-        .status(200)
-        .json({ message: "Статус перевода успешно обновлен", translation });
-      return
+      res.status(200).json({ message: "Статус перевода успешно обновлен", translation });
+      return;
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ message: "Ошибка при обновлении статуса перевода" });
-      next(error)
+      res.status(500).json({ message: "Ошибка при обновлении статуса перевода" });
+      next(error);
     }
   },
 
@@ -268,15 +226,15 @@ const translationController = {
 
       if (!translation) {
         res.status(404).json({ message: "Перевод не найдено" });
-        return
+        return;
       }
 
       res.json({ message: "Перевод принят", translation });
-      return
+      return;
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Ошибка при принятии перевода" });
-      next(error)
+      next(error);
     }
   },
 
@@ -292,45 +250,43 @@ const translationController = {
 
       if (!translation) {
         res.status(404).json({ message: "Перевод не найден" });
-        return
+        return;
       }
 
       res.json({ message: "Перевод отклонен", translation });
-      return
+      return;
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Ошибка при отклонении перевода" });
-      next(error)
+      next(error);
     }
   },
 
-  vote: async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  vote: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
       const { isUpvote } = req.body;
 
       if (typeof isUpvote !== "boolean") {
-        res
-          .status(400)
-          .json({
-            message: `Параметр isUpvote является обязательным и тип Boolean`,
-          });
-        return
+        res.status(400).json({
+          message: `Параметр isUpvote является обязательным и тип Boolean`,
+        });
+        return;
       }
-      if (!req.user) {
-        res.status(400).json({ message: 'Вы не авторизованы' }); return
+
+      if (!req.user || !req.user._id) { // Проверка авторизации
+        res.status(401).json({ message: 'Вы не авторизованы' });
+        return;
       }
-      const userId = new ObjectId(req.user.userId); // Assuming you have user information in the request after authentication
+
+      const userId = new ObjectId(req.user._id); // Заменено на _id
 
       if (!isValidObjectId(id)) {
-        // return res.status(400).json({ message: 'Неверные входные данные' });
-
         if (!isValidObjectIdString(id)) {
-          res
-            .status(400)
-            .json({
-              message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
-            }); return
+          res.status(400).json({
+            message: `Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId`,
+          });
+          return;
         }
       }
 
@@ -348,9 +304,8 @@ const translationController = {
         },
       })
         .then(async (document) => {
-
           if (!document) {
-            return false
+            return false;
           }
 
           logger.info(`Голос успешно добавлен, к переводу ${document._id}`);
@@ -365,24 +320,22 @@ const translationController = {
 
           await updateRating(userId);
 
-          return res
-            .status(201)
-            .json({
-              message: "Голос успешно добавлен",
-              translationId: document._id,
-            });
+          return res.status(201).json({
+            message: "Голос успешно добавлен",
+            translationId: document._id,
+          });
         })
         .catch(async (error) => {
           logger.error(`Ошибка при добавлении голоса к переводу: ${error}`);
+          res.status(500).json({ message: "Ошибка при добавлении голоса к переводу" });
+          return;
         });
 
       return;
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ message: "Ошибка при добавлении голоса к переводу" });
-      next(error)
+      res.status(500).json({ message: "Ошибка при добавлении голоса к переводу" });
+      next(error);
     }
   },
 };
