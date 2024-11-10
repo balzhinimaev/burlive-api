@@ -21322,3 +21322,13 @@
 {"level":"info","message":"Запрос на сохранение пользовательской темы WebApp telegram bot","timestamp":"2024-10-28T10:33:27.849Z"}
 {"level":"info","message":"Запрос на сохранение пользовательской темы WebApp telegram bot","timestamp":"2024-10-28T10:33:31.650Z"}
 {"level":"info","message":"create user","timestamp":"2024-10-28T11:42:18.138Z"}
+{"level":"info","message":"Успешная регистрация пользователя: 67290ab91f08d188712e9257","timestamp":"2024-11-04T17:56:09.991Z"}
+{"level":"info","message":"Токен создан: {\n  userId: new ObjectId('67290ab91f08d188712e9257'),\n  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzI5MGFiOTFmMDhkMTg4NzEyZTkyNTciLCJzZXNzaW9uSWQiOiIzNDZhYWJiYi02Yzk1LTRhNjktOWIxNy0yZGY0MjgyN2FlZTMiLCJpYXQiOjE3MzA3NDM0NDUsImV4cCI6MTczMTAwMjY0NX0.LpwtbO6U7euV41Y_oVz-xbn9kvg1KhqdsC76OXZ17P4',\n  expiresAt: 2024-11-07T18:04:05.716Z,\n  _id: new ObjectId('67290c951f08d188712e925b'),\n  createdAt: 2024-11-04T18:04:05.721Z,\n  __v: 0\n}","timestamp":"2024-11-04T18:04:05.726Z"}
+{"level":"info","message":"Токен создан для пользователя: 67290ab91f08d188712e9257","timestamp":"2024-11-04T18:04:05.728Z"}
+{"level":"info","message":"create user","timestamp":"2024-11-04T18:04:39.207Z"}
+{"level":"info","message":"create user","timestamp":"2024-11-04T18:04:42.889Z"}
+{"level":"info","message":"create user","timestamp":"2024-11-04T18:04:49.991Z"}
+{"level":"error","message":"Ошибка при входе пользователя: MongoServerError: Command find requires authentication","timestamp":"2024-11-10T05:52:59.937Z"}
+{"level":"error","message":"Ошибка при проверке токена: jwt malformed","timestamp":"2024-11-10T05:54:31.357Z"}
+{"level":"info","message":"Токен создан: {\n  userId: new ObjectId('67290ab91f08d188712e9257'),\n  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzI5MGFiOTFmMDhkMTg4NzEyZTkyNTciLCJzZXNzaW9uSWQiOiIzMTAwZjllMC1lOTI2LTQ2YmUtODI2Yy0xYjRkYzZmZGYzNWMiLCJpYXQiOjE3MzEyMTgwOTMsImV4cCI6MTczMTQ3NzI5M30.pXg9DGoP7qIvSlzIQd-nLoq8bFCAI9Yx6OYclHvNZnU',\n  expiresAt: 2024-11-13T05:54:53.802Z,\n  _id: new ObjectId('67304aad458936d16b93aedc'),\n  createdAt: 2024-11-10T05:54:53.830Z,\n  __v: 0\n}","timestamp":"2024-11-10T05:54:53.847Z"}
+{"level":"info","message":"Токен создан для пользователя: 67290ab91f08d188712e9257","timestamp":"2024-11-10T05:54:53.849Z"}
