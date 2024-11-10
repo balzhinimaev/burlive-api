@@ -21332,3 +21332,5 @@
 {"level":"error","message":"Ошибка при проверке токена: jwt malformed","timestamp":"2024-11-10T05:54:31.357Z"}
 {"level":"info","message":"Токен создан: {\n  userId: new ObjectId('67290ab91f08d188712e9257'),\n  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzI5MGFiOTFmMDhkMTg4NzEyZTkyNTciLCJzZXNzaW9uSWQiOiIzMTAwZjllMC1lOTI2LTQ2YmUtODI2Yy0xYjRkYzZmZGYzNWMiLCJpYXQiOjE3MzEyMTgwOTMsImV4cCI6MTczMTQ3NzI5M30.pXg9DGoP7qIvSlzIQd-nLoq8bFCAI9Yx6OYclHvNZnU',\n  expiresAt: 2024-11-13T05:54:53.802Z,\n  _id: new ObjectId('67304aad458936d16b93aedc'),\n  createdAt: 2024-11-10T05:54:53.830Z,\n  __v: 0\n}","timestamp":"2024-11-10T05:54:53.847Z"}
 {"level":"info","message":"Токен создан для пользователя: 67290ab91f08d188712e9257","timestamp":"2024-11-10T05:54:53.849Z"}
+{"level":"info","message":"Все слова получены!","timestamp":"2024-11-10T07:31:08.250Z"}
+{"level":"info","message":"Получение подтвержденного слова","timestamp":"2024-11-10T07:33:11.831Z"}

@@ -1,8 +1,9 @@
+// src/models/Vocabulary/DeclinedWordModel.ts
 import { Document, Schema, Types, model } from "mongoose";
 
 export interface IDeclinedWordModel extends Document {
   text: string;
-  normalized_text: string; // Новый атрибут для нормализованного текста
+  normalized_text: string;
   language: string;
   author: Types.ObjectId;
   contributors: Types.ObjectId[];
@@ -12,10 +13,15 @@ export interface IDeclinedWordModel extends Document {
   // Additional fields, if needed
 }
 
-const WordSchema = new Schema(
+const DeclinedWordSchema = new Schema<IDeclinedWordModel>(
   {
     text: { type: String, required: true, unique: true },
-    normalized_text: { type: String, required: true, lowercase: true, unique: true }, // Новый атрибут
+    normalized_text: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+    },
     language: { type: String },
     dialect: { type: String },
     translations: {
@@ -31,5 +37,5 @@ const WordSchema = new Schema(
   }
 );
 
-const DeclinedWordModel = model<IDeclinedWordModel>("declined_word", WordSchema);
+const DeclinedWordModel = model<IDeclinedWordModel>("declined_word", DeclinedWordSchema);
 export default DeclinedWordModel;

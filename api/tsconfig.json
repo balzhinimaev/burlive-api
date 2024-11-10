@@ -31,8 +31,8 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "useDefineForClassFields": true,
-    "typeRoots": ["./node_modules/@types", "./@types"]
+    "typeRoots": ["types", "./node_modules/@types"]
   },
-  "include": ["src", "@types", "types"],
+  "include": ["src", "types"],
   "exclude": ["node_modules", "dist"]
 }

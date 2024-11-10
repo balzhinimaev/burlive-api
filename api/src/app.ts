@@ -15,8 +15,11 @@ import translationsRouter from './routes/translationRouter';
 import dialectRouter from './routes/dialectRouter';
 import vocabularyRouter from './routes/vocabularyRouter';
 import telegramRouter from './routes/telegramRouter';
+
 // Новые маршруты для системы обучения
 import levelRoutes from './routes/levelRoutes';
+import moduleRoutes from './routes/modulesRouter';
+
 const app = express();
 const server = createServer(app);
 // const io = new Server(server);
@@ -29,8 +32,11 @@ app.use('/backendapi/sentences', authenticateToken, sentencesRouter);
 app.use('/backendapi/vocabulary', authenticateToken, vocabularyRouter);
 app.use('/backendapi/translations', authenticateToken, translationsRouter);
 app.use('/backendapi/telegram', authenticateToken, telegramRouter);
+
 // Новые маршруты для системы обучения
 app.use('/backendapi/levels', authenticateToken, levelRoutes);
+app.use('/backendapi/modules', authenticateToken, moduleRoutes);
+
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Внутренняя ошибка сервера' });

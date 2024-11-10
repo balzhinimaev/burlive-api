@@ -1,30 +1,55 @@
+// src/controllers/vocabularyController.ts
 import { NextFunction, Request, Response } from "express";
-import { Types } from "mongoose";
+import { isValidObjectId } from "mongoose";
 import logger from "../utils/logger";
 import WordModel from "../models/Vocabulary/WordModel";
 import SuggestedWordModel, { ISuggestedWordModel } from "../models/Vocabulary/SuggestedWordModel";
-import TelegramUserModel from "../models/TelegramUsers";
 import updateRating from "../utils/updateRatingTelegram";
 import DeclinedWordModel from "../models/Vocabulary/DeclinedWordModel";
 import { ObjectId } from "mongodb";
+import TelegramUserModel from "../models/TelegramUsers";
+
+// Интерфейсы для типов запросов
+interface SuggestWordTranslateBody {
+  word_id: string;
+  translate_language: string;
+  translate: string;
+  dialect?: string;
+  normalized_text: string;
+  telegram_user_id: string;
+}
+
+// interface SuggestWordsBody {
+//   text: string;
+//   language: string;
+//   id: string;
+//   dialect?: string;
+// }
 
 const vocabularyController = {
+  /**
+   * Получение всех слов
+   */
   getAllWords: async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const words = await WordModel.find()
         .sort({ _id: 1 })
-        .populate("author", "_id firstname username email")
-        .populate("translations", "_id text");
+        .populate("author", "_id firstName username email")
+        .populate("translations", "_id text")
+        .populate("translations_u", "_id text language dialect createdAt pre_translations normalized_text author contributors");
 
       logger.info("Все слова получены!");
       res.status(200).json({ message: "Словарь найден", words });
     } catch (error) {
       logger.error(`Ошибка при получении слов: ${error}`);
-      next(error); // Передаем ошибку в следующий middleware
+      next(error); // Передаём ошибку в следующий middleware
     }
   },
-  // Контроллер для получения всех слов с пагинацией и сортировкой по количеству переводов
-  getAllWordsPaginated: async (req: Request, res: Response) => {
+
+  /**
+   * Получение всех слов с пагинацией и сортировкой по количеству переводов
+   */
+  getAllWordsPaginated: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const page = parseInt(req.query.page as string, 10) || 1;
       const limit = parseInt(req.query.limit as string, 10) || 10;
@@ -38,8 +63,9 @@ const vocabularyController = {
         .sort({ translations: 1 }) // Сортировка по количеству переводов
         .skip(skip)
         .limit(limit)
-        .populate("author", "_id firstname username email")
+        .populate("author", "_id firstName username email")
         .populate("translations", "_id text")
+        .populate("translations_u", "_id text language dialect createdAt pre_translations normalized_text author contributors");
 
       // Формируем ответ с данными
       res.status(200).json({
@@ -50,39 +76,46 @@ const vocabularyController = {
         totalPages: Math.ceil(totalWords / limit), // Общее количество страниц
       });
     } catch (error) {
-      console.error(`Ошибка при получении слов: ${error}`);
+      logger.error(`Ошибка при получении слов: ${error}`);
       res.status(500).json({ message: "Ошибка при получении слов" });
+      next(error);
     }
   },
-  getWordsOnApproval: async (req: Request, res: Response) => {
-    try {
-      const { page = 1, limit = 10 } = req.query;
 
-      const pageNumber = Number(page);
-      const limitNumber = Number(limit);
-      const skipIndex = (pageNumber - 1) * limitNumber;
+  /**
+   * Получение предложенных слов на утверждение с пагинацией
+   */
+  getWordsOnApproval: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+      const skip = (page - 1) * limit;
 
       const count = await SuggestedWordModel.countDocuments();
       const words = await SuggestedWordModel.find()
         .sort({ _id: 1 })
-        .skip(skipIndex)
-        .limit(limitNumber)
-        .populate("author", "_id firstname username email")
+        .skip(skip)
+        .limit(limit)
+        .populate("author", "_id firstName username email")
         .populate("pre_translations", "_id text");
 
       logger.info("Все предложенные слова получены!");
-      res
-        .status(200)
-        .json({ message: "Словарь найден", words, total_count: count });
+      res.status(200).json({ message: "Словарь найден", words, total_count: count });
     } catch (error) {
       logger.error(`Ошибка при получении предложенных слов: ${error}`);
-      res
-        .status(500)
-        .json({ message: "Ошибка при получении предложенных слов" });
+      res.status(500).json({ message: "Ошибка при получении предложенных слов" });
+      next(error);
     }
   },
 
-  suggestWordTranslate: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  /**
+   * Предложение перевода слова
+   */
+  suggestWordTranslate: async (
+    req: Request<{}, {}, SuggestWordTranslateBody>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     const { word_id, translate_language, translate, dialect, normalized_text, telegram_user_id } = req.body;
 
     try {
@@ -95,10 +128,16 @@ const vocabularyController = {
         return;
       }
 
+      // Проверка валидности ObjectId
+      if (!isValidObjectId(word_id) || !isValidObjectId(telegram_user_id)) {
+        res.status(400).json({ message: "Неверный формат word_id или telegram_user_id" });
+        return;
+      }
+
       // Поиск исходного слова в базе данных
       const existingWord = await WordModel.findById(word_id);
       if (!existingWord) {
-        res.status(400).json({ message: "Исходное слово не найдено" });
+        res.status(404).json({ message: "Исходное слово не найдено" });
         return;
       }
 
@@ -109,7 +148,9 @@ const vocabularyController = {
 
       if (existingSuggestedWord) {
         if (existingSuggestedWord.language !== translate_language) {
-          console.log("Надо посмотреть!");
+          logger.warn("Нужно проверить языковую соответствие предложенного перевода");
+          // Дополнительная логика, если языки не совпадают
+          // Например, можно вернуть ошибку или обновить язык
         }
 
         logger.info(`Предложенное слово уже существует в коллекции`);
@@ -130,7 +171,7 @@ const vocabularyController = {
         const newSuggestedWord = new SuggestedWordModel({
           text: translate,
           language: translate_language,
-          author: new Types.ObjectId(telegram_user_id),
+          author: new ObjectId(telegram_user_id),
           dialect,
           normalized_text: translate.toLowerCase().trim(),
         });
@@ -164,42 +205,45 @@ const vocabularyController = {
     }
   },
 
-  suggestWords: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  /**
+   * Предложение нескольких слов
+   */
+  suggestWords: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     const { text, language, id, dialect } = req.body;
+
     try {
       if (!text || !language) {
-        logger.error(
-          "Ошибка при предложении слов, отсутствует один из параметров"
-        );
-        res
-          .status(400)
-          .json({ message: "Отсутствует один из параметров" });
+        logger.error("Ошибка при предложении слов, отсутствует один из параметров");
+        res.status(400).json({ message: "Отсутствует один из параметров" });
         return;
       }
-
-      if (!req.user) {
-        res.status(400).json({ message: "Отсутствует токен" });
-        return
+      
+      if (!req.user || !req.user._id) {
+        res.status(401).json({ message: "Вы не авторизованы!" });
+        return;
       }
 
       if (!id) {
         logger.error(`Отсутствует telegramID`);
         res.status(400).json({ message: "Ошибка запроса" });
-        return
+        return;
       }
 
-      // const userId = new Types.ObjectId(req.user.userId);
       // Найти пользователя и получить только его _id
       const user = await TelegramUserModel.findOne({ id }).select("_id");
 
       if (!user) {
         res.status(404).json({ message: "Пользователь не найден" });
-        return
+        return;
       }
 
-      const userId = user?._id; // Извлечение _id как ObjectId
+      const userId = user._id; // Извлечение _id как ObjectId
 
-      const results = [];
+      const results: Array<{ message: string; word?: ISuggestedWordModel }> = [];
       const wordsArray = text.split(",").map((word: string) => ({
         normalized: word.trim().toLowerCase(),
         original: word.trim(),
@@ -214,12 +258,11 @@ const vocabularyController = {
           if (!existingWord.contributors.includes(userId)) {
             existingWord.contributors.push(userId);
             await existingWord.save();
-            await updateRating(userId);
+            await updateRating(userId, 30); // Передаем бонус, если необходимо
           }
           results.push({
-            message:
-              "Слово уже существует, автор добавлен в список контрибьюторов",
-            existingWord,
+            message: "Слово уже существует, автор добавлен в список контрибьюторов",
+            word: existingWord,
           });
         } else {
           const newSuggestedWord = new SuggestedWordModel({
@@ -230,38 +273,43 @@ const vocabularyController = {
             contributors: [userId],
           });
 
-          if (language === "buryat") {
-            if (typeof dialect === "string") {
-              newSuggestedWord.dialect = dialect;
-              logger.info(`Диалект присвоен к слову`);
-            }
+          if (language === "buryat" && typeof dialect === "string") {
+            newSuggestedWord.dialect = dialect;
+            logger.info(`Диалект присвоен к слову`);
           }
 
           await newSuggestedWord.save();
           results.push({
             message: "Слово успешно предложено",
-            newSuggestedWord,
+            word: newSuggestedWord,
           });
           await updateRating(userId, 30);
         }
       }
 
       res.status(200).json(results);
-      return;
     } catch (error) {
       logger.error(`Ошибка при предложении слов: ${error}`);
       res.status(500).json({ message: "Ошибка при предложении слов" });
-      next(error)
+      next(error);
     }
   },
 
+  /**
+   * Принятие предложенного слова
+   */
   acceptSuggestedWord: async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
+    
     const suggestedWord = req.suggestedWord as ISuggestedWordModel;
-    // const telegram_user_id = req.telegram_user_id;
+    if (typeof (req.telegram_user_id) !== 'string') {
+      res.status(400).json({ message: 'Телеграм пользователь не указан или не найден' })
+      return;
+    }
+    const telegram_user_id = req.telegram_user_id as string;
 
     try {
       if (!suggestedWord) {
@@ -269,35 +317,70 @@ const vocabularyController = {
         return;
       }
 
-      // Ваш код по обработке suggestedWord и telegram_user_id
+      if (!telegram_user_id) {
+        res.status(400).json({ message: "telegram_user_id не указан" });
+        return;
+      }
 
+      // Поиск пользователя по telegram_user_id
+      const user = await TelegramUserModel.findById(telegram_user_id);
+      if (!user) {
+        res.status(404).json({ message: "Пользователь не найден" });
+        return;
+      }
+
+      // Создание нового подтвержденного слова
+      const word = new WordModel({
+        text: suggestedWord.text,
+        normalized_text: suggestedWord.normalized_text,
+        language: suggestedWord.language,
+        dialect: suggestedWord.dialect,
+        translations: suggestedWord.pre_translations,
+        author: suggestedWord.author,
+        contributors: suggestedWord.contributors,
+      });
+
+      await word.save();
+
+      // Обновление исходных слов с новым переводом
+      await WordModel.findByIdAndUpdate(suggestedWord.pre_translations, {
+        $addToSet: { translations: word._id },
+      });
+
+      // Удаление предложенного слова
+      await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
+
+      logger.info(`Предложенное слово принято и добавлено в словарь: ${word._id}`);
+      res.status(200).json({ message: "Слово успешно принято и добавлено в словарь", word });
     } catch (error) {
-      console.error(error);
+      logger.error(`Ошибка при принятии предложенного слова: ${error}`);
       res.status(500).json({ message: "Ошибка при принятии предложенного слова" });
       next(error);
     }
   },
+
+  /**
+   * Отклонение предложенного слова
+   */
   declineSuggestedWord: async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    const { suggestedWord } = req;
+    const suggestedWord = req.suggestedWord as ISuggestedWordModel;
 
     try {
       if (!suggestedWord) {
         res.status(400).json({ message: "SuggestedWord не указан" });
-        return
+        return;
       }
 
       // Найти слово в SuggestedWordModel
-      const wordToDecline = await SuggestedWordModel.findById(
-        suggestedWord._id
-      );
+      const wordToDecline = await SuggestedWordModel.findById(suggestedWord._id);
 
       if (!wordToDecline) {
         res.status(404).json({ message: "Слово не найдено" });
-        return
+        return;
       }
 
       // Создать новый документ в DeclinedWordModel с теми же данными
@@ -305,10 +388,10 @@ const vocabularyController = {
         text: wordToDecline.text,
         normalized_text: wordToDecline.normalized_text,
         language: wordToDecline.language,
+        dialect: wordToDecline.dialect,
+        translations: wordToDecline.pre_translations, // соответствие переводам
         author: wordToDecline.author,
         contributors: wordToDecline.contributors,
-        translations: wordToDecline.pre_translations, // предполагаю, что это соответствие переводам
-        dialect: wordToDecline.dialect,
       });
 
       // Сохранить отклонённое слово
@@ -317,66 +400,59 @@ const vocabularyController = {
       // Удалить слово из SuggestedWordModel
       await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
 
+      logger.info(`Слово отклонено и перенесено в архив отклонённых слов: ${suggestedWord._id}`);
       res.status(200).json({
         message:
           "Слово успешно отклонено и перенесено в архив отклонённых слов.",
       });
-      return
     } catch (error) {
       logger.error(`Ошибка при отклонении предложенного слова: ${error}`);
-      res
-        .status(500)
-        .json({ message: "Ошибка при отклонении предложенного слова" });
-      next(error)
+      res.status(500).json({ message: "Ошибка при отклонении предложенного слова" });
+      next(error);
     }
   },
 
-  // Новый метод для получения одного подтверждённого слова
+  /**
+   * Получение одного подтверждённого слова или случайного
+   */
   getConfirmedWord: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { wordId } = req.query;
-
-      // Если указан ID, ищем по ID
+      logger.info(`Получение подтвержденного слова`)
       let word;
-      if (wordId) {
+      if (wordId && typeof wordId === "string") {
+        if (!isValidObjectId(wordId)) {
+          res.status(400).json({ message: "Неверный формат wordId" });
+          return;
+        }
         word = await WordModel.findById(wordId)
-          .populate("author", "_id firstname username email")
-          .populate("translations", "_id text")
-          .populate(
-            "translations_u",
-            "_id text language dialect createdAt pre_translations normalized_text author contributors"
-          );
+          .populate("author", "_id firstName username email")
+          .populate("translations", "_id text language dialect createdAt pre_translations normalized_text author contributors")
+          .populate("translations_u", "_id text language dialect createdAt pre_translations normalized_text author contributors");
       } else {
-        // Если ID не указан, получаем случайное слово
+        // Получение случайного слова
         const count = await WordModel.countDocuments();
         const random = Math.floor(Math.random() * count);
         word = await WordModel.findOne()
           .skip(random)
-          .populate("author", "_id firstname username email")
-          .populate(
-            "translations",
-            "_id text language dialect createdAt pre_translations normalized_text author contributors"
-          )
-          .populate(
-            "translations_u",
-            "_id text language dialect createdAt pre_translations normalized_text author contributors"
-          );
+          .populate("author", "_id firstName username email")
+          .populate("translations", "_id text language dialect createdAt pre_translations normalized_text author contributors")
+          .populate("translations_u", "_id text language dialect createdAt pre_translations normalized_text author contributors");
       }
 
       if (!word) {
         res.status(404).json({ message: "Слово не найдено" });
-        return
+        return;
       }
 
       res.status(200).json({
         message: "Подтверждённое слово найдено",
         word,
       });
-      return
     } catch (error) {
-      console.error(`Ошибка при получении слова: ${error}`);
+      logger.error(`Ошибка при получении слова: ${error}`);
       res.status(500).json({ message: "Ошибка при получении слова" });
-      next(error)
+      next(error);
     }
   },
 };

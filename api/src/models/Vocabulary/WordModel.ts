@@ -1,8 +1,9 @@
+// src/models/Vocabulary/WordModel.ts
 import { Document, Schema, Types, model } from "mongoose";
 
 export interface IWordModel extends Document {
   text: string;
-  normalized_text: string; // Новый атрибут для нормализованного текста
+  normalized_text: string;
   language: string;
   author: Types.ObjectId;
   contributors: Types.ObjectId[];
@@ -13,7 +14,7 @@ export interface IWordModel extends Document {
   // Additional fields, if needed
 }
 
-const WordSchema = new Schema(
+const WordSchema = new Schema<IWordModel>(
   {
     text: { type: String, required: true, unique: true },
     normalized_text: {
@@ -21,7 +22,7 @@ const WordSchema = new Schema(
       required: true,
       lowercase: true,
       unique: true,
-    }, // Новый атрибут
+    },
     language: { type: String },
     dialect: { type: String },
     translations: {
