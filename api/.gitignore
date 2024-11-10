@@ -1,4 +1,4 @@
 /logs
 node_modules
 .env
-src/logs
+./src/logs
