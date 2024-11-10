@@ -1,14 +1,15 @@
 // @types/express/index.d.ts
 
-import { ISuggestedWordModel } from '../../src/models/Vocabulary/SuggestedWordModel';
+import { IUser } from '../../src/models/User'; // Adjust the path as necessary
 
 declare global {
     namespace Express {
         interface Request {
-            suggestedWord?: ISuggestedWordModel;
+            user?: IUser;
+            suggestedWord?: ISuggestedWordModel; // If you have other custom properties
             telegram_user_id?: number;
         }
     }
 }
 
-export { };
+export { }; // Ensures this file is treated as a module
