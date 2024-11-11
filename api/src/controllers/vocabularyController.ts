@@ -6,7 +6,6 @@ import WordModel from "../models/Vocabulary/WordModel";
 import SuggestedWordModel, { ISuggestedWordModel } from "../models/Vocabulary/SuggestedWordModel";
 import updateRating from "../utils/updateRatingTelegram";
 import DeclinedWordModel from "../models/Vocabulary/DeclinedWordModel";
-import { ObjectId } from "mongodb";
 import TelegramUserModel from "../models/TelegramUsers";
 
 // Интерфейсы для типов запросов
@@ -99,7 +98,7 @@ const vocabularyController = {
         .populate("author", "_id firstName username email")
         .populate("pre_translations", "_id text");
 
-      logger.info("Все предложенные слова получены!");
+      logger.info(`Все предложенные слова получены! total count: ${count}`);
       res.status(200).json({ message: "Словарь найден", words, total_count: count });
     } catch (error) {
       logger.error(`Ошибка при получении предложенных слов: ${error}`);
@@ -117,7 +116,7 @@ const vocabularyController = {
     next: NextFunction
   ): Promise<void> => {
     const { word_id, translate_language, translate, dialect, normalized_text, telegram_user_id } = req.body;
-
+    
     try {
       // Проверка обязательных параметров
       if (!word_id || !translate_language || !translate || !telegram_user_id || !normalized_text) {
@@ -129,10 +128,12 @@ const vocabularyController = {
       }
 
       // Проверка валидности ObjectId
-      if (!isValidObjectId(word_id) || !isValidObjectId(telegram_user_id)) {
+      if (!isValidObjectId(word_id) || typeof (telegram_user_id) !== "number") {
         res.status(400).json({ message: "Неверный формат word_id или telegram_user_id" });
         return;
       }
+
+      const telegram_author = await TelegramUserModel.findOne({ id: telegram_user_id });
 
       // Поиск исходного слова в базе данных
       const existingWord = await WordModel.findById(word_id);
@@ -157,21 +158,22 @@ const vocabularyController = {
 
         // Обновляем исходное слово
         await WordModel.findByIdAndUpdate(word_id, {
-          $addToSet: { translations_u: existingSuggestedWord._id, contributors: new ObjectId(telegram_user_id) },
+          $addToSet: { translations_u: existingSuggestedWord._id, contributors: telegram_author?._id },
         });
 
         // Обновляем предложенное слово
         await SuggestedWordModel.findByIdAndUpdate(existingSuggestedWord._id, {
-          $addToSet: { pre_translations: existingWord._id, contributors: new ObjectId(telegram_user_id) },
+          $addToSet: { pre_translations: existingWord._id, contributors: telegram_author?._id },
         });
 
         logger.info(`Данные успешно обновлены`);
       } else {
+        console.log(translate_language)
         // Создаём новое предложенное слово
         const newSuggestedWord = new SuggestedWordModel({
           text: translate,
-          language: translate_language,
-          author: new ObjectId(telegram_user_id),
+          language: translate_language == "russian" || translate_language == "русский" ? 'buryat' : translate_language,
+          author: telegram_author?._id,
           dialect,
           normalized_text: translate.toLowerCase().trim(),
         });
@@ -198,7 +200,7 @@ const vocabularyController = {
         });
       }
 
-      res.status(200).json({ message: "Перевод успешно предложен и добавлен в словарь" });
+      res.status(200).json({ message: `Перевод успешно предложен и добавлен в словарь, пользователем ${ telegram_author?._id }` });
     } catch (error) {
       logger.error(`Ошибка при предложении перевода: ${error}`);
       next(error);
@@ -213,7 +215,7 @@ const vocabularyController = {
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    const { text, language, id, dialect } = req.body;
+    const { text, language, telegram_user_id, dialect } = req.body;
 
     try {
       if (!text || !language) {
@@ -227,14 +229,14 @@ const vocabularyController = {
         return;
       }
 
-      if (!id) {
+      if (!telegram_user_id) {
         logger.error(`Отсутствует telegramID`);
         res.status(400).json({ message: "Ошибка запроса" });
         return;
       }
 
       // Найти пользователя и получить только его _id
-      const user = await TelegramUserModel.findOne({ id }).select("_id");
+      const user = await TelegramUserModel.findOne({ id: telegram_user_id }).select("_id");
 
       if (!user) {
         res.status(404).json({ message: "Пользователь не найден" });
@@ -305,11 +307,11 @@ const vocabularyController = {
   ): Promise<void> => {
     
     const suggestedWord = req.suggestedWord as ISuggestedWordModel;
-    if (typeof (req.telegram_user_id) !== 'string') {
+    if (typeof (req.telegram_user_id) !== 'number') {
       res.status(400).json({ message: 'Телеграм пользователь не указан или не найден' })
       return;
     }
-    const telegram_user_id = req.telegram_user_id as string;
+    const telegram_user_id = req.telegram_user_id as number;
 
     try {
       if (!suggestedWord) {
@@ -323,7 +325,7 @@ const vocabularyController = {
       }
 
       // Поиск пользователя по telegram_user_id
-      const user = await TelegramUserModel.findById(telegram_user_id);
+      const user = await TelegramUserModel.findOne({ id: telegram_user_id });
       if (!user) {
         res.status(404).json({ message: "Пользователь не найден" });
         return;

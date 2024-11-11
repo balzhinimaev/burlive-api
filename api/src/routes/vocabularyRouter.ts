@@ -84,8 +84,8 @@ vocabularyRouter.post(
             .isString()
             .withMessage("normalized_text должен быть строкой"),
         body("telegram_user_id")
-            .isMongoId()
-            .withMessage("telegram_user_id должен быть валидным ObjectId"),
+            .isNumeric()
+            .withMessage("telegram_user_id должен быть валидным Numeric"),
     ],
     validate,
     vocabularyController.suggestWordTranslate
@@ -99,7 +99,7 @@ vocabularyRouter.post(
 vocabularyRouter.post(
     "/suggest-words",
     authenticateToken,
-    attachSuggestedWord, // Middleware для прикрепления suggestedWord и telegram_user_id
+    // attachSuggestedWord, // Middleware для прикрепления suggestedWord и telegram_user_id
     [
         body("text")
             .isString()
@@ -111,11 +111,11 @@ vocabularyRouter.post(
             .withMessage("language должен быть строкой")
             .notEmpty()
             .withMessage("language не может быть пустым"),
-        body("id")
-            .isString()
-            .withMessage("id должен быть строкой")
+        body("telegram_user_id")
+            .isNumeric()
+            .withMessage("telegram_user_id должен быть числом")
             .notEmpty()
-            .withMessage("id не может быть пустым"),
+            .withMessage("telegram_user_id не может быть пустым"),
         body("dialect")
             .optional()
             .isString()
@@ -139,8 +139,8 @@ vocabularyRouter.post(
             .isMongoId()
             .withMessage("suggestedWordId должен быть валидным ObjectId"),
         body("telegram_user_id")
-            .isMongoId()
-            .withMessage("telegram_user_id должен быть валидным ObjectId"),
+            .isNumeric()
+            .withMessage("telegram_user_id должен быть валидным Number"),
     ],
     validate,
     attachSuggestedWord, // Middleware для прикрепления suggestedWord и telegram_user_id

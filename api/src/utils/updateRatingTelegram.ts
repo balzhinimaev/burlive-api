@@ -14,7 +14,7 @@ const updateRating = async (userId: any, rating?: number) => {
             return null
         } else {
             
-            logger.info(`Рейтинг пользователя обновлён!, ${result.rating}`)
+            logger.info(`Рейтинг пользователя ${userId} обновлён!, ${result.rating}`)
             return result.rating
         
         }
