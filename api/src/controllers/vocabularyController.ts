@@ -25,6 +25,12 @@ interface SuggestWordTranslateBody {
 //   dialect?: string;
 // }
 
+interface TranslateBody {
+  userInput: string;
+  target_language: string;
+  telegram_user_id: number;
+}
+
 const vocabularyController = {
   /**
    * Получение всех слов
@@ -454,6 +460,165 @@ const vocabularyController = {
     } catch (error) {
       logger.error(`Ошибка при получении слова: ${error}`);
       res.status(500).json({ message: "Ошибка при получении слова" });
+      next(error);
+    }
+  },
+
+  /**
+   * Перевод слова
+   */
+  translateWord: async (
+    req: Request<{}, {}, TranslateBody>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const { userInput, target_language, telegram_user_id } = req.body;
+
+    try {
+      console.log("Целевой язык:", target_language);
+      console.log("Telegram ID пользователя:", telegram_user_id);
+
+      // Нормализация входного слова
+      const normalized_userInput = userInput.toLocaleLowerCase().trim();
+
+      // Проверка валидности telegram_user_id
+      if (!telegram_user_id) {
+        res.status(400).json({ message: "Неверный формат telegram_user_id" });
+        return;
+      }
+
+      // Поиск слова в вашей базе данных (опционально)
+      const existingWord = await WordModel.findOne({
+        normalized_text: normalized_userInput
+      }).populate("translations").populate("translations_u");
+
+      let burlivedb: any = []
+
+      if (existingWord) {
+        
+        console.log("Найденное слово в базе данных:", existingWord);
+
+        if (existingWord.translations.length) {
+          burlivedb = existingWord.translations
+        }
+
+        console.log("Найденные предложенные переводы в базе данных:", existingWord?.translations_u);
+      }
+
+      console.log(`Тут надо добавить функцион добавления искомого слова в бд на проверку для дальнейшего перевода`)
+      
+      // Определение источника языка слова с помощью внешних API
+      // let source_language = target_language;
+
+      // Функция для поиска слова в указанном API
+      // const searchWord = async (language: 'russian' | 'buryat'): Promise<boolean> => {
+      //   const searchUrl = `https://burlang.ru/api/v1/${source_language}-word/search?q=${encodeURIComponent(normalized_userInput)}`;
+      //   try {
+      //     const response = await fetch(searchUrl);
+      //     if (!response.ok) {
+      //       logger.error(`Ошибка при поиске слова в ${language} API: ${response.statusText}`);
+      //       return false;
+      //     }
+      //     const data = await response.json();
+      //     // Предполагаем, что API возвращает массив результатов
+      //     // return Array.isArray(data) && data.length > 0;
+      //     console.log(data)
+      //     return true
+      //   } catch (error: any) {
+      //     logger.error(`Ошибка при выполнении запроса к ${language} API: ${error.message}`);
+      //     return false;
+      //   }
+      // };
+
+      // Проверяем, является ли слово русским
+      // const isRussian = await searchWord('russian');
+      // if (isRussian) {
+      //   source_language = 'russian';
+      // } else {
+      //   // Проверяем, является ли слово бурятским
+      //   const isBuryat = await searchWord('buryat');
+      //   if (isBuryat) {
+      //     source_language = 'buryat';
+      //   }
+      // }
+
+      // if (!source_language) {
+      //   res.status(404).json({ message: "Слово не найдено в русских или бурятских словарях." });
+      //   return;
+      // }
+
+      // Определяем URL для перевода на основе источника языка
+      let translateUrl = '';
+      if (target_language === 'russian') {
+        translateUrl = `https://burlang.ru/api/v1/russian-word/translate?q=${encodeURIComponent(normalized_userInput)}`;
+      } else if (target_language === 'buryat') {
+        translateUrl = `https://burlang.ru/api/v1/buryat-word/translate?q=${encodeURIComponent(normalized_userInput)}`;
+      }
+
+      // Выполняем запрос к API перевода
+      const translateResponse = await fetch(translateUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+
+      let burlang_translate_result: string = ``
+      interface translateResponse {
+        translations: {
+          value: string
+        }[]
+      }
+      if (!translateResponse.ok) {
+        // logger.error(`Ошибка при переводе слова: ${translateResponse.statusText}`);
+        // res.status(500).json({ message: "Ошибка при переводе слова." });
+        // return;
+        burlang_translate_result = `Переводов не найдено`
+      } else {
+        const translateData = await translateResponse.json() as translateResponse;
+        console.log(translateData)
+        for (let i = 0; i < translateData.translations.length; i++) {
+          let translate = translateData.translations[i].value
+          if (translateData.translations.length === i + 1) {
+            burlang_translate_result += `${translate}`
+          } else {
+            burlang_translate_result = burlang_translate_result + `${translate}, `
+          }
+        }
+      }
+
+      // Предполагаем, что API возвращает объект с полем translatedText
+      // const translatedText = translateData.translatedText;
+
+      // if (!translatedText) {
+        // logger.error("Переведённый текст не найден в ответе API.");
+        // res.status(500).json({ message: "Ошибка при получении перевода." });
+        // return;
+      // }
+
+      // (Опционально) Сохранение перевода в вашей базе данных
+      // Например, если вы хотите сохранять переводы
+      /*
+      const newTranslation = new TranslationModel({
+        original_word: existingWord._id,
+        translated_word: translatedText,
+        source_language,
+        target_language
+      });
+      await newTranslation.save();
+      */
+
+      // (Опционально) Обновление рейтинга пользователя
+      // await updateRating(new ObjectId(telegram_user_id), 10); // Например, добавить 10 баллов
+
+      res.status(200).json({
+        message: burlang_translate_result,
+        burlivedb
+        // translatedText,
+      });
+    } catch (error: any) {
+      logger.error(`Ошибка при переводе слова: ${error.message}`);
+      res.status(500).json({ message: "Ошибка при переводе слова" });
       next(error);
     }
   },

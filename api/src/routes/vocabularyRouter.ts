@@ -183,4 +183,32 @@ vocabularyRouter.get(
     vocabularyController.getConfirmedWord
 );
 
+/**
+ * @route   POST /backendapi/vocabulary/translate
+ * @desc    Перевод слова
+ * @access  Public
+ */
+vocabularyRouter.post(
+    "/translate",
+    [
+        body("userInput")
+            .isString()
+            .withMessage("userInput должен быть строкой")
+            .notEmpty()
+            .withMessage("userInput не может быть пустым"),
+        body("target_language")
+            .isString()
+            .withMessage("target_language должен быть строкой")
+            .notEmpty()
+            .withMessage("target_language не может быть пустым"),
+        body("telegram_user_id")
+            .isNumeric()
+            .withMessage("telegram_user_id должен быть числовым значением")
+            .notEmpty()
+            .withMessage("telegram_user_id не может быть пустым"),
+    ],
+    validate,
+    vocabularyController.translateWord
+);
+
 export default vocabularyRouter;
