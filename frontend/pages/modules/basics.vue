@@ -1,11 +1,14 @@
 <template>
     <div class="page module-page">
         <header>
-            <h2>Основы бурятского языка</h2>
-            <p>
-                Изучите базовые фразы и попрактикуйтесь в приветствиях.
-            </p>
-            {{ useRouter().options.history.state.back }}
+            <div class="container">
+                <div class="header-inner">
+                    <h2 class="heading">Основы бурятского языка</h2>
+                    <p class="typography-body">
+                        Изучите базовые фразы и попрактикуйтесь в приветствиях.
+                    </p>
+                </div>
+            </div>
         </header>
 
         <main>
@@ -18,7 +21,6 @@
                     <button class="start-button">Начать</button>
                 </div>
             </section>
-            <NuxtLink class="btn btn-primary" style="display: block; margin: 16px 0;" to="/modules">Назад</NuxtLink>
 
         </main>
     </div>
@@ -54,6 +56,11 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+header {
+    .header-inner {
+        padding: 16px 0;
+    }
+}
 .lesson-card {
     display: flex;
     justify-content: space-between;
