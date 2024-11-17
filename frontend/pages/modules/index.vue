@@ -14,11 +14,15 @@
             <section id="modules-list">
                 <ul class="modules-list">
                     <li v-for="(module, index) in modules" :key="module.id">
-                        <a href="#" @click.prevent="goToModule(module.route)">
-                            <span class="module-number">{{ index + 1 }}.</span>
-                            <span class="module-title">{{ module.title }}</span>
+                        <a href="javascript:void(0)" @click.prevent="goToModule(module.route)" class="list-wrapper">
+                            <div class="number">{{ index }}</div>
+                            <div class="content">
+                                <div class="module-title">{{ module.title }}</div>
+                                <div class="module-description">
+                                    {{ module.title }}
+                                </div>
+                            </div>
                         </a>
-                        <p class="module-description">{{ module.description }}</p>
                     </li>
                 </ul>
             </section>
@@ -90,6 +94,9 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 header {
     margin-bottom: 10px;
+}
+.list-wrapper {
+    display: flex;
 }
 #modules-list {
     padding: 0 32px 32px;

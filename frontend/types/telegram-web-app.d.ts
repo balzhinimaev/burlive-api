@@ -21,6 +21,7 @@ interface TelegramWebApp {
     setBackgroundColor(color: string): void;
     setBottomBarColor(color: string): void;
     setFooterColor(color: string): void;
+    openTelegramLink: any;
     themeParams: {
         background_color?: string;
         text_color?: string;
