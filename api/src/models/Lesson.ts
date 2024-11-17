@@ -1,18 +1,32 @@
-// src/models/Lesson.ts
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-export interface ILesson extends Document {
+interface ILesson extends Document {
     title: string;
     content: string;
+    moduleId: mongoose.Types.ObjectId;
     order: number;
-    module: Schema.Types.ObjectId;
+    questions: {
+        question: string;
+        options: string[];
+        correct: number;
+    }[];
 }
 
-const LessonSchema = new Schema<ILesson>({
-    title: { type: String, required: true },
-    content: { type: String, required: true },
-    order: { type: Number, required: true },
-    module: { type: Schema.Types.ObjectId, ref: 'Module', required: true },
-});
+const LessonSchema: Schema = new Schema(
+    {
+        title: { type: String, required: true },
+        content: { type: String, required: true },
+        moduleId: { type: mongoose.Types.ObjectId, ref: 'Module', required: true },
+        order: { type: Number, required: true },
+        questions: [
+            {
+                question: { type: String, required: true },
+                options: { type: [String], required: true },
+                correct: { type: Number, required: true },
+            },
+        ],
+    },
+    { timestamps: true }
+);
 
-export default model<ILesson>('Lesson', LessonSchema);
+export default mongoose.model<ILesson>('Lesson', LessonSchema);
