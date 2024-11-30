@@ -1,118 +1,39 @@
 <template>
     <div class="dashboard-page">
-        <HeadingPage title="Профиль" :back_button="false" />
-
-        <div v-if="user" class="user-info" style="
+        <UserInfo></UserInfo>
+        <header>
+            <div class="container">
+                <div v-if="user" class="user-info" style="
                 gap: 5px;
                 display: flex;
                 flex-direction: column;">
-            <div>
-                <p><strong>User ID:</strong> {{ user.id }}</p>
+                    <div>
+                        <p><strong>User ID:</strong> {{ user.id }}</p>
+                    </div>
+                    <div>
+                        <p><strong>Email:</strong> {{ user.email || 'Нет данных' }}</p>
+                    </div>
+                    <div>
+                        <p><strong>Имя:</strong> {{ user.first_name || 'Нет данных' }}</p>
+                    </div>
+                    <div>
+                        <p>
+                            <strong>Дата регистрации:</strong>
+                            {{ user.createdAt ? formattedDate(user.createdAt) : 'Неизвестно' }}
+                        </p>
+                    </div>
+                    <div>
+                        <p><strong>Рейтинг:</strong> {{ user.rating || 'Нет данных' }}</p>
+                    </div>
+                </div>
             </div>
-            <div>
-                <p><strong>Имя пользователя:</strong> {{ user.c_username || 'Неизвестно' }}</p>
-            </div>
-            <div>
-                <p><strong>Email:</strong> {{ user.email || 'Нет данных' }}</p>
-            </div>
-            <div>
-                <p><strong>Имя:</strong> {{ user.first_name || 'Нет данных' }}</p>
+        </header>
 
-            </div>
-            <div>
-                <p>
-                    <strong>Дата регистрации:</strong>
-                    {{ user.createdAt ? formattedDate(user.createdAt) : 'Неизвестно' }}
-                </p>
-            </div>
-            <div>
-                <p><strong>Рейтинг:</strong> {{ user.rating || 'Нет данных' }}</p>
-            </div>
-        </div>
-
-        <div class="user-info more">
-            <!-- <h6><b>More</b></h6> -->
-            <ul>
-                <li>
-                    <button class="btn" @click="goToReferralProgram">
-                        <div class="icon">💰</div>
-                        <div class="content">
-                            <div class="content-heading">
-                                <p>Программа реферальная</p>
-                            </div>
-                            <div class="content-body">
-                                <p style="font-size: 12px; color: #666;">Зарабатывайте с BurLive</p>
-                            </div>
-                        </div>
-                        <div class="arrow-right">
-                            <svg width="8" height="14" viewBox="0 0 6 11" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M5.34821 5.27192C5.33894 5.40156 5.28649 5.52436 5.19925 5.6207L1.01382 10.2712C0.962768 10.328 0.901033 10.3741 0.832138 10.4071C0.763243 10.44 0.688537 10.459 0.612285 10.4631C0.536034 10.4671 0.45973 10.4561 0.387733 10.4307C0.315735 10.4052 0.249454 10.3659 0.192672 10.3148C0.135891 10.2638 0.0897232 10.202 0.0568043 10.1331C0.0238854 10.0642 0.00486054 9.98952 0.000816144 9.91327C-0.00322825 9.83702 0.00778706 9.76071 0.033233 9.68872C0.0586789 9.61673 0.0980571 9.55045 0.149119 9.49368L3.98576 5.23194L0.149119 0.970224C0.0980571 0.913448 0.0586789 0.847176 0.033233 0.775181C0.00778706 0.703187 -0.00322825 0.626885 0.000816144 0.550633C0.00486054 0.474381 0.0238854 0.399668 0.0568043 0.330769C0.0897232 0.26187 0.135891 0.200122 0.192672 0.149067C0.249454 0.0980117 0.315735 0.05864 0.387733 0.0332024C0.45973 0.00776469 0.536034 -0.00323723 0.612285 0.000815906C0.688537 0.00486904 0.763243 0.0239055 0.832138 0.0568323C0.901033 0.089759 0.962768 0.135935 1.01382 0.192722L5.19925 4.8432C5.25156 4.90102 5.2917 4.96877 5.31729 5.04242C5.34288 5.11607 5.3534 5.19412 5.34821 5.27192Z"
-                                    :fill="theme === 'light' ? 'black' : 'white'" />
-                            </svg>
-                        </div>
-                    </button>
-                </li>
-                <li>
-                    <button class="btn" @click="goToNews">
-                        <div class="icon">🗞</div>
-                        <div class="content">
-                            <div class="content-heading">
-                                <p>Наши новости</p>
-                            </div>
-                            <div class="content-body">
-                                <p style="font-size: 12px; color: #666;">t.me/bur_live</p>
-                            </div>
-                        </div>
-                        <div class="arrow-right">
-                            <svg width="8" height="14" viewBox="0 0 6 11" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M5.34821 5.27192C5.33894 5.40156 5.28649 5.52436 5.19925 5.6207L1.01382 10.2712C0.962768 10.328 0.901033 10.3741 0.832138 10.4071C0.763243 10.44 0.688537 10.459 0.612285 10.4631C0.536034 10.4671 0.45973 10.4561 0.387733 10.4307C0.315735 10.4052 0.249454 10.3659 0.192672 10.3148C0.135891 10.2638 0.0897232 10.202 0.0568043 10.1331C0.0238854 10.0642 0.00486054 9.98952 0.000816144 9.91327C-0.00322825 9.83702 0.00778706 9.76071 0.033233 9.68872C0.0586789 9.61673 0.0980571 9.55045 0.149119 9.49368L3.98576 5.23194L0.149119 0.970224C0.0980571 0.913448 0.0586789 0.847176 0.033233 0.775181C0.00778706 0.703187 -0.00322825 0.626885 0.000816144 0.550633C0.00486054 0.474381 0.0238854 0.399668 0.0568043 0.330769C0.0897232 0.26187 0.135891 0.200122 0.192672 0.149067C0.249454 0.0980117 0.315735 0.05864 0.387733 0.0332024C0.45973 0.00776469 0.536034 -0.00323723 0.612285 0.000815906C0.688537 0.00486904 0.763243 0.0239055 0.832138 0.0568323C0.901033 0.089759 0.962768 0.135935 1.01382 0.192722L5.19925 4.8432C5.25156 4.90102 5.2917 4.96877 5.31729 5.04242C5.34288 5.11607 5.3534 5.19412 5.34821 5.27192Z"
-                                    :fill="theme === 'light' ? 'black' : 'white'" />
-                            </svg>
-                        </div>
-                    </button>
-                </li>
-                <li>
-                    <button class="btn" @click="goToContact">
-                        <div class="icon">💬</div>
-                        <div class="content">
-                            <div class="content-heading">
-                                <p>Связаться с нами</p>
-                            </div>
-                            <div class="content-body">
-                                <p style="font-size: 12px; color: #666;">Помощь, партнерство, и тд</p>
-                            </div>
-                        </div>
-                        <div class="arrow-right">
-                            <svg width="8" height="14" viewBox="0 0 6 11" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M5.34821 5.27192C5.33894 5.40156 5.28649 5.52436 5.19925 5.6207L1.01382 10.2712C0.962768 10.328 0.901033 10.3741 0.832138 10.4071C0.763243 10.44 0.688537 10.459 0.612285 10.4631C0.536034 10.4671 0.45973 10.4561 0.387733 10.4307C0.315735 10.4052 0.249454 10.3659 0.192672 10.3148C0.135891 10.2638 0.0897232 10.202 0.0568043 10.1331C0.0238854 10.0642 0.00486054 9.98952 0.000816144 9.91327C-0.00322825 9.83702 0.00778706 9.76071 0.033233 9.68872C0.0586789 9.61673 0.0980571 9.55045 0.149119 9.49368L3.98576 5.23194L0.149119 0.970224C0.0980571 0.913448 0.0586789 0.847176 0.033233 0.775181C0.00778706 0.703187 -0.00322825 0.626885 0.000816144 0.550633C0.00486054 0.474381 0.0238854 0.399668 0.0568043 0.330769C0.0897232 0.26187 0.135891 0.200122 0.192672 0.149067C0.249454 0.0980117 0.315735 0.05864 0.387733 0.0332024C0.45973 0.00776469 0.536034 -0.00323723 0.612285 0.000815906C0.688537 0.00486904 0.763243 0.0239055 0.832138 0.0568323C0.901033 0.089759 0.962768 0.135935 1.01382 0.192722L5.19925 4.8432C5.25156 4.90102 5.2917 4.96877 5.31729 5.04242C5.34288 5.11607 5.3534 5.19412 5.34821 5.27192Z"
-                                    :fill="theme === 'light' ? 'black' : 'white'" />
-                            </svg>
-                        </div>
-                    </button>
-                </li>
-            </ul>
-        </div>
-
-        <div class="user-info">
-            <div class="theme-switch">
-                <button class="theme-button btn" :class="theme === 'light' ? 'btn-light' : 'btn-dark'"
-                    @click="toggleTheme()">
-                    {{ theme === 'light' ? '🌞 Светлая' : '🌙 Тёмная' }}
-                </button>
-            </div>
-        </div>
-
-        <div class="premium-card">
+        <!-- <div class="premium-card">
             <h2>BurLive Premium</h2>
             <p>Получи безлимитный доступ с подпиской</p>
             <button class="subscribe-button">Подписаться</button>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -158,21 +79,21 @@ const formattedDate = (dateString: string) => {
     }).format(date);
 };
 
-// Инициализация пользователя
-onBeforeMount(async () => {
-    const tg = (window as any).Telegram.WebApp;
-    const tgUser = tg.initDataUnsafe?.user;
+onMounted(() => {
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.BackButton.show();
+        window.Telegram.WebApp.BackButton.onClick(() => {
+            useRouter().push({ path: `/` });
+        });
+    }
+});
 
-    if (tgUser) {
-        const userExists = await userStore.checkUserExists(tgUser.id);
-        if (!userExists) {
-            await userStore.createUser({
-                id: tgUser.id,
-                username: tgUser.username || '',
-                first_name: tgUser.first_name || '',
-                email: tgUser.email || '',
-            });
-        }
+onBeforeUnmount(() => {
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.BackButton.hide();
+        window.Telegram.WebApp.MainButton.hide();
+        window.Telegram.WebApp.MainButton.disable();
+        window.Telegram.WebApp.BackButton.offClick();
     }
 });
 </script>
@@ -188,13 +109,13 @@ onBeforeMount(async () => {
 }
 
 .user-info {
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
     background-color: var(--background-component-color);
     border-radius: 12px;
     padding: 16px;
     width: 100%;
     box-shadow: 0px 2px 8px var(--inner-component-shadow);
-    margin: auto auto 20px auto;
+    // margin: auto auto 20px auto;
     p {
         &:last-child {
             margin: 0;

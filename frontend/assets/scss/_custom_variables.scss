@@ -1,9 +1,9 @@
 // _custom_variables.scss
-
-$light: #eee;
+$white: #fff;
+$light: #ddd;
 $dark: #1f1f1f;
 
-$dark-description-color: #aaa;
+$dark-description-color: #373737;
 $light-description-color: #aaa;
 
 $darkness-dark: #1c1c1c;
@@ -12,17 +12,19 @@ $dark-hover: #121212;
 $light-hover: $light;
 
 // Переопределяем переменные Bootstrap, если нужно
-$body-bg: #f5f5f5;
+$body-bg: #bbbbbb;
 $primary-color: #3498db;
 
 $border-radius: 10px;
 
 // Собственные переменные для проекта
-$custom-light-background: #ffffff;
-$custom-dark-background: #2c2c2c;
+$custom-light-background: $light;
+$custom-light-secondary-background: $white;
+
+$custom-dark-background: #1c1c1c;
 $custom-dark-secondary-background: #0000002b;
 
-$custom-text-color-light: #1f2937;
+$custom-text-color-light: $dark;
 $custom-text-color-dark: $light;
 
 $custom-transition: background-color 0.3s ease, color 0.3s ease;

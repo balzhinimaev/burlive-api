@@ -21,6 +21,7 @@ interface TelegramWebApp {
     setBackgroundColor(color: string): void;
     setBottomBarColor(color: string): void;
     setFooterColor(color: string): void;
+    expand: any;
     openTelegramLink: any;
     themeParams: {
         background_color?: string;
@@ -29,8 +30,16 @@ interface TelegramWebApp {
         link_color?: string;
         button_color?: string;
         button_text_color?: string;
+        section_bg_color?: string;
+        bottom_bar_bg_color?: string;
+        theme?: string;
     };
+    platform: string;
+    MainButton: any;
+    isFullscreen: boolean;
+    disableVerticalSwipes: any;
     colorScheme: "light" | "dark";
+    onEvent: any;
     // Другие свойства и методы WebApp
 }
 

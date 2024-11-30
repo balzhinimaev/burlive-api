@@ -9,40 +9,52 @@
     // }
 }
 
-:root {
-  --background-component-color: #1a1a1a;
-  --tg-theme-bg-color: #222;
-  --tg-theme-text-color: #{$custom-text-color-dark};
-  --tg-theme-hint-color: #777;
-  --tg-theme-link-color: #444;
-  --tg-theme-button-color: #dc5757;
-  --tg-theme-button-text-color: #eee;
-  --tg-theme-secondary-bg-color: #222;
-  --tg-theme-header-bg-color: #222;
-  --tg-theme-bottom-bar-bg-color: #aaa;
-  --tg-theme-accent-text-color: #aaa;
-  --tg-theme-section-bg-color: #444;
-  --tg-theme-section-separator-color: #222;
-  --tg-theme-subtitle-text-color: #555;
-  --tg-theme-destructive-text-color: #444;
+// :root {
+//   --background-component-color: #1a1a1a;
+//   --tg-theme-bg-color: #222;
+//   --tg-theme-text-color: #{$custom-text-color-dark};
+//   --tg-theme-hint-color: #777;
+//   --tg-theme-link-color: #444;
+//   --tg-theme-button-color: #dc5757;
+//   --tg-theme-button-text-color: #eee;
+//   --tg-theme-secondary-bg-color: #222;
+//   --tg-theme-header-bg-color: #222;
+//   --tg-theme-bottom-bar-bg-color: #aaa;
+//   --tg-theme-accent-text-color: #aaa;
+//   --tg-theme-section-bg-color: #444;
+//   --tg-theme-section-separator-color: #222;
+//   --tg-theme-subtitle-text-color: #555;
+//   --tg-theme-destructive-text-color: #444;
+// }
+* {
+  user-select: none;
 }
-
 body {
   font-family: 'Nunito', sans-serif;
+  color: var(--text-color);
 }
+
 header {
     // border-radius: $border-radius;
     // background-color: var(--background-component-color);
     overflow: hidden;
     // padding: 32px 8px 0;
     color: var(--text-color);
+    padding: 16px 0;
+    .header-inner {
+      padding: 0 !important;
+    }
 }
 
 .single-page {
-  padding: 0
+  padding: 0;
+}
+.page {
+  padding-bottom: 16px;
 }
 
 .breadcrumb {
+  margin: 0;
   a {
     color: #777;
     text-decoration: none;
@@ -55,4 +67,75 @@ header {
     margin: 0 10px;
     color: #777;
   }
+}
+
+
+/* Стили для плейсхолдера загрузки */
+.loading-placeholder {
+    position: relative;
+    overflow: hidden;
+    // background-color: #2c2c2c;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+/* Эффект мерцания (shimmer) */
+.loading-placeholder::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    height: 100%;
+    width: 100%;
+    background-color: var(--background-component-color);
+    // background: linear-gradient(90deg, transparent, rgba(22, 19, 19, 0.95), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Специфические стили для заголовка и контента */
+.title-placeholder {
+    width: 60%;
+    height: 24px;
+    margin-bottom: 16px;
+    // filter: blur(2px);
+    /* Опционально: эффект блюра */
+}
+
+.content-placeholder {
+    width: 100%;
+    /* Высота можно настроить в зависимости от ожидаемого контента */
+    height: 400px;
+}
+
+/* Дополнительные линии для плейсхолдера контента */
+.content-placeholder .line, .title-placeholder .line {
+    width: 100%;
+    height: 16px;
+    background-color: #2c2c2c;
+    margin-bottom: 12px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.content-placeholder .line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    height: 100%;
+    width: 100%;
+    background-color: #222;
+    // background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    // animation: shimmer 1.5s infinite;
 }

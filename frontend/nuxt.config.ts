@@ -2,9 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ["@pinia/nuxt", "@nuxt/image"],
-  routeRules: {
-    '/api/**': { ssr: false }
-  },
+
   app: {
     head: {
       title: "Заголовок по умолчанию для всего сайта",
@@ -24,18 +22,20 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          src: 'https://telegram.org/js/telegram-web-app.js',
-          async: true,
+          src: 'https://telegram.org/js/telegram-web-app.js?56"',
+          // async: true,
+          defer: true
         },
       ],
     },
   },
+
   runtimeConfig: {
-    jwtToken: process.env.JWT_TOKEN || '',
-    public: {
-      apiUrl: process.env.API_URL || 'http://localhost:5000/backendapi',
-    },
+    // Доступно только на сервере
+    apiBase: process.env.API_BASE,
+    jwtToken: process.env.JWT_TOKEN,
   },
+
   css: [
     'bootstrap/scss/bootstrap.scss',
     '@fortawesome/fontawesome-free/css/all.css',
@@ -44,19 +44,23 @@ export default defineNuxtConfig({
     'swiper/css', // Используем swiper/css вместо swiper-bundle.min.css
     '@/assets/scss/styles.scss'
   ],
-vite: {
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `
-          @use "~/assets/scss/_custom_variables.scss" as *;
-          @use "~/assets/scss/_custom_theme.scss" as *;
-        `,
+
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `
+            @use "~/assets/scss/_custom_variables.scss" as *;
+            @use "~/assets/scss/_custom_theme.scss" as *;
+          `,
+        },
       },
     },
   },
-},
+
   alias: {
     "/analytics": "/dashboard/analytics",
   },
+
+  compatibilityDate: "2024-11-25",
 });

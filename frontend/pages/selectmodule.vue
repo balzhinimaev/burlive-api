@@ -3,106 +3,134 @@
         <header>
             <div class="container">
                 <div class="header-inner">
-                    <h2 class="heading">Выберите модуль</h2>
+                    <h2 class="heading">
+                        <!-- Плейсхолдер для заголовка при загрузке -->
+                        <template v-if="isFetching">
+                            <div class="loading-placeholder title-placeholder" style="margin: 0;">
+                                <div class="line" style="width: 90%; height: 0;"></div>
+                            </div>
+                        </template>
+                        <!-- Реальный заголовок после загрузки -->
+                        <template v-else>
+                            Выберите модуль
+                        </template>
+                    </h2>
                     <p class="breadcrumb">
                         <nuxt-link to="/">Главная</nuxt-link>
                         <span class="split">/</span>
                         <nuxt-link to="/selectmodule">Модули</nuxt-link>
                     </p>
                     <p class="typography-body">
-                        Выберите тему или модуль, который хотите изучать.
+                        <!-- Плейсхолдер для описания при загрузке -->
+                        <template v-if="isFetching">
+                            <div class="loading-placeholder description-placeholder">
+                                <div class="line" style="width: 100%; height: 16px;"></div>
+                                <div class="line" style="width: 80%; height: 16px;"></div>
+                                <div class="line" style="width: 90%; height: 16px;"></div>
+                            </div>
+                        </template>
+                        <!-- Реальное описание после загрузки -->
+                        <template v-else>
+                            Выберите тему или модуль, который хотите изучать.
+                        </template>
                     </p>
                 </div>
             </div>
         </header>
 
         <main>
-            <section id="modules-list">
+            <!-- Список модулей после загрузки -->
+            <section class="list-items" v-if="!isFetching && modules.length > 0">
+                <div class="container">
+                    <ModulesItem v-for="module in modules" :module="module" />
+                </div>
+            </section>
+
+            <!-- Плейсхолдеры при загрузке -->
+            <template v-else-if="isFetching">
                 <div class="container">
                     <ul class="modules-list">
-                        <li v-for="(module, index) in modules" :key="module.id" :class="{ disabled: module.disabled }">
-                            <a href="javascript:void(0)" @click.prevent="!module.disabled && goToModule(module.route)"
-                                class="list-wrapper">
-                                <div class="number">
-                                    {{ index + 1 }}
-                                    <div class="circle"></div>
+                        <li v-for="n in 3" :key="n" class="loading-placeholder module-card-placeholder">
+                            <a href="javascript:void(0)" class="list-wrapper">
+                                <div class="number-placeholder">
+                                    <div class="circle-placeholder"></div>
                                 </div>
-                                <div class="content">
-                                    <div class="module-title">{{ module.title }}</div>
-                                    <div class="module-description">{{ module.description }}</div>
+                                <div class="content-placeholder">
+                                    <div class="module-title-placeholder"></div>
+                                    <div class="module-description-placeholder"></div>
                                 </div>
                             </a>
                         </li>
                     </ul>
                 </div>
+            </template>
+
+            <!-- Отображение ошибки -->
+            <section v-else-if="errorOnFetchingModules">
+                <div class="container">
+                    <p class="typography-body">{{ errorOnFetchingModules }}</p>
+                </div>
             </section>
+
+            <!-- Плейсхолдеры по умолчанию (опционально) -->
+            <template v-else>
+                <div class="container">
+                    <ul class="modules-list">
+                        <li v-for="n in 3" :key="n" class="loading-placeholder module-card-placeholder">
+                            <a href="javascript:void(0)" class="list-wrapper">
+                                <div class="number-placeholder">
+                                    <div class="circle-placeholder"></div>
+                                </div>
+                                <div class="content-placeholder">
+                                    <div class="module-title-placeholder"></div>
+                                    <div class="module-description-placeholder"></div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </template>
         </main>
     </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount } from 'vue';
+import { useModulesStore } from '@/stores/Modules';
+import { onMounted, onBeforeUnmount, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
+const modulesStore = useModulesStore();
 const router = useRouter();
 
-interface Module {
-    id: number;
-    title: string;
-    description: string;
-    route: string;
-    disabled: boolean;
+// Получаем доступ к состоянию напрямую без конфликта
+const modules = computed(() => modulesStore.getModules);
+const isFetching = computed(() => modulesStore.isFetching);
+const errorOnFetchingModules = computed(() => modulesStore.errorOnFetchingModules);
+const config = useRuntimeConfig()
+
+console.log('Runtime config:', config)
+if (import.meta.server) {
+    console.log('API secret:', config.jwtToken)
 }
-
-const modules: Module[] = [
-    {
-        id: 1,
-        title: 'Основы бурятского языка',
-        description: 'Начните с базовых фраз и приветствий.',
-        route: '/modules/basics',
-        disabled: false, // Модуль доступен
-    },
-    {
-        id: 2,
-        title: 'Продвинутый курс',
-        description: 'Углубитесь в грамматику и сложные фразы.',
-        route: '/modules/advanced',
-        disabled: true, // Модуль недоступен
-    },
-];
-
 function goToModule(route: string) {
-    router.push(route);
+    router.push(`/modules/${route}`);
 }
 
-function rgbToHex(rgb: string) {
-    const result = rgb.match(/\d+/g);
-    if (result) {
-        return (
-            '#' +
-            result
-                .slice(0, 3)
-                .map((x) => {
-                    const hex = parseInt(x).toString(16);
-                    return hex.length === 1 ? '0' + hex : hex;
-                })
-                .join('')
-        );
-    }
-    return rgb; // Возвращаем исходное значение, если не удалось преобразовать
-}
-
-onMounted(() => {
-    if (window.Telegram?.WebApp) {
+onMounted(async () => {
+    console.log('onMounted вызван');
+    if (process.client && window.Telegram?.WebApp) {
         window.Telegram.WebApp.BackButton.show();
         window.Telegram.WebApp.BackButton.onClick(() => {
-            router.push({ path: '/' }); // Или другой маршрут по умолчанию
+            router.push({ path: '/' });
         });
     }
+    console.log('Перед fetchModules');
+    await modulesStore.fetchModules();
+    console.log('После fetchModules');
 });
 
 onBeforeUnmount(() => {
-    if (window.Telegram?.WebApp) {
+    if (process.client && window.Telegram?.WebApp) {
         window.Telegram.WebApp.BackButton.hide();
         window.Telegram.WebApp.BackButton.offClick();
     }
@@ -111,39 +139,6 @@ onBeforeUnmount(() => {
 
 
 <style scoped lang="scss">
-header {
-    .header-inner {
-        padding: 16px 0;
-    }
-}
-
-.list-wrapper {
-    display: flex;
-    list-style-type: none;
-
-    .number {
-        margin: 0 15px auto 0;
-        position: relative;
-
-        .circle {
-            display: block;
-            width: 15px;
-            height: 15px;
-            background-color: rgba(114, 35, 109, 0.416);
-            border-radius: 50%;
-            margin: auto;
-            position: absolute;
-            z-index: -1;
-            left: -5px;
-            top: 5px;
-        }
-    }
-}
-
-h2 {
-    margin-bottom: 0;
-}
-
 .modules-list {
     list-style-type: none;
     padding: 0 0 0 15px;
@@ -165,7 +160,6 @@ h2 {
             text-decoration: none;
             display: flex;
             align-items: center;
-            color: #eee;
 
             .module-title {
                 font-weight: 600;

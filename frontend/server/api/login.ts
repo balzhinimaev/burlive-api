@@ -9,7 +9,5 @@ export default defineEventHandler(async (event) => {
         email: body.username,
       },
     });
-
     return query
-
 })

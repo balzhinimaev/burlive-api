@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "api"
+		},
+		{
+			"path": "Y:/workspace/mvpv2/frontend2"
 		}
 	],
 	"settings": {}
