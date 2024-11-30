@@ -23499,3 +23499,42 @@
 {"level":"error","message":"Ошибка в subscribe: Error: Ошибка от YooKassa: {\"type\":\"error\",\"id\":\"01937c89-aa4e-7b82-8699-dab1395c7664\",\"code\":\"invalid_request\",\"description\":\"Error in the recipient object. Store's ID differs from the ID provided in the header\",\"parameter\":\"recipient.account_id\"}","timestamp":"2024-11-30T10:06:57.216Z"}
 {"level":"error","message":"Ошибка в subscribe: Error: Ошибка от YooKassa: {\"type\":\"error\",\"id\":\"08df18ff-9450-4810-8e98-23559da1c00c\",\"code\":\"internal_server_error\",\"description\":\"Internal server error\"}","timestamp":"2024-11-30T10:07:24.907Z"}
 {"level":"error","message":"Ошибка в subscribe: Error: Ошибка от YooKassa: {\"type\":\"error\",\"id\":\"01937c8a-58ce-7f89-a39b-2b56287abe70\",\"code\":\"invalid_request\",\"description\":\"Receipt is missing or illegal\",\"parameter\":\"receipt\"}","timestamp":"2024-11-30T10:07:41.880Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:02:07.248Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:02:13.240Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:03:05.313Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:03:13.153Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:04:03.228Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:04:05.184Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:04:29.317Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:04:34.908Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:04:55.263Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:05:28.761Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:05:29.225Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:06:19.307Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:06:52.783Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:07:00.990Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:07:17.502Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:07:25.534Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:08:17.256Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:08:17.561Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:09:07.346Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:09:40.805Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:09:41.592Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:13:19.473Z"}
+{"level":"info","message":"Token created for user: admin@burlive.ru","timestamp":"2024-11-30T13:15:26.337Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:15:55.827Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:16:47.862Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:17:51.617Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:18:11.868Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:18:31.251Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:18:43.836Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:20:34.399Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:20:52.792Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:20:59.886Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:21:26.446Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:22:50.479Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:22:55.874Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:25:38.542Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:32:12.318Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:34:08.386Z"}
+{"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:36:50.541Z"}

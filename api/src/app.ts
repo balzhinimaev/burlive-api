@@ -22,6 +22,7 @@ import levelRoutes from './routes/levelRoutes';
 import moduleRoutes from './routes/modulesRouter';
 import themeRouter from './routes/themeRouter';
 import bodyParser from 'body-parser';
+import logger from './utils/logger';
 
 const app = express();
 const server = createServer(app);
@@ -53,7 +54,17 @@ app.use('/backendapi/lessons', authenticateToken, lessonsRouter);
 app.use('/backendapi/themes', authenticateToken, themeRouter);
 
 app.use(`/backendapi/questions`, authenticateToken, questionRouter)
+app.post(`/backendapi/pay-cb`, (req, _res) => {
+  try {
+    logger.info(`Получен успешный платеж`)
+    console.log(req.body)
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    console.log(`IP адрес отправителя: ${ip}`);
 
+  } catch (error) {
+    logger.error(error)
+  }
+})
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Внутренняя ошибка сервера' });

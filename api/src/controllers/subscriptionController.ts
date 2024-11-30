@@ -71,8 +71,8 @@ const subscriptionController = {
             };
 
             // Создание строки авторизации в формате Base64
-            // const auth = Buffer.from(`${process.env.YOOKASSA_SHOP_ID_PROD}:${process.env.YOOKASSA_SECRET_KEY_PROD}`).toString('base64');
-            const auth = Buffer.from(`${process.env.YOOKASSA_SHOP_ID_DEV}:${process.env.YOOKASSA_SECRET_KEY}`).toString('base64');
+            const auth = Buffer.from(`${process.env.YOOKASSA_SHOP_ID_PROD}:${process.env.YOOKASSA_SECRET_KEY_PROD}`).toString('base64');
+            // const auth = Buffer.from(`${process.env.YOOKASSA_SHOP_ID_DEV}:${process.env.YOOKASSA_SECRET_KEY}`).toString('base64');
 
             // Отправка запроса на создание платежа с использованием fetch
             const response = await fetch('https://api.yookassa.ru/v3/payments', {
@@ -112,7 +112,9 @@ const subscriptionController = {
     // Обработка вебхука от YooKassa
     paymentCallback: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
+            logger.info(`Получен платежное уведомление:`)
             console.log(req.body)
+            console.log(req)
             // // Получение сырых данных тела запроса
             // const rawBody = req.body as Buffer;
             // console.log(rawBody)
