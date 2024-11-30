@@ -11,6 +11,8 @@ export interface IWordModel extends Document {
   translations_u: Types.ObjectId[];
   createdAt: Date;
   dialect: string;
+  themes: Types.ObjectId[]
+  
   // Additional fields, if needed
 }
 
@@ -39,6 +41,8 @@ const WordSchema = new Schema<IWordModel>(
       required: true,
     },
     contributors: [{ type: Schema.Types.ObjectId, ref: "telegram_user" }],
+    // Вставьте это в WordSchema в файле WordModel.ts
+    themes: [{ type: Schema.Types.ObjectId, ref: "theme", default: [] }],
     // Additional fields, if needed
   },
   {

@@ -26,13 +26,14 @@ const authenticateToken = async (
   }
 
   try {
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      userId: string;
+      _id: string;
       sessionId: string;
     };
 
     const existingToken = await JwtTokenModel.findOne({
-      userId: decoded.userId,
+      userId: decoded._id,
       token,
     });
 
@@ -43,17 +44,29 @@ const authenticateToken = async (
     }
 
     // Получаем пользователя из базы данных для получения роли
-    const user = await UserModel.findById(decoded.userId);
+    const user = await UserModel.findById({
+      _id: decoded._id
+    });
+    
+    // const isTelegramUser = await TelegramUserModel.findById({
+    //   _id: decoded._id
+    // })
 
-    if (!user) {
-      res.status(401).json({ message: "User not found" });
-      return;
+    let _id
+    let role
+
+    if (user) {
+      _id = user._id
+      role = user.role
+      req.user = { _id: _id.toString(), role: role ? role : "user" };      
+      next();
+    } else {
+      res.status(404).json({
+        message: "Пользователь не зарегистрирован"
+      })
     }
 
-    // Устанавливаем свойство user в Request
-    req.user = { _id: user._id.toString(), role: user.role };
 
-    next();
   } catch (error: any) {
     console.error(error);
     logger.error(`Error verifying token: ${error.message}`);

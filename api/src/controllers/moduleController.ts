@@ -24,11 +24,11 @@ const moduleController = {
             const [count, modules] = await Promise.all([
                 Module.countDocuments(),
                 Module.find()
-                    .sort({ createdAt: -1 })
+                    // .sort({ createdAt: -1 })
                     .skip(skipIndex)
                     .limit(limitNumber)
+                    .sort({ order: 1 })
                     .populate('lessons', 'title') // Предполагается, что есть модель Lesson
-                    .populate('author', '_id firstName username email'), // Если есть поле author
             ]);
 
             if (modules.length === 0) {
@@ -45,6 +45,8 @@ const moduleController = {
                 current_page: pageNumber,
                 total_pages: Math.ceil(count / limitNumber),
             });
+
+            logger.info(`Модули запрошены`)
         } catch (error) {
             logger.error(`Ошибка при получении модулей: ${error}`);
             console.error(error);
@@ -69,7 +71,6 @@ const moduleController = {
 
             const module = await Module.findById(id)
                 .populate('lessons', 'title description') // Предполагается, что есть модель Lesson
-                .populate('author', '_id firstName username email'); // Если есть поле author
 
             if (!module) {
                 logger.warn(`Модуль с ID ${id} не найден`);
@@ -94,16 +95,16 @@ const moduleController = {
      */
     createModule: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const { title, description, lessons } = req.body;
+            const { title, short_title, description, lessons } = req.body;
 
             if (!req.user || !req.user._id) {
                 res.status(401).json({ message: 'Вы не авторизованы!' });
                 return;
             }
 
-            if (!title || !description) {
-                logger.warn('Пожалуйста, предоставьте заголовок и описание модуля');
-                res.status(400).json({ message: 'Пожалуйста, предоставьте заголовок и описание модуля' });
+            if (!title || !description || !short_title) {
+                logger.warn('Пожалуйста, предоставьте заголовок и описание модуля, и короткий заголок тоже');
+                res.status(400).json({ message: 'Пожалуйста, предоставьте заголовок и описание модуля, и короткий заголок тоже' });
                 return;
             }
 
@@ -117,6 +118,7 @@ const moduleController = {
             // Создание нового модуля
             const newModule = new Module({
                 title,
+                short_title,
                 description,
                 lessons: lessons || [], // Если переданы уроки
                 // Предполагается, что есть поле author в модели Module
@@ -152,7 +154,7 @@ const moduleController = {
     updateModule: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { id } = req.params;
-            const { title, description, lessons } = req.body;
+            const { title, description, lessons, short_title } = req.body;
 
             if (!isValidObjectId(id) && !isValidObjectIdString(id)) {
                 res.status(400).json({
@@ -173,6 +175,7 @@ const moduleController = {
             if (title) module.title = title;
             if (description) module.description = description;
             if (lessons) module.lessons = lessons;
+            if (short_title) module.short_title = short_title;
 
             await module.save();
 

@@ -6,6 +6,9 @@ import {
     getLessonById,
     updateLesson,
     deleteLesson,
+    getLessonByModuleId,
+    getLessonByIdByTelegram,
+    addQuestion,
 } from '../controllers/lessonController';
 import authenticateToken from '../middleware/authenticateToken';
 import authorizeAdmin from '../middleware/authorizeAdmin';
@@ -59,6 +62,12 @@ router.get('/', authenticateToken, getAllLessons);
 // Получение урока по ID
 router.get('/:id', authenticateToken, getLessonById);
 
+// Просмотр урока по ID пользователем телеграмм
+router.get('/:telegram_id/:id', authenticateToken, getLessonByIdByTelegram);
+
+// Получение урока по moduleID
+router.post('/module/:id', authenticateToken, getLessonByModuleId);
+
 // Обновление урока с валидацией
 router.put(
     '/:id',
@@ -98,6 +107,8 @@ router.put(
     validate,
     updateLesson
 );
+
+router.put(`/:id/:question_id`, authenticateToken, authorizeAdmin, addQuestion)
 
 // Удаление урока
 router.delete('/:id', authenticateToken, authorizeAdmin, deleteLesson);

@@ -80,7 +80,7 @@ const userController = {
 
   login: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { email, username, password } = req.body;
+      const { email, username, password, neverExpire } = req.body;
 
       // Проверка существования email или username
       if (!email && !username) {
@@ -98,18 +98,31 @@ const userController = {
         }
 
         const sessionId = uuidv4(); // Генерация уникального идентификатора сессии
+
+        // Определение срока действия токена
+        let tokenOptions: jwt.SignOptions = {};
+        let expiresAt: Date;
+
+        if (neverExpire) {
+          // Устанавливаем очень длительный срок действия токена (например, 100 лет)
+          tokenOptions.expiresIn = "100y";
+          expiresAt = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000); // 100 лет
+        } else {
+          // Стандартный срок действия токена
+          tokenOptions.expiresIn = "3d";
+          expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 3 дня
+        }
+
         const token = jwt.sign(
-          { userId: user._id.toString(), sessionId },
+          { _id: user._id.toString(), sessionId },
           process.env.JWT_SECRET as string,
-          { expiresIn: "3d" }
+          tokenOptions
         );
-        const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 3 дня
 
         await Token.deleteMany({ userId: user._id }); // Удаление старых токенов
-        const createdToken = await Token.create({ userId: user._id, token, expiresAt });
+        await Token.create({ userId: user._id, token, expiresAt });
 
-        logger.info(`Token created: ${createdToken}`);
-        logger.info(`Token created for user: ${user._id}`);
+        logger.info(`Token created for user: ${user.email}`);
 
         res.status(200).json({ token, userId: user._id.toString() });
         return;

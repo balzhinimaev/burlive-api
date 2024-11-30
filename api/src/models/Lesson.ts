@@ -1,30 +1,33 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Types, Document } from 'mongoose';
 
-interface ILesson extends Document {
+export interface ILesson extends Document {
+    _id: Types.ObjectId;
     title: string;
     content: string;
-    moduleId: mongoose.Types.ObjectId;
+    description?: string;
+    moduleId: Types.ObjectId;
     order: number;
-    questions: {
-        question: string;
-        options: string[];
-        correct: number;
-    }[];
+    questions: Types.ObjectId[];
+    viewsCounter: number;
+    views: Types.ObjectId[];
 }
 
 const LessonSchema: Schema = new Schema(
     {
         title: { type: String, required: true },
+        description: { type: String, required: false },
         content: { type: String, required: true },
         moduleId: { type: mongoose.Types.ObjectId, ref: 'Module', required: true },
         order: { type: Number, required: true },
-        questions: [
-            {
-                question: { type: String, required: true },
-                options: { type: [String], required: true },
-                correct: { type: Number, required: true },
-            },
-        ],
+        questions: {
+            type: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
+            default: []
+        },
+        viewsCounter: { type: Number, default: 0 },
+        views: {
+            type: [{ type: Schema.Types.ObjectId, ref: 'View' }],
+            default: []
+        }
     },
     { timestamps: true }
 );

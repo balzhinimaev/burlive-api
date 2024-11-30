@@ -7,8 +7,31 @@ import WordModel from "../models/Vocabulary/WordModel";
 import SearchedWordModel from "../models/Vocabulary/SearchedWordModel";
 import TelegramUserState from "../models/Telegram/UserState";
 import { Types } from "mongoose";
-
+import LevelModel from "../models/Level";
+// Импортируйте модель LevelModel
 const telegramController = {
+  getAllUsers: async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const users = await TelegramUserModel.find()
+      if (users) {
+        res.status(200).json({
+          message: "Пользователи получены",
+          count: users.length,
+          users,
+        })
+        return
+      } else {
+        res.status(200).json({
+          message: "Пользователей нет",
+          users: []
+        })
+        return
+      }
+    } catch (error) {
+      logger.error(error)
+      next(error)
+    }
+  },
   create: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { messages } = req.body;
@@ -119,9 +142,9 @@ const telegramController = {
   user_is_exists: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
-      const user = await TelegramUserModel.findOne({ id }).select(
-        "_id id c_username email createdAt first_name rating theme"
-      );
+      const user = await TelegramUserModel.findOne({ id: Number(id) }).select(
+        "_id id c_username email createdAt first_name rating theme photo_url"
+      ).populate("level");
 
       if (!user) {
         res
@@ -140,9 +163,12 @@ const telegramController = {
           createdAt: user.createdAt,
           first_name: user.first_name,
           rating: user.rating,
-          theme: user.theme
+          theme: user.theme,
+          photo_url: user.photo_url,
+          level: user.level
         },
       });
+      logger.info(`Получение данных ID ${id}`)
       return
     } catch (error) {
       logger.error("Error in user_is_exists:", error);
@@ -153,38 +179,47 @@ const telegramController = {
 
   register_telegram_user: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      console.log(req.body)
-      const { id, username, first_name, last_name, email } = req.body;
-      console.log(req.body)
-      logger.info("create user")
+      const { id, username, first_name, last_name, email, photo_url, platform } = req.body;
+
       // Проверка на существование пользователя
       const existingUser = await TelegramUserModel.findOne({ id });
       if (existingUser) {
         res.status(409).json({
           message: "Пользователь уже зарегистрирован!"
         });
-        return
+        return;
       }
 
-      // Сохранение нового пользователя
+      // Получение начального уровня
+      const initialLevel = await LevelModel.findOne().sort({ minRating: 1 });
+      if (!initialLevel) {
+        logger.error('Начальный уровень не найден.');
+        res.status(500).json({ error: "Начальный уровень не найден." });
+        return;
+      }
+
+      // Сохранение нового пользователя с установленным уровнем
       const newUser = new TelegramUserModel({
         id,
         username,
         first_name,
         last_name,
+        photo_url,
+        platform,
         email: email || "", // Обработка возможного отсутствия email
+        level: initialLevel._id, // Установка начального уровня
       });
 
       await newUser.save();
 
       res.status(201).json({
-        message: "Пользователь успешно зарегистрирован!"
+        message: "Пользователь успешно зарегистрирован!",
+        user: newUser
       });
-      return
+      logger.info(`Пользователь успешно зарегистрирован: ${newUser}`);
     } catch (error) {
       logger.error(`Ошибка при регистрации телеграмм пользователя: ${error}`);
-      res.status(500).json({ error: "Ошибка сервера" });
-      next(error)
+      next(error); // Передаем ошибку в следующий middleware
     }
   },
 
