@@ -1,10 +1,12 @@
-FROM node:18
+FROM node:lts
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
 # Копируем package.json и package-lock.json
 COPY package*.json ./
+
+RUN npm install -g npm@11.0.0
 
 # Устанавливаем зависимости
 RUN npm install
@@ -19,4 +21,4 @@ RUN npx tsc
 EXPOSE 5000
 
 # Запускаем приложение
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]

@@ -15,6 +15,7 @@ interface TelegramUser extends User {
   platform: string;
   via_app: boolean;
   photo_url: string;
+  phone?: string;
   role: "admin" | "user" | "moderator" | undefined;
   vocabular: {
     selected_language_for_translate: "russian" | "buryat";
@@ -24,6 +25,7 @@ interface TelegramUser extends User {
     startDate: Date | null;
     endDate: Date | null;
     isActive: boolean;
+    paymentId: Types.ObjectId;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -42,6 +44,7 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
     c_username: { type: String, required: false, default: "" },
     first_name: { type: String, required: false },
     email: { type: String, required: false },
+    phone: { type: String, required: false },
     platform: { type: String, required: false },
     referrals_telegram: [{ type: Schema.Types.ObjectId, ref: "telegram_user" }],
 
@@ -70,6 +73,7 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
         enum: ["monthly", "quarterly", "annual", null],
         default: null,
       },
+      paymentId: { type: Schema.Types.ObjectId, ref: "Payment", required: true },
       startDate: { type: Date, default: null },
       endDate: { type: Date, default: null },
       isActive: { type: Boolean, default: false },
@@ -106,6 +110,34 @@ TelegramUserSchema.methods.updateLevel = async function (
       await user.save(); // Now TypeScript recognizes 'save()' method
     }
   }
+};
+
+TelegramUserSchema.methods.hasActiveSubscription = function (): boolean {
+  const subscription = this.subscription;
+  return subscription.isActive && subscription.endDate && new Date() <= subscription.endDate;
+};
+TelegramUserSchema.methods.activateSubscription = function (
+  type: "monthly" | "quarterly" | "annual",
+  paymentId: Types.ObjectId
+): void {
+  const durationMap = {
+    monthly: 30,
+    quarterly: 90,
+    annual: 365,
+  };
+
+  const now = new Date();
+  const endDate = new Date(now.getTime() + durationMap[type] * 24 * 60 * 60 * 1000);
+
+  this.subscription = {
+    type,
+    paymentId,
+    startDate: now,
+    endDate,
+    isActive: true,
+  };
+
+  this.save();
 };
 
 const TelegramUserModel = model<TelegramUserDocument>(

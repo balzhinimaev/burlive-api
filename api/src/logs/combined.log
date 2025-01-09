@@ -23538,3 +23538,730 @@
 {"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:32:12.318Z"}
 {"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-11-30T13:34:08.386Z"}
 {"level":"info","message":"Получен успешный платеж","timestamp":"2024-11-30T13:36:50.541Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-11-30T16:50:53.394Z"}
+{"level":"info","message":"Все предложенные слова получены! total count: 1","timestamp":"2024-11-30T16:51:23.032Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 1272270574,\n  username: 'frntdev',\n  c_username: '',\n  first_name: 'S',\n  email: '',\n  referrals_telegram: [],\n  rating: 1,\n  level: new ObjectId('6745c1226e9f989a4e6e318b'),\n  via_app: false,\n  photo_url: '',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  _id: new ObjectId('674b441e5f231b0b09f9d65d'),\n  createdAt: 2024-11-30T16:58:06.112Z,\n  updatedAt: 2024-11-30T16:58:06.112Z,\n  __v: 0\n}","timestamp":"2024-11-30T16:58:06.206Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 1272270574,\n  username: 'frntdev',\n  c_username: '',\n  first_name: 'S',\n  email: '',\n  referrals_telegram: [],\n  rating: 1,\n  level: new ObjectId('6745c1226e9f989a4e6e318b'),\n  via_app: false,\n  photo_url: '',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  _id: new ObjectId('674b44815f231b0b09f9d662'),\n  createdAt: 2024-11-30T16:59:45.825Z,\n  updatedAt: 2024-11-30T16:59:45.825Z,\n  __v: 0\n}","timestamp":"2024-11-30T16:59:45.913Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde934-000f-5000-9000-125fe060483d","timestamp":"2024-12-01T03:18:20.453Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde808-000f-5000-a000-181446babe3b","timestamp":"2024-12-01T03:18:23.518Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde934-000f-5000-9000-125fe060483d","timestamp":"2024-12-01T03:18:30.524Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde934-000f-5000-9000-125fe060483d","timestamp":"2024-12-01T03:19:12.542Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde964-000f-5000-b000-19ae4f52dfea","timestamp":"2024-12-01T03:19:12.654Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde964-000f-5000-b000-19ae4f52dfea","timestamp":"2024-12-01T03:19:22.605Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde964-000f-5000-b000-19ae4f52dfea","timestamp":"2024-12-01T03:20:04.658Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde864-000f-5000-8000-1403ad5ae95f","timestamp":"2024-12-01T03:20:15.681Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde934-000f-5000-9000-125fe060483d","timestamp":"2024-12-01T03:20:36.734Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde964-000f-5000-b000-19ae4f52dfea","timestamp":"2024-12-01T03:21:28.878Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde934-000f-5000-9000-125fe060483d","timestamp":"2024-12-01T03:23:25.014Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde964-000f-5000-b000-19ae4f52dfea","timestamp":"2024-12-01T03:24:16.992Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde808-000f-5000-a000-181446babe3b","timestamp":"2024-12-01T03:29:35.703Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde864-000f-5000-8000-1403ad5ae95f","timestamp":"2024-12-01T03:31:27.861Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde934-000f-5000-9000-125fe060483d","timestamp":"2024-12-01T03:34:37.431Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde964-000f-5000-b000-19ae4f52dfea","timestamp":"2024-12-01T03:35:29.189Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfc2f-000f-5000-9000-15194438215d","timestamp":"2024-12-01T04:39:20.672Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T04:39:20.705Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfc2f-000f-5000-9000-15194438215d","timestamp":"2024-12-01T04:39:30.695Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T04:39:30.697Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfc2f-000f-5000-9000-15194438215d","timestamp":"2024-12-01T04:40:12.919Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T04:40:12.921Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfc2f-000f-5000-9000-15194438215d","timestamp":"2024-12-01T04:41:37.655Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T04:41:37.679Z"}
+{"level":"error","message":"Ошибка в subscribe: Error: Ошибка от YooKassa: {\"type\":\"error\",\"id\":\"01938088-033f-7bd2-a67e-4030f2f2207f\",\"code\":\"invalid_request\",\"description\":\"No customer information in the receipt: the \\\"customer\\\" parameter is missing or phone number or email are not specified\",\"parameter\":\"receipt.customer\"}","timestamp":"2024-12-01T04:43:37.933Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfc2f-000f-5000-9000-15194438215d","timestamp":"2024-12-01T04:44:25.467Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T04:44:25.468Z"}
+{"level":"error","message":"Ошибка в subscribe: Error: Ошибка от YooKassa: {\"type\":\"error\",\"id\":\"0193808c-9a9b-72fc-8a11-00dde64d529a\",\"code\":\"invalid_request\",\"description\":\"No customer information in the receipt: the \\\"customer\\\" parameter is missing or phone number or email are not specified\",\"parameter\":\"receipt.customer\"}","timestamp":"2024-12-01T04:48:38.829Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-12-01T05:03:38.790Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde934-000f-5000-9000-125fe060483d","timestamp":"2024-12-01T05:04:13.301Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:04:13.302Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2edde964-000f-5000-b000-19ae4f52dfea","timestamp":"2024-12-01T05:05:05.800Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:05:05.801Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-12-01T05:05:28.869Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-12-01T05:06:09.992Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddf6aa-000f-5000-b000-19bced96903c","timestamp":"2024-12-01T05:17:39.451Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:17:39.452Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddf6aa-000f-5000-b000-19bced96903c","timestamp":"2024-12-01T05:17:49.708Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:17:49.709Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddf6aa-000f-5000-b000-19bced96903c","timestamp":"2024-12-01T05:18:31.757Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:18:31.758Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddf6aa-000f-5000-b000-19bced96903c","timestamp":"2024-12-01T05:19:55.761Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:19:55.762Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddf6aa-000f-5000-b000-19bced96903c","timestamp":"2024-12-01T05:22:44.109Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:22:44.110Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddf6aa-000f-5000-b000-19bced96903c","timestamp":"2024-12-01T05:33:56.433Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:33:56.434Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-12-01T05:38:41.041Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-01T05:38:48.262Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-01T05:40:51.339Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2024-12-01T05:40:55.019Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-01T05:41:51.859Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfcb8-000f-5000-b000-1c246d8590c5","timestamp":"2024-12-01T05:43:29.676Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:43:29.677Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfcb8-000f-5000-b000-1c246d8590c5","timestamp":"2024-12-01T05:43:39.735Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:43:39.736Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfcb8-000f-5000-b000-1c246d8590c5","timestamp":"2024-12-01T05:44:21.764Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:44:21.765Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfd16-000f-5000-b000-1eeec786a147","timestamp":"2024-12-01T05:45:03.807Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:45:03.808Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfd16-000f-5000-b000-1eeec786a147","timestamp":"2024-12-01T05:45:13.837Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:45:13.838Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfcb8-000f-5000-b000-1c246d8590c5","timestamp":"2024-12-01T05:45:45.835Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:45:45.836Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfd16-000f-5000-b000-1eeec786a147","timestamp":"2024-12-01T05:45:55.869Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:45:55.869Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfd16-000f-5000-b000-1eeec786a147","timestamp":"2024-12-01T05:47:20.183Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:47:20.184Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfcb8-000f-5000-b000-1c246d8590c5","timestamp":"2024-12-01T05:48:34.057Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:48:34.058Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfd16-000f-5000-b000-1eeec786a147","timestamp":"2024-12-01T05:50:08.503Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:50:08.504Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2024-12-01T05:53:14.324Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfcb8-000f-5000-b000-1c246d8590c5","timestamp":"2024-12-01T05:59:46.210Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T05:59:46.211Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfd16-000f-5000-b000-1eeec786a147","timestamp":"2024-12-01T06:01:20.649Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T06:01:20.651Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfc2f-000f-5000-9000-15194438215d","timestamp":"2024-12-01T06:25:14.111Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T06:25:14.112Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddf6aa-000f-5000-b000-19bced96903c","timestamp":"2024-12-01T07:03:32.626Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T07:03:32.627Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfcb8-000f-5000-b000-1c246d8590c5","timestamp":"2024-12-01T07:29:22.375Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T07:29:22.376Z"}
+{"level":"info","message":"Уведомление об успешном платеже 2eddfd16-000f-5000-b000-1eeec786a147","timestamp":"2024-12-01T07:30:56.911Z"}
+{"level":"error","message":"Отсутствует заголовок X-Api-Signature-256","timestamp":"2024-12-01T07:30:56.913Z"}
+{"level":"error","message":"Ошибка в subscribe: Error: Ошибка от YooKassa: {\"type\":\"error\",\"id\":\"01938137-d1f4-7b88-b20d-0dd096de5247\",\"code\":\"invalid_request\",\"description\":\"No customer information in the receipt: the \\\"customer\\\" parameter is missing or phone number or email are not specified\",\"parameter\":\"receipt.customer\"}","timestamp":"2024-12-01T07:55:39.688Z"}
+{"level":"error","message":"Ошибка в subscribe: Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client","timestamp":"2024-12-01T07:56:12.672Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T07:57:01.269Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T07:57:11.301Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T07:57:43.875Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T07:57:53.685Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T07:57:53.805Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T07:58:35.990Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T07:59:17.873Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T08:00:00.006Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T08:02:05.968Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T08:02:48.484Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T08:13:18.285Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T08:14:00.327Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T08:58:13.247Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T08:58:23.423Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T08:59:05.376Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T09:00:29.471Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T09:03:17.643Z"}
+{"level":"info","message":"Получен платежное уведомление:","timestamp":"2024-12-01T09:14:29.895Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-12-02T04:30:44.841Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2024-12-02T04:33:18.724Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2024-12-02T04:42:59.409Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2024-12-02T04:46:01.549Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2024-12-02T04:48:51.536Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2024-12-15T21:40:11.220Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-15T21:40:20.027Z"}
+{"level":"info","message":"Пользователь 6746c37d5505498e60f0942f запрашивает уроки по модулю 673a70647dbfb73c143a3dc5","timestamp":"2024-12-15T21:40:23.117Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-15T21:40:26.594Z"}
+{"level":"info","message":"Пользователь 6746c37d5505498e60f0942f запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2024-12-15T21:40:27.675Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-15T21:40:32.051Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2024-12-15T21:40:36.203Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-12-18T19:31:16.303Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-18T19:31:35.107Z"}
+{"level":"info","message":"Пользователь 674b44815f231b0b09f9d662 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2024-12-18T19:31:37.642Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2024-12-18T19:32:51.502Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-18T19:33:10.279Z"}
+{"level":"info","message":"Пользователь 6746c37d5505498e60f0942f запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2024-12-18T19:33:24.969Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-18T19:33:53.231Z"}
+{"level":"info","message":"Пользователь 6746c37d5505498e60f0942f запрашивает уроки по модулю 673a70647dbfb73c143a3dc5","timestamp":"2024-12-18T19:33:54.806Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-18T19:33:57.036Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2024-12-18T19:34:00.727Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2024-12-18T19:34:57.145Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-18T19:35:00.900Z"}
+{"level":"info","message":"Пользователь 6746c37d5505498e60f0942f запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2024-12-18T19:35:03.773Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-18T19:35:43.551Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2024-12-18T19:36:22.026Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-12-24T15:48:51.117Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T15:54:45.833Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T15:58:37.826Z"}
+{"level":"info","message":"Пользователь 674b44815f231b0b09f9d662 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2024-12-24T15:58:41.270Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2024-12-24T15:58:43.939Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2024-12-24T15:58:44.123Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2024-12-24T15:58:51.290Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2024-12-24T15:58:51.465Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2024-12-24T15:59:10.207Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2024-12-24T15:59:10.383Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2024-12-24T15:59:21.459Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2024-12-24T15:59:21.648Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2024-12-24T16:00:13.273Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2024-12-24T16:00:13.465Z"}
+{"level":"info","message":"Пользователь 674b44815f231b0b09f9d662 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2024-12-24T16:00:17.184Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:00:18.480Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2024-12-24T16:02:05.693Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:02:20.512Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:02:22.419Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:02:24.245Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2024-12-24T16:02:28.097Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:02:33.593Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:03:19.265Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:03:20.778Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:03:55.403Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:03:57.211Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:05:42.023Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:05:44.001Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:05:45.827Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:05:47.944Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:05:54.839Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:06:24.150Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:06:41.880Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:06:59.026Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:07:56.398Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:08:08.399Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:08:29.854Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2024-12-24T16:08:36.816Z"}
+{"level":"error","message":"Начальный уровень не найден.","timestamp":"2025-01-03T15:29:19.681Z"}
+{"level":"warn","message":"Token not found in the database: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ0MTQ5NDQwYTgwY2JlOTBiYmZiMjIiLCJzZXNzaW9uSWQiOiIxYmRkNGI3ZS1hNjk3LTQ4YWMtOTRlMS1kMjQ3NWFkYTExZjkiLCJpYXQiOjE3MzI3NzU0OTQsImV4cCI6NDg4ODUzNTQ5NH0.ZR4OMU5ZiDVGde2xDGdQnm2CluzdS6n6ghnD2n1uwy4","timestamp":"2025-01-03T15:29:48.105Z"}
+{"level":"warn","message":"Token not found in the database: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ0MTQ5NDQwYTgwY2JlOTBiYmZiMjIiLCJzZXNzaW9uSWQiOiIxYmRkNGI3ZS1hNjk3LTQ4YWMtOTRlMS1kMjQ3NWFkYTExZjkiLCJpYXQiOjE3MzI3NzU0OTQsImV4cCI6NDg4ODUzNTQ5NH0.ZR4OMU5ZiDVGde2xDGdQnm2CluzdS6n6ghnD2n1uwy4","timestamp":"2025-01-03T15:29:48.371Z"}
+{"level":"warn","message":"Token not found in the database: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ0MTQ5NDQwYTgwY2JlOTBiYmZiMjIiLCJzZXNzaW9uSWQiOiIxYmRkNGI3ZS1hNjk3LTQ4YWMtOTRlMS1kMjQ3NWFkYTExZjkiLCJpYXQiOjE3MzI3NzU0OTQsImV4cCI6NDg4ODUzNTQ5NH0.ZR4OMU5ZiDVGde2xDGdQnm2CluzdS6n6ghnD2n1uwy4","timestamp":"2025-01-03T15:29:50.913Z"}
+{"level":"warn","message":"Token not found in the database: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ0MTQ5NDQwYTgwY2JlOTBiYmZiMjIiLCJzZXNzaW9uSWQiOiIxYmRkNGI3ZS1hNjk3LTQ4YWMtOTRlMS1kMjQ3NWFkYTExZjkiLCJpYXQiOjE3MzI3NzU0OTQsImV4cCI6NDg4ODUzNTQ5NH0.ZR4OMU5ZiDVGde2xDGdQnm2CluzdS6n6ghnD2n1uwy4","timestamp":"2025-01-03T15:29:51.174Z"}
+{"level":"info","message":"User successfully registered: 677802880a44efd8e5573857","timestamp":"2025-01-03T15:30:16.103Z"}
+{"level":"info","message":"Token created for user: alexandrbnimaev@gmail.com","timestamp":"2025-01-03T15:30:39.872Z"}
+{"level":"error","message":"Начальный уровень не найден.","timestamp":"2025-01-03T15:32:01.846Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 1640959206,\n  username: 'daizhid',\n  c_username: '',\n  first_name: 'Дэжид',\n  email: '',\n  platform: 'tdesktop',\n  referrals_telegram: [],\n  rating: 1,\n  level: new ObjectId('677803da00eae1e31f3eece5'),\n  via_app: false,\n  photo_url: 'https://t.me/i/userpic/320/2hd_d8nrAZUSvfMCHYifiBCPGdhkHl43kI9zvEDcCp4.svg',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  _id: new ObjectId('6778041f0a44efd8e5573865'),\n  createdAt: 2025-01-03T15:37:03.961Z,\n  updatedAt: 2025-01-03T15:37:03.961Z,\n  __v: 0\n}","timestamp":"2025-01-03T15:37:03.969Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T15:37:04.244Z"}
+{"level":"warn","message":"Token not found in the database: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ0MTQ5NDQwYTgwY2JlOTBiYmZiMjIiLCJzZXNzaW9uSWQiOiIxYmRkNGI3ZS1hNjk3LTQ4YWMtOTRlMS1kMjQ3NWFkYTExZjkiLCJpYXQiOjE3MzI3NzU0OTQsImV4cCI6NDg4ODUzNTQ5NH0.ZR4OMU5ZiDVGde2xDGdQnm2CluzdS6n6ghnD2n1uwy4","timestamp":"2025-01-03T15:37:20.902Z"}
+{"level":"warn","message":"Token not found in the database: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ0MTQ5NDQwYTgwY2JlOTBiYmZiMjIiLCJzZXNzaW9uSWQiOiIxYmRkNGI3ZS1hNjk3LTQ4YWMtOTRlMS1kMjQ3NWFkYTExZjkiLCJpYXQiOjE3MzI3NzU0OTQsImV4cCI6NDg4ODUzNTQ5NH0.ZR4OMU5ZiDVGde2xDGdQnm2CluzdS6n6ghnD2n1uwy4","timestamp":"2025-01-03T15:37:21.181Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T17:40:29.540Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:41:17.497Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:41:17.955Z"}
+{"level":"error","message":"Error verifying token: jwt malformed","timestamp":"2025-01-03T17:42:04.363Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:42:25.758Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:43:03.771Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:43:04.169Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:43:11.214Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:43:11.610Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:43:43.819Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:43:44.220Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:43:47.352Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:43:47.745Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:44:03.352Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:44:03.746Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:44:18.893Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:44:19.294Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:47:30.514Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:47:30.928Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:49:11.759Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:49:12.144Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:49:34.218Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:49:34.620Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:50:27.608Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:50:28.008Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:50:29.867Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:50:30.270Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:50:56.975Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:50:57.378Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:12.260Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T17:51:12.266Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:12.665Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:15.785Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:16.179Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:29.175Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:29.574Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:43.092Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:43.498Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:45.875Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:46.273Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:48.101Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:51:48.506Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-03T17:53:14.633Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:54:43.232Z"}
+{"level":"warn","message":"Модули не найдены","timestamp":"2025-01-03T17:54:43.674Z"}
+{"level":"warn","message":"Пожалуйста, предоставьте заголовок и описание модуля, и короткий заголок тоже","timestamp":"2025-01-03T17:57:41.843Z"}
+{"level":"warn","message":"Пожалуйста, предоставьте заголовок и описание модуля, и короткий заголок тоже","timestamp":"2025-01-03T17:58:25.203Z"}
+{"level":"info","message":"Рейтинг пользователя обновлён!, 200","timestamp":"2025-01-03T17:59:15.639Z"}
+{"level":"info","message":"Модуль создан: 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T17:59:15.641Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T17:59:32.819Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T17:59:32.828Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T17:59:49.337Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:00:16.611Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:03:43.074Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:03:45.338Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:03:47.245Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:03:48.952Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:03:52.819Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:03:55.017Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:03:59.203Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:04:00.977Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:04:41.253Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:05:00.512Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:05:55.160Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:05:57.252Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:05:58.879Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:06.762Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:08.735Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:10.298Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:11.769Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:13.875Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T18:06:19.073Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:23.450Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T18:06:24.441Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:25.495Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T18:06:26.430Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:28.168Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T18:06:28.975Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:33.231Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:35.436Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T18:06:36.588Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:38.376Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:06:40.600Z"}
+{"level":"info","message":"Рейтинг пользователя обновлён!, 300","timestamp":"2025-01-03T18:07:27.083Z"}
+{"level":"info","message":"Модуль создан: 6778275f0fa7b264a9ebf645","timestamp":"2025-01-03T18:07:27.084Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:07:30.176Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-03T18:07:34.122Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:07:36.180Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-03T18:07:37.043Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:07:44.789Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T18:08:14.941Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:08:14.951Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:08:56.551Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:11:21.432Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-03T18:11:26.161Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:11:29.634Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T18:11:31.747Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:11:33.813Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T18:11:34.661Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:11:36.279Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-03T18:11:41.262Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:12:03.367Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:16:03.690Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:22:39.835Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:23:27.551Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:25:46.021Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:28:52.883Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:31:59.007Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:35:26.344Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T18:36:07.923Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:39:04.635Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:48:57.689Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T18:50:39.428Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T18:52:04.192Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:54:12.039Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:54:31.667Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:54:46.841Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T18:59:26.715Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:59:45.869Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T18:59:55.113Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T18:59:56.630Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:02:51.904Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:02:54.928Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-03T19:03:00.214Z"}
+{"level":"info","message":"Получение данных ID 1640959206","timestamp":"2025-01-03T19:04:09.986Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:06:40.585Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T19:07:00.367Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:07:02.142Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-03T19:08:04.875Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:08:06.177Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-03T19:08:11.076Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:30:00.949Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:56:56.259Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:57:01.776Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T19:57:03.582Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T19:57:04.818Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 677825730fa7b264a9ebf5a2","timestamp":"2025-01-03T20:00:00.030Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T20:00:01.546Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-03T20:00:02.647Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T20:00:03.565Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-03T20:00:04.338Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T20:00:08.025Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-03T20:00:09.226Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T20:00:10.865Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T20:00:12.603Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-03T20:00:14.214Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T20:00:17.050Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-03T20:00:17.813Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T20:00:20.374Z"}
+{"level":"info","message":"Пользователь 6778041f0a44efd8e5573865 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-03T20:00:21.244Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-03T20:00:22.916Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 1272270574,\n  username: 'frntdev',\n  c_username: '',\n  first_name: 'S',\n  email: '',\n  platform: 'tdesktop',\n  referrals_telegram: [],\n  rating: 1,\n  level: new ObjectId('677803da00eae1e31f3eece5'),\n  via_app: false,\n  photo_url: 'https://t.me/i/userpic/320/TXrA1rUB4ejg9Wox_-Tn-JuNQ6loZkoc2FxHMknzn2U.svg',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  _id: new ObjectId('677de9d2c2b2a67d248ea250'),\n  createdAt: 2025-01-08T02:58:26.055Z,\n  updatedAt: 2025-01-08T02:58:26.055Z,\n  __v: 0\n}","timestamp":"2025-01-08T02:58:26.065Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T02:58:26.460Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T02:58:51.986Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T02:58:55.571Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T02:58:56.711Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T02:58:58.956Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T03:00:20.990Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T03:04:45.170Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T03:04:45.207Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T03:11:45.145Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T03:11:58.015Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T03:12:05.251Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T03:27:09.380Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T03:29:45.330Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T03:30:06.114Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T03:30:13.578Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T03:32:45.407Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T03:32:46.115Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T03:32:46.126Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T03:32:56.448Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T03:53:11.716Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T03:53:18.104Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T03:57:17.759Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T03:57:20.156Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T03:57:21.102Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T04:01:26.502Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:01:52.101Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T04:01:54.093Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T04:02:04.756Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T04:03:01.717Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T04:03:21.506Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T04:12:45.633Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T04:12:46.892Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T04:15:30.245Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T04:15:30.282Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T04:39:53.869Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:39:57.072Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T04:39:57.836Z"}
+{"level":"error","message":"Error verifying token: jwt malformed","timestamp":"2025-01-08T04:41:50.251Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2025-01-08T04:42:54.662Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2025-01-08T04:48:18.793Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2025-01-08T04:49:24.439Z"}
+{"level":"info","message":"Подтягивание урока по ID","timestamp":"2025-01-08T04:50:19.631Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T04:50:34.850Z"}
+{"level":"info","message":"Пользователь undefined запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:51:25.911Z"}
+{"level":"info","message":"Пользователь undefined запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:51:42.195Z"}
+{"level":"info","message":"Пользователь undefined запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:51:42.220Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:52:10.302Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:53:00.644Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:54:46.691Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:55:17.210Z"}
+{"level":"info","message":{"__v":0,"_id":"677e053570ff45890e0c246b","createdAt":"2025-01-08T04:55:17.248Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T04:55:17.248Z"},"timestamp":"2025-01-08T04:55:17.257Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:56:09.948Z"}
+{"level":"info","message":{"__v":0,"_id":"677e0569d1094dc3fd2effb0","createdAt":"2025-01-08T04:56:09.991Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T04:56:09.991Z"},"timestamp":"2025-01-08T04:56:09.998Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:57:10.888Z"}
+{"level":"info","message":{"__v":0,"_id":"677e05a661bb27b18a17430f","createdAt":"2025-01-08T04:57:10.936Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T04:57:10.936Z"},"timestamp":"2025-01-08T04:57:10.951Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:57:28.466Z"}
+{"level":"info","message":{"__v":0,"_id":"677e05b861bb27b18a174317","createdAt":"2025-01-08T04:57:28.474Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T04:57:28.474Z"},"timestamp":"2025-01-08T04:57:28.477Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T04:57:31.018Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T04:59:28.418Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06306267fadf74e1d0a3","createdAt":"2025-01-08T04:59:28.618Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T04:59:28.618Z"},"timestamp":"2025-01-08T04:59:28.641Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:00:31.660Z"}
+{"level":"info","message":{"__v":0,"_id":"677e066f4c12c69d3c3ed065","createdAt":"2025-01-08T05:00:31.697Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:00:31.697Z"},"timestamp":"2025-01-08T05:00:31.703Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:00:35.171Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06734c12c69d3c3ed06e","createdAt":"2025-01-08T05:00:35.180Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:00:35.180Z"},"timestamp":"2025-01-08T05:00:35.182Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T05:00:41.187Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T05:00:41.201Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:00:44.123Z"}
+{"level":"info","message":{"__v":0,"_id":"677e067c4c12c69d3c3ed081","createdAt":"2025-01-08T05:00:44.131Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:00:44.131Z"},"timestamp":"2025-01-08T05:00:44.134Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:00:47.013Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:00:47.815Z"}
+{"level":"info","message":{"__v":0,"_id":"677e067f4c12c69d3c3ed08f","createdAt":"2025-01-08T05:00:47.823Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:00:47.823Z"},"timestamp":"2025-01-08T05:00:47.827Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:00:57.139Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:00:57.971Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06894c12c69d3c3ed09d","createdAt":"2025-01-08T05:00:57.979Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:00:57.979Z"},"timestamp":"2025-01-08T05:00:57.981Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:00:59.585Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:01:00.720Z"}
+{"level":"info","message":{"__v":0,"_id":"677e068c4c12c69d3c3ed0ab","createdAt":"2025-01-08T05:01:00.731Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:01:00.731Z"},"timestamp":"2025-01-08T05:01:00.733Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:01:32.634Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:01:33.513Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06ad4c12c69d3c3ed0b9","createdAt":"2025-01-08T05:01:33.521Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:01:33.521Z"},"timestamp":"2025-01-08T05:01:33.523Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:01:34.516Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:01:56.748Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:01:57.597Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06c54c12c69d3c3ed0cc","createdAt":"2025-01-08T05:01:57.605Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:01:57.605Z"},"timestamp":"2025-01-08T05:01:57.608Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:01:59.120Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:01:59.959Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06c74c12c69d3c3ed0da","createdAt":"2025-01-08T05:01:59.967Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:01:59.967Z"},"timestamp":"2025-01-08T05:01:59.969Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:02:25.488Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:02:26.369Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06e24c12c69d3c3ed0e8","createdAt":"2025-01-08T05:02:26.377Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:02:26.377Z"},"timestamp":"2025-01-08T05:02:26.380Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:02:28.541Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:02:29.315Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06e54c12c69d3c3ed0f6","createdAt":"2025-01-08T05:02:29.324Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:02:29.324Z"},"timestamp":"2025-01-08T05:02:29.326Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:02:44.981Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:02:46.042Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06f64c12c69d3c3ed104","createdAt":"2025-01-08T05:02:46.051Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:02:46.051Z"},"timestamp":"2025-01-08T05:02:46.053Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:02:47.943Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:02:48.751Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06f84c12c69d3c3ed112","createdAt":"2025-01-08T05:02:48.758Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:02:48.758Z"},"timestamp":"2025-01-08T05:02:48.760Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:02:50.172Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:02:51.034Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06fb4c12c69d3c3ed120","createdAt":"2025-01-08T05:02:51.043Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:02:51.043Z"},"timestamp":"2025-01-08T05:02:51.047Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:02:51.756Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:02:52.594Z"}
+{"level":"info","message":{"__v":0,"_id":"677e06fc4c12c69d3c3ed12e","createdAt":"2025-01-08T05:02:52.602Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:02:52.602Z"},"timestamp":"2025-01-08T05:02:52.605Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:02:53.527Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:08.788Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:12.060Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:14.043Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:16.206Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:22.587Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:23.912Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:27.259Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:32.715Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:34.335Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:03:40.530Z"}
+{"level":"info","message":{"__v":0,"_id":"677e072c4c12c69d3c3ed169","createdAt":"2025-01-08T05:03:40.538Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:03:40.538Z"},"timestamp":"2025-01-08T05:03:40.540Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:41.146Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:42.488Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:03:55.881Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:03.454Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:04:18.024Z"}
+{"level":"info","message":{"__v":0,"_id":"677e07524c12c69d3c3ed186","createdAt":"2025-01-08T05:04:18.033Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:04:18.033Z"},"timestamp":"2025-01-08T05:04:18.034Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:18.806Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:20.337Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:22.117Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:27.898Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:36.230Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:38.108Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:39.681Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:42.289Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:43.784Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:45.339Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:47.007Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:48.845Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:50.708Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:04:51.944Z"}
+{"level":"info","message":{"__v":0,"_id":"677e07734c12c69d3c3ed1d0","createdAt":"2025-01-08T05:04:51.951Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:04:51.951Z"},"timestamp":"2025-01-08T05:04:51.954Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:04:52.949Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:04:53.903Z"}
+{"level":"info","message":{"__v":0,"_id":"677e07754c12c69d3c3ed1de","createdAt":"2025-01-08T05:04:53.909Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:04:53.909Z"},"timestamp":"2025-01-08T05:04:53.912Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T05:09:25.480Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T05:09:25.485Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:33:41.343Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:33:44.863Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:33:47.401Z"}
+{"level":"info","message":{"__v":0,"_id":"677e0e3b4c12c69d3c3ed1f6","createdAt":"2025-01-08T05:33:47.408Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:33:47.408Z"},"timestamp":"2025-01-08T05:33:47.410Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T05:33:48.464Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:33:49.229Z"}
+{"level":"info","message":{"__v":0,"_id":"677e0e3d4c12c69d3c3ed204","createdAt":"2025-01-08T05:33:49.235Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:33:49.235Z"},"timestamp":"2025-01-08T05:33:49.238Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T05:33:50.842Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T05:33:50.849Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T05:33:55.422Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T05:33:55.427Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T05:33:59.410Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T05:33:59.416Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T05:34:01.101Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T05:34:01.106Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T05:34:04.080Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T05:34:04.086Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T05:34:26.135Z"}
+{"level":"info","message":{"__v":0,"_id":"677e0e624c12c69d3c3ed23f","createdAt":"2025-01-08T05:34:26.141Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T05:34:26.141Z"},"timestamp":"2025-01-08T05:34:26.143Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T05:34:33.407Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T05:34:33.412Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T07:58:39.664Z"}
+{"level":"info","message":{"__v":0,"_id":"677e302f4c12c69d3c3ed252","createdAt":"2025-01-08T07:58:39.675Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T07:58:39.675Z"},"timestamp":"2025-01-08T07:58:39.680Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T07:58:41.052Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T07:58:52.081Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:04.716Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:06.569Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:08.069Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:24.301Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:25.845Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:28.176Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:29.941Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:32.062Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T08:13:34.452Z"}
+{"level":"info","message":{"__v":0,"_id":"677e33ae4c12c69d3c3ed28b","createdAt":"2025-01-08T08:13:34.460Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T08:13:34.460Z"},"timestamp":"2025-01-08T08:13:34.462Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:44.799Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T08:13:45.711Z"}
+{"level":"info","message":{"__v":0,"_id":"677e33b94c12c69d3c3ed299","createdAt":"2025-01-08T08:13:45.719Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T08:13:45.719Z"},"timestamp":"2025-01-08T08:13:45.721Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T08:13:47.454Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T08:13:47.462Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:13:48.256Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T08:13:49.031Z"}
+{"level":"info","message":{"__v":0,"_id":"677e33bd4c12c69d3c3ed2b1","createdAt":"2025-01-08T08:13:49.039Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T08:13:49.039Z"},"timestamp":"2025-01-08T08:13:49.042Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T08:13:50.616Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T08:13:50.627Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T08:13:51.578Z"}
+{"level":"info","message":{"__v":0,"_id":"677e33bf4c12c69d3c3ed2c4","createdAt":"2025-01-08T08:13:51.586Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T08:13:51.586Z"},"timestamp":"2025-01-08T08:13:51.588Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T08:13:54.969Z"}
+{"level":"info","message":"Подтягивание урока 6747576df8551022e666f1ad","timestamp":"2025-01-08T08:13:54.974Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T08:13:56.320Z"}
+{"level":"info","message":{"__v":0,"_id":"677e33c44c12c69d3c3ed2d6","createdAt":"2025-01-08T08:13:56.328Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T08:13:56.328Z"},"timestamp":"2025-01-08T08:13:56.329Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T08:13:57.441Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T08:13:57.447Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T08:14:07.020Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T08:14:07.031Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T08:14:10.481Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T08:14:10.487Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T08:14:19.562Z"}
+{"level":"info","message":{"__v":0,"_id":"677e33db4c12c69d3c3ed2fd","createdAt":"2025-01-08T08:14:19.572Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T08:14:19.572Z"},"timestamp":"2025-01-08T08:14:19.574Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:14:20.631Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:14:53.696Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:17:06.718Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T08:17:07.747Z"}
+{"level":"info","message":{"__v":0,"_id":"677e34834c12c69d3c3ed313","createdAt":"2025-01-08T08:17:07.754Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T08:17:07.754Z"},"timestamp":"2025-01-08T08:17:07.756Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T08:17:09.173Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:17:10.984Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:18:46.374Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:19:30.829Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T08:21:29.803Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:21:33.558Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T08:25:19.155Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:25:24.354Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T08:27:53.370Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T08:31:04.065Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:33:46.669Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:34:34.144Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:34:58.724Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:38:22.558Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:42:14.832Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T08:44:56.146Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:44:58.943Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:47:23.008Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:47:25.233Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:47:27.987Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:47:30.187Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:47:34.402Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:47:38.132Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:47:40.411Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:47:43.373Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T08:48:54.691Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:49:07.247Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T08:49:28.635Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T10:09:50.854Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T10:09:58.400Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T10:10:04.514Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T10:10:06.736Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-08T10:10:09.854Z"}
+{"level":"info","message":{"__v":0,"_id":"677e4f01d0c55aa85b5990bf","createdAt":"2025-01-08T10:10:09.867Z","module":"6778275f0fa7b264a9ebf645","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:10:09.867Z"},"timestamp":"2025-01-08T10:10:09.876Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T10:10:11.125Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:10:12.124Z"}
+{"level":"info","message":{"__v":0,"_id":"677e4f04d0c55aa85b5990cd","createdAt":"2025-01-08T10:10:12.133Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:10:12.133Z"},"timestamp":"2025-01-08T10:10:12.136Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:10:17.446Z"}
+{"level":"info","message":"Подтягивание урока 6747576df8551022e666f1ad","timestamp":"2025-01-08T10:10:17.452Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:10:19.871Z"}
+{"level":"info","message":{"__v":0,"_id":"677e4f0bd0c55aa85b5990df","createdAt":"2025-01-08T10:10:19.878Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:10:19.878Z"},"timestamp":"2025-01-08T10:10:19.880Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:10:27.386Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T10:10:27.392Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:10:32.780Z"}
+{"level":"info","message":{"__v":0,"_id":"677e4f18d0c55aa85b5990f2","createdAt":"2025-01-08T10:10:32.787Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:10:32.787Z"},"timestamp":"2025-01-08T10:10:32.789Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:10:34.156Z"}
+{"level":"info","message":"Подтягивание урока 6747507b84faca84177b5147","timestamp":"2025-01-08T10:10:34.161Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:10:36.769Z"}
+{"level":"info","message":"Подтягивание урока 6747507b84faca84177b5147","timestamp":"2025-01-08T10:10:36.774Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:10:38.157Z"}
+{"level":"info","message":"Подтягивание урока 6747507b84faca84177b5147","timestamp":"2025-01-08T10:10:38.162Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:10:39.052Z"}
+{"level":"info","message":{"__v":0,"_id":"677e4f1fd0c55aa85b599116","createdAt":"2025-01-08T10:10:39.060Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:10:39.060Z"},"timestamp":"2025-01-08T10:10:39.062Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:10:40.360Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T10:10:40.366Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T10:11:04.072Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T10:11:35.244Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T10:12:20.222Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:12:27.292Z"}
+{"level":"info","message":{"__v":0,"_id":"677e4f8bd0c55aa85b599132","createdAt":"2025-01-08T10:12:27.298Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:12:27.298Z"},"timestamp":"2025-01-08T10:12:27.300Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:13:18.210Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T10:13:18.216Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:15:15.860Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T10:15:15.866Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:15:48.795Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T10:15:48.804Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:15:51.326Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T10:15:51.331Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:15:54.920Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T10:15:54.926Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:15:55.859Z"}
+{"level":"info","message":{"__v":0,"_id":"677e505bd0c55aa85b59916d","createdAt":"2025-01-08T10:15:55.866Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:15:55.866Z"},"timestamp":"2025-01-08T10:15:55.868Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T10:15:57.086Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T10:16:31.071Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T10:16:38.197Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T10:18:30.532Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T10:20:21.490Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T10:20:46.972Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:29:14.629Z"}
+{"level":"info","message":{"__v":0,"_id":"677e537ad0c55aa85b59918a","createdAt":"2025-01-08T10:29:14.639Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:29:14.639Z"},"timestamp":"2025-01-08T10:29:14.644Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T10:29:16.355Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T10:56:05.461Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:56:06.689Z"}
+{"level":"info","message":{"__v":0,"_id":"677e59c6d0c55aa85b59919d","createdAt":"2025-01-08T10:56:06.695Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:56:06.695Z"},"timestamp":"2025-01-08T10:56:06.697Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:56:08.868Z"}
+{"level":"info","message":"Подтягивание урока 6747507b84faca84177b5147","timestamp":"2025-01-08T10:56:08.873Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:56:10.027Z"}
+{"level":"info","message":{"__v":0,"_id":"677e59cad0c55aa85b5991af","createdAt":"2025-01-08T10:56:10.033Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:56:10.033Z"},"timestamp":"2025-01-08T10:56:10.036Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T10:56:14.428Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T10:56:14.438Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T10:56:15.346Z"}
+{"level":"info","message":{"__v":0,"_id":"677e59cfd0c55aa85b5991c2","createdAt":"2025-01-08T10:56:15.352Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T10:56:15.352Z"},"timestamp":"2025-01-08T10:56:15.354Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T10:56:15.932Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T10:56:19.227Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T10:56:52.197Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T11:21:13.843Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T12:19:14.261Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T12:23:00.505Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T12:23:10.146Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T12:23:16.524Z"}
+{"level":"info","message":"Все темы получены!","timestamp":"2025-01-08T12:23:18.342Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:23:19.708Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:23:21.198Z"}
+{"level":"info","message":{"__v":0,"_id":"677e6e39d0c55aa85b5991ff","createdAt":"2025-01-08T12:23:21.208Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:23:21.208Z"},"timestamp":"2025-01-08T12:23:21.212Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:23:22.178Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:24:20.619Z"}
+{"level":"info","message":{"__v":0,"_id":"677e6e74d0c55aa85b59920d","createdAt":"2025-01-08T12:24:20.626Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:24:20.626Z"},"timestamp":"2025-01-08T12:24:20.628Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:24:21.678Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:26:53.065Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:29:53.751Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:29:57.914Z"}
+{"level":"info","message":{"__v":0,"_id":"677e6fc5f1e402c7539c3a7c","createdAt":"2025-01-08T12:29:57.929Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:29:57.929Z"},"timestamp":"2025-01-08T12:29:57.934Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:30:04.181Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-08T12:30:05.193Z"}
+{"level":"info","message":{"__v":0,"_id":"677e6fcdf1e402c7539c3a8a","createdAt":"2025-01-08T12:30:05.201Z","module":"6778275f0fa7b264a9ebf645","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:30:05.201Z"},"timestamp":"2025-01-08T12:30:05.204Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:30:06.299Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:34:39.761Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:34:42.297Z"}
+{"level":"info","message":{"__v":0,"_id":"677e70e26a623d565061dd44","createdAt":"2025-01-08T12:34:42.313Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:34:42.313Z"},"timestamp":"2025-01-08T12:34:42.321Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:34:43.341Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-08T12:36:58.235Z"}
+{"level":"info","message":{"__v":0,"_id":"677e716a6a623d565061dd52","createdAt":"2025-01-08T12:36:58.244Z","module":"6778275f0fa7b264a9ebf645","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:36:58.244Z"},"timestamp":"2025-01-08T12:36:58.248Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:37:01.266Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:37:02.543Z"}
+{"level":"info","message":{"__v":0,"_id":"677e716e6a623d565061dd60","createdAt":"2025-01-08T12:37:02.555Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:37:02.555Z"},"timestamp":"2025-01-08T12:37:02.559Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:37:14.087Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-08T12:39:18.963Z"}
+{"level":"info","message":{"__v":0,"_id":"677e71f66a623d565061dd6e","createdAt":"2025-01-08T12:39:18.970Z","module":"6778275f0fa7b264a9ebf645","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:39:18.970Z"},"timestamp":"2025-01-08T12:39:18.973Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:39:19.787Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:39:20.650Z"}
+{"level":"info","message":{"__v":0,"_id":"677e71f86a623d565061dd7c","createdAt":"2025-01-08T12:39:20.660Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:39:20.660Z"},"timestamp":"2025-01-08T12:39:20.662Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T12:40:00.742Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:40:03.983Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:40:07.853Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:40:13.596Z"}
+{"level":"info","message":{"__v":0,"_id":"677e722d6a623d565061dd91","createdAt":"2025-01-08T12:40:13.603Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:40:13.603Z"},"timestamp":"2025-01-08T12:40:13.605Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:40:15.227Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:40:20.730Z"}
+{"level":"info","message":{"__v":0,"_id":"677e72346a623d565061dd9f","createdAt":"2025-01-08T12:40:20.737Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:40:20.737Z"},"timestamp":"2025-01-08T12:40:20.739Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T12:40:45.608Z"}
+{"level":"info","message":"Подтягивание урока 67475540f8551022e666f0c0","timestamp":"2025-01-08T12:40:45.614Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:40:48.189Z"}
+{"level":"info","message":{"__v":0,"_id":"677e72506a623d565061ddb1","createdAt":"2025-01-08T12:40:48.195Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:40:48.195Z"},"timestamp":"2025-01-08T12:40:48.198Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T12:41:18.275Z"}
+{"level":"info","message":"Подтягивание урока 6747576df8551022e666f1ad","timestamp":"2025-01-08T12:41:18.280Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:41:22.809Z"}
+{"level":"info","message":{"__v":0,"_id":"677e72726a623d565061ddc3","createdAt":"2025-01-08T12:41:22.815Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:41:22.815Z"},"timestamp":"2025-01-08T12:41:22.816Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:41:24.712Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:41:26.759Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:41:28.135Z"}
+{"level":"info","message":{"__v":0,"_id":"677e72786a623d565061ddd6","createdAt":"2025-01-08T12:41:28.142Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:41:28.142Z"},"timestamp":"2025-01-08T12:41:28.143Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:41:29.352Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T12:41:30.548Z"}
+{"level":"info","message":{"__v":0,"_id":"677e727a6a623d565061dde4","createdAt":"2025-01-08T12:41:30.554Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:41:30.554Z"},"timestamp":"2025-01-08T12:41:30.556Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:41:31.512Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-08T12:41:33.029Z"}
+{"level":"info","message":{"__v":0,"_id":"677e727d6a623d565061ddf2","createdAt":"2025-01-08T12:41:33.035Z","module":"6778275f0fa7b264a9ebf645","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T12:41:33.035Z"},"timestamp":"2025-01-08T12:41:33.038Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:41:34.777Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T12:45:11.869Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T13:01:54.288Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T13:01:56.750Z"}
+{"level":"info","message":{"__v":0,"_id":"677e77446a623d565061de0a","createdAt":"2025-01-08T13:01:56.763Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T13:01:56.763Z"},"timestamp":"2025-01-08T13:01:56.767Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T13:01:59.811Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T13:01:59.819Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T13:02:05.566Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T13:02:05.571Z"}
+{"level":"info","message":"Подтягивание урока по ID 2","timestamp":"2025-01-08T13:02:07.135Z"}
+{"level":"info","message":"Подтягивание урока 67445817a2450d5fc9481a62","timestamp":"2025-01-08T13:02:07.142Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T13:02:07.935Z"}
+{"level":"info","message":{"__v":0,"_id":"677e774f6a623d565061de31","createdAt":"2025-01-08T13:02:07.943Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T13:02:07.943Z"},"timestamp":"2025-01-08T13:02:07.945Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T13:02:08.907Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-01-08T13:12:44.630Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T13:13:42.949Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T13:13:45.497Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 673a702f7dbfb73c143a3dbc","timestamp":"2025-01-08T13:13:46.564Z"}
+{"level":"info","message":{"__v":0,"_id":"677e7a0a6a623d565061de4b","createdAt":"2025-01-08T13:13:46.571Z","module":"673a702f7dbfb73c143a3dbc","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T13:13:46.571Z"},"timestamp":"2025-01-08T13:13:46.574Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T13:13:47.825Z"}
+{"level":"info","message":"Пользователь 677de9d2c2b2a67d248ea250 запрашивает уроки по модулю 6778275f0fa7b264a9ebf645","timestamp":"2025-01-08T13:13:49.718Z"}
+{"level":"info","message":{"__v":0,"_id":"677e7a0d6a623d565061de59","createdAt":"2025-01-08T13:13:49.723Z","module":"6778275f0fa7b264a9ebf645","tu":"677de9d2c2b2a67d248ea250","updatedAt":"2025-01-08T13:13:49.723Z"},"timestamp":"2025-01-08T13:13:49.725Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T13:13:51.086Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T14:00:41.392Z"}
+{"level":"info","message":"Модули запрошены","timestamp":"2025-01-08T14:03:56.892Z"}

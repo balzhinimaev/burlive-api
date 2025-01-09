@@ -1,25 +1,32 @@
-// src/models/Module.ts
-
 import { Schema, model, Document, Types } from 'mongoose';
 
 export interface IModule extends Document {
     title: string;
     short_title: string;
     description: string;
-    lessons: Types.ObjectId[]; // Используйте Types.ObjectId
+    lessons: Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
     order?: number;
     viewsCounter: number;
     views: Types.ObjectId[];
+    complexity: number;
+    isPremium: boolean; // Новое поле
 }
 
+const allowedComplexities = [1, 1.5, 2, 2.5, 3];
 const moduleSchema = new Schema<IModule>(
     {
         title: {
             type: String,
             required: [true, 'Заголовок модуля обязателен'],
             trim: true,
+        },
+        complexity: {
+            type: Number,
+            required: true,
+            enum: allowedComplexities,
+            default: 1,
         },
         short_title: {
             type: String,
@@ -41,9 +48,12 @@ const moduleSchema = new Schema<IModule>(
         viewsCounter: { type: Number, default: 0 },
         views: {
             type: [{ type: Schema.Types.ObjectId, ref: 'View' }],
-            default: []
-        }
-
+            default: [],
+        },
+        isPremium: {
+            type: Boolean,
+            default: false, // По умолчанию модуль доступен всем
+        },
     },
     {
         timestamps: true, // Автоматически добавляет поля createdAt и updatedAt

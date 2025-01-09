@@ -23,14 +23,18 @@ import moduleRoutes from './routes/modulesRouter';
 import themeRouter from './routes/themeRouter';
 import bodyParser from 'body-parser';
 import logger from './utils/logger';
+import subscriptionController from './controllers/subscriptionController';
 
 const app = express();
 const server = createServer(app);
 // const io = new Server(server);
 
 // Проверка необходимых переменных окружения
-if (!process.env.YOOKASSA_SHOP_ID_PROD || !process.env.YOOKASSA_SECRET_KEY_PROD) {
+if ((!process.env.YOOKASSA_SHOP_ID || !process.env.YOOKASSA_SECRET_KEY) && process.env.MODE === 'PROD') {
   console.error('YOOKASSA_SHOP_ID и YOOKASSA_SECRET_KEY должны быть установлены в переменных окружения.');
+  process.exit(1);
+} else if ((!process.env.YOOKASSA_SHOP_ID_DEV || !process.env.YOOKASSA_SECRET_KEY_DEV) && process.env.MODE === 'DEV') {
+  console.error('YOOKASSA_SHOP_ID_DEV и YOOKASSA_SECRET_KEY_DEV должны быть установлены в переменных окружения.');
   process.exit(1);
 }
 
@@ -40,6 +44,32 @@ app.use(cors());
 // app.post('/backendapi/telegram/payment-callback', bodyParser.raw({ type: 'application/json' }));
 
 app.use(bodyParser.json());
+app.use("/", async (req, res, next) => {
+  let body = req.body
+  if (body.type) {
+    if (body.type === 'notification') {
+      await subscriptionController.paymentCallback(req, res, next)
+      // if (body.object) {
+      //   let object = body.object
+      //   logger.info(`Уведомление об успешном платеже ${object.id}`)
+      //   const signature = req.headers['x-api-signature-256'] as string;
+      //   if (!signature) {
+      //     logger.error('Отсутствует заголовок X-Api-Signature-256');
+      //     res.status(400).send('Missing signature');
+      //     return;
+      //   }
+      //   const rawBody = req.body as Buffer;
+      //   const isValid = verifyWebhookSignature(rawBody, signature, process.env.YOOKASSA_SECRET_KEY_DEV || '');
+      //   if (!isValid) {
+      //     logger.error('Некорректная подпись вебхука');
+      //     res.status(400).send('Invalid signature');
+      //     return;
+      //   }
+      // }
+    }
+  }
+  next()
+})
 app.use('/backendapi/users', userRouter);
 app.use('/backendapi/dialect', authenticateToken, dialectRouter);
 app.use('/backendapi/sentences', authenticateToken, sentencesRouter);

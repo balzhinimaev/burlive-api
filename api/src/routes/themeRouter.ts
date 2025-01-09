@@ -1,5 +1,5 @@
 import express from "express";
-import { body, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import themeController from "../controllers/themeController";
 import authenticateToken from "../middleware/authenticateToken";
 import authorizeAdmin from "../middleware/authorizeAdmin";
@@ -43,7 +43,7 @@ themeRouter.get(
 themeRouter.get(
     "/:id",
     [
-        query("id")
+        param("id")
             .isMongoId()
             .withMessage("ID должен быть валидным ObjectId"),
     ],

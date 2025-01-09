@@ -62,11 +62,11 @@ router.get('/', authenticateToken, getAllLessons);
 // Получение урока по ID
 router.get('/:id', authenticateToken, getLessonById);
 
-// Просмотр урока по ID пользователем телеграмм
-router.get('/:telegram_id/:id', authenticateToken, getLessonByIdByTelegram);
-
 // Получение урока по moduleID
 router.post('/module/:id', authenticateToken, getLessonByModuleId);
+
+// Просмотр урока по ID пользователем телеграмм
+router.get('/:telegram_id/:id', authenticateToken, getLessonByIdByTelegram);
 
 // Обновление урока с валидацией
 router.put(
