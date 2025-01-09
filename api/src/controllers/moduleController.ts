@@ -8,6 +8,7 @@ import { isValidObjectId } from 'mongoose';
 import logger from '../utils/logger';
 import isValidObjectIdString from '../utils/isValidObjectIdString';
 import updateRating from '../utils/updateRating';
+import TelegramUserModel from '../models/TelegramUsers';
 
 const moduleController = {
     /**
@@ -60,9 +61,16 @@ const moduleController = {
      */
     getModuleById: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const { id } = req.params;
+            const { id, userId } = req.params;
 
-            if (!isValidObjectId(id) && !isValidObjectIdString(id)) {
+            if (!isValidObjectId(id)) {
+                res.status(400).json({
+                    message: 'Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId',
+                });
+                return;
+            }
+
+            if (!isValidObjectId(userId)) {
                 res.status(400).json({
                     message: 'Неверный параметр id, не является ObjectId или невозможно преобразить в ObjectId',
                 });
@@ -70,12 +78,29 @@ const moduleController = {
             }
 
             const module = await Module.findById(id)
-                .populate('lessons', 'title description') // Предполагается, что есть модель Lesson
+                .populate('lessons', 'title description').lean() // Предполагается, что есть модель Lesson
 
             if (!module) {
                 logger.warn(`Модуль с ID ${id} не найден`);
                 res.status(404).json({ message: 'Модуль не найден' });
                 return;
+            }
+
+            // Если модуль является премиум, проверяем подписку пользователя
+            if (module.isPremium) {
+                const user = await TelegramUserModel.findById(userId).lean();
+
+                if (
+                    !user ||
+                    !user.subscription?.isActive ||
+                    !user.subscription.endDate || // Проверяем, что endDate не null
+                    new Date() > new Date(user.subscription.endDate)
+                ) {
+                    res.status(403).json({
+                        message: 'Доступ к этому модулю доступен только для пользователей с активной подпиской.',
+                    });
+                    return;
+                }
             }
 
             res.status(200).json({
