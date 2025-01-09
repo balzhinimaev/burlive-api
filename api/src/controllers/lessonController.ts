@@ -79,7 +79,7 @@ export const getLessonByIdByTelegram = async (req: Request, res: Response, next:
     try {
         const { id, telegram_id } = req.params;
 
-        logger.info(`Подтягивание урока по ID`)
+        logger.info(`Подтягивание урока по ID 2`)
         
         if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(telegram_id)) {
             res.status(400).json({ message: 'Неверный формат ID' });
@@ -126,11 +126,18 @@ export const getLessonByModuleId = async (req: Request, res: Response, next: Nex
             return;
         }
         
-        const module = await Module.findById(id).populate("lessons")
+        const lessons = await Lesson.find({
+            moduleId: id
+        })
+
+        let module: any = await Module.findById(id)
         if (!module) {
             res.status(404).json({ message: "Модуль не найден" })
             return 
-        }        
+        }
+
+        module.lessons = lessons
+
         // Создание нового просмотра (View)
         const newView: IView = new View({
             tu: new ObjectId(telegramUser),
@@ -138,8 +145,10 @@ export const getLessonByModuleId = async (req: Request, res: Response, next: Nex
             // Если у вас есть конкретный урок, который просматривается:
             // lesson: lessonId
         });
-        await newView.save();
+        const saveResult = await newView.save();
+        logger.info(saveResult)
         // Добавление нового View в массив views модуля и обновление счетчика
+        
         module.views.push(newView._id);
         module.viewsCounter += 1;
         // const lesson = await Lesson.findById(id).populate('moduleId');
