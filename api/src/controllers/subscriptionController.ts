@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 import logger from '../utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 import TelegramUserModel from '../models/TelegramUsers';
+import PaymentModel, { Payment } from '../models/Payment';
+import mongoose from 'mongoose';
 
 const subscriptionController = {
     // Создание платежа для подписки
@@ -22,8 +24,12 @@ const subscriptionController = {
                 return;
             }
 
+            if (!user.phone) {
+                res.status(404).json({ message: 'Пользователь не предоставил номер телефона' })
+            }
+
             // Определите сумму и валюту подписки
-            const amount = '10.00'; // Пример: 1000 RUB
+            const amount = '399.00'; // Пример: 1000 RUB
             const currency = 'RUB';
 
             // Генерация уникального идентификатора платежа
@@ -44,8 +50,8 @@ const subscriptionController = {
                 },
                 receipt: {
                     customer: {
-                        email: "test@mail.com",
-                        phone: "+79999999999",
+                        telegram_id: userId,
+                        phone: user.phone
                     },
                     items: [
                         {
@@ -71,8 +77,12 @@ const subscriptionController = {
             };
 
             // Создание строки авторизации в формате Base64
-            const auth = Buffer.from(`${process.env.YOOKASSA_SHOP_ID_PROD}:${process.env.YOOKASSA_SECRET_KEY_PROD}`).toString('base64');
-            // const auth = Buffer.from(`${process.env.YOOKASSA_SHOP_ID_DEV}:${process.env.YOOKASSA_SECRET_KEY}`).toString('base64');
+            let auth
+            if (process.env.MODE !== "DEV") {
+                auth = Buffer.from(`${process.env.YOOKASSA_SHOP_ID}:${process.env.YOOKASSA_SECRET_KEY}`).toString('base64');
+            } else {
+                auth = Buffer.from(`${process.env.YOOKASSA_SHOP_ID_DEV}:${process.env.YOOKASSA_SECRET_KEY_DEV}`).toString('base64');
+            }
 
             // Отправка запроса на создание платежа с использованием fetch
             const response = await fetch('https://api.yookassa.ru/v3/payments', {
@@ -96,12 +106,29 @@ const subscriptionController = {
             if (!payment.confirmation || !payment.confirmation.confirmation_url) {
                 throw new Error('Не удалось получить confirmation_url от YooKassa');
             }
+            console.log(payment)
+
+            // Сохранение платежа в базе данных
+            const newPayment = new PaymentModel({
+                id: payment.id,
+                status: payment.status,
+                amount: payment.amount,
+                description: payment.description,
+                recipient: payment.recipient,
+                confirmation: payment.confirmation,
+                test: payment.test,
+                paid: payment.paid,
+                refundable: payment.refundable,
+                metadata: payment.metadata,
+            });
+            await newPayment.save();
 
             // Ответ с URL для подтверждения платежа
             res.status(200).json({
                 confirmation_url: payment.confirmation.confirmation_url,
                 payment_id: payment.id,
             });
+
         } catch (error) {
             logger.error(`Ошибка в subscribe: ${error}`);
             res.status(500).json({ message: 'Внутренняя ошибка сервера' });
@@ -113,75 +140,106 @@ const subscriptionController = {
     paymentCallback: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             logger.info(`Получен платежное уведомление:`)
-            console.log(req.body)
-            console.log(req)
-            // // Получение сырых данных тела запроса
-            // const rawBody = req.body as Buffer;
-            // console.log(rawBody)
-            // const signature = req.headers['x-api-signature-256'] as string;
 
-            // if (!signature) {
-            //     logger.error('Отсутствует заголовок X-Api-Signature-256');
-            //     res.status(400).send('Missing signature');
-            //     return;
-            // }
+            const event = req.body.event;
+            const object = req.body.object;
+            
+            
+            
+            if (!event || !object) {
+                res.status(400).json({ message: 'Некорректные данные вебхука' });
+                return;
+            }
 
-            // const isValid = verifyWebhookSignature(rawBody, signature, process.env.YOOKASSA_SECRET_KEY || '');
+            if (event === 'payment.succeeded') {
+                const payment = object; // Объект платежа
 
-            // if (!isValid) {
-            //     logger.error('Некорректная подпись вебхука');
-            //     res.status(400).send('Invalid signature');
-            //     return;
-            // }
+                const userId = payment.metadata?.userId;
+                const paymentId = payment.metadata?.paymentId;
 
-            // // Парсинг тела запроса как JSON
-            // const event = JSON.parse(rawBody.toString()).event;
-            // const object = JSON.parse(rawBody.toString()).object;
+                if (!userId || !paymentId) {
+                    logger.error('Отсутствуют необходимые метаданные в платеже');
+                    res.status(400).send('Некорректные метаданные');
+                    return;
+                }
 
-            // if (!event || !object) {
-            //     res.status(400).json({ message: 'Некорректные данные вебхука' });
-            //     return;
-            // }
+                if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(paymentId)) {
+                    res.status(400).json({ message: 'Неверный формат данных из метаданных' });
+                    return
+                }
 
-            // if (event === 'payment.succeeded') {
-            //     const payment = object; // Объект платежа
+                const paymentDocument: Payment | null = await PaymentModel.findById(paymentId)
+                
+                if (!paymentDocument) {
+                    logger.error(`Документ платежа не найден для paymentId: ${paymentId}`)
+                    res.status(404).json({ message: `Документ платежа не найден для paymentId: ${paymentId}` })
+                    return
+                }
+                
+                paymentDocument.status = "succeeded"
+                await paymentDocument.save()
 
-            //     const userId = payment.metadata?.userId;
-            //     const paymentId = payment.metadata?.paymentId;
+                // Поиск пользователя
+                const user = await TelegramUserModel.findById(userId);
 
-            //     if (!userId || !paymentId) {
-            //         logger.error('Отсутствуют необходимые метаданные в платеже');
-            //         res.status(400).send('Некорректные метаданные');
-            //         return;
-            //     }
+                if (!user) {
+                    logger.error(`Пользователь не найден для paymentId: ${paymentId}`);
+                    res.status(404).send('Пользователь не найден');
+                    return;
+                }
 
-            //     // Поиск пользователя
-            //     const user = await TelegramUserModel.findOne({ id: Number(userId) });
+                // Обновление статуса подписки
+                const now = new Date();
+                const oneMonthLater = new Date(now);
+                oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
 
-            //     if (!user) {
-            //         logger.error(`Пользователь не найден для paymentId: ${paymentId}`);
-            //         res.status(404).send('Пользователь не найден');
-            //         return;
-            //     }
+                user.subscription = {
+                    type: 'monthly',
+                    startDate: now,
+                    endDate: oneMonthLater,
+                    isActive: true,
+                    paymentId
+                };
 
-            //     // Обновление статуса подписки
-            //     const now = new Date();
-            //     const oneMonthLater = new Date(now);
-            //     oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+                await user.save();
 
-            //     user.subscription = {
-            //         type: 'monthly',
-            //         startDate: now,
-            //         endDate: oneMonthLater,
-            //         isActive: true,
-            //     };
+                logger.info(`Подписка обновлена для пользователя ${userId}`);
+                res.status(200).send('OK');
+                next() 
+            }
 
-            //     await user.save();
+            if (event === 'payment.canceled') {
+                const payment = object; // Объект платежа
 
-            //     logger.info(`Подписка обновлена для пользователя ${userId}`);
-            // }
+                const userId = payment.metadata?.userId;
+                const paymentId = payment.metadata?.paymentId;
 
-            // res.status(200).send('OK');
+                if (!userId || !paymentId) {
+                    logger.error('Отсутствуют необходимые метаданные в платеже');
+                    res.status(400).send('Некорректные метаданные');
+                    return;
+                }
+
+                if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(paymentId)) {
+                    res.status(400).json({ message: 'Неверный формат данных из метаданных' });
+                    return
+                }
+
+                const paymentDocument: Payment | null = await PaymentModel.findById(paymentId)
+                
+                if (!paymentDocument) {
+                    logger.error(`Документ платежа не найден для paymentId: ${paymentId}`)
+                    res.status(404).json({ message: `Документ платежа не найден для paymentId: ${paymentId}` })
+                    return
+                }
+                
+                await PaymentModel.findOneAndDelete(paymentId)
+
+                logger.info(`Платеж отменен для пользователя ${userId}`);
+                res.status(200).send('OK');
+                next() 
+            }
+
         } catch (error) {
             logger.error(`Ошибка в paymentCallback: ${error}`);
             res.status(500).json({ message: 'Внутренняя ошибка сервера' });
