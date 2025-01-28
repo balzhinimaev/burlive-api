@@ -154,7 +154,7 @@ onBeforeUnmount(() => {
 .loading-placeholder {
     position: relative;
     overflow: hidden;
-    background-color: #2c2c2c;
+    background-color: var(--background-component-color);
     /* Цвет фона плейсхолдера */
     border-radius: 4px;
     margin-bottom: 16px;
@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
     display: flex;
     align-items: center;
     padding: 16px;
-    border: 1px solid #333;
+    // border: 1px solid #333;
     border-radius: 8px;
     margin-bottom: 16px;
 }
@@ -216,7 +216,7 @@ onBeforeUnmount(() => {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #3a3a3a;
+    // background-color: #3a3a3a;
     margin-right: 16px;
     position: relative;
 }
@@ -268,7 +268,7 @@ onBeforeUnmount(() => {
 .lesson-icon-placeholder,
 .lesson-title-placeholder,
 .lesson-description-placeholder {
-    background-color: #2c2c2c;
+    // background-color: #2c2c2c;
     /* Общий цвет фона */
 }
 </style>

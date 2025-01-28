@@ -1,10 +1,14 @@
 // _custom_variables.scss
 $white: #fff;
-$light: #ddd;
+$light: #fff;
+// $light: #ddd;
 $dark: #1f1f1f;
 
 $dark-description-color: #373737;
-$light-description-color: #aaa;
+$dark-text-color: #d1d1d1;
+
+$light-description-color: #868686;
+$light-text-color: #333;
 
 $darkness-dark: #1c1c1c;
 $darkness-shadow: #1e1e1e;
@@ -19,7 +23,7 @@ $border-radius: 10px;
 
 // Собственные переменные для проекта
 $custom-light-background: $light;
-$custom-light-secondary-background: $white;
+$custom-light-secondary-background: #f6f6f6;
 
 $custom-dark-background: #1c1c1c;
 $custom-dark-secondary-background: #0000002b;

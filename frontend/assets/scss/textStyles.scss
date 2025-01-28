@@ -35,6 +35,32 @@
     margin-top: 4px;
     color: var(--description-color);
     margin-bottom: 0;
+    p {
+        margin-bottom: 1rem;
+    }
+}
+.description {
+    // font-family: var(--font-family-primary);
+    // font-weight: 400;
+    // font-size: var(--font-size-body);
+    // line-height: 18px;
+    // letter-spacing: var(--letter-spacing);
+    // margin-bottom: 24px;
+    // color: #BFBFBF;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 4px;
+    color: var(--description-color);
+    margin-bottom: 0;
+}
+
+p {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-color);
+    margin-bottom: 0;
 }
 
 /* Маленький текст */
@@ -45,3 +71,7 @@
     line-height: var(--line-height-body);
     letter-spacing: var(--letter-spacing);
 }
+
+// .my-class {
+//     color: red;
+// }   

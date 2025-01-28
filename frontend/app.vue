@@ -196,7 +196,6 @@ onMounted(async () => {
   flex: 1;
   height: 100%;
   // margin: 16px 16px 0 16px;
-  border-radius: $border-radius;
   overflow: hidden;
   box-shadow: 0 0 2px 3px var(--shadow-color);
 }

@@ -41,8 +41,8 @@
                     </template>
                     <!-- Основной контент после загрузки -->
                     <template v-else>
-                        {{ lessonId }}
-                        <button class="btn btn-primary mb-3" @click="goToEditTests(lessonId)">+ Добавить тесты</button>
+                        <!-- {{ user }} -->
+                        <!-- <button v-if="user?.role === 'admin'" class="btn btn-primary mb-3" @click="goToEditTests(lessonId)">+ Добавить тесты</button> -->
                         <div class="content typography-body" v-html="parsedContent"></div>
                     </template>
                 </div>
@@ -60,6 +60,9 @@ import { marked } from 'marked'; // Ensure you're importing from 'marked'
 import DOMPurify from 'dompurify';
 
 const lessonsStore = useLessonsStore();
+const userStore = useUserStore();
+
+const user = computed(() => userStore.getUser)
 const isFetching = computed(() => useLessonsStore().isFetching)
 const route = useRoute();
 const lessonId = ref<string>(useRoute().params._id as string);
@@ -179,7 +182,10 @@ header {
 }
 
 .content {
-    color: var(--text-color)
+    color: var(--text-color);
+    p, ul {
+        margin-bottom: 1rem;
+    }
 }
 
 </style>

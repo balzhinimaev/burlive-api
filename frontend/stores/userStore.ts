@@ -14,6 +14,14 @@ export interface User {
   createdAt?: string;
   photo_url?: string;
   level: any;
+  role: string;
+  subscription: {
+    type: "monthly" | "quarterly" | "annual" | null;
+    startDate: Date | null;
+    endDate: Date | null;
+    isActive: boolean;
+    paymentId: string;
+  };
 }
 
 interface UserExistsResponse {

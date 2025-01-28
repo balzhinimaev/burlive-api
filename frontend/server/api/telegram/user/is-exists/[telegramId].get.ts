@@ -14,6 +14,14 @@ interface User {
     rating?: number;
     createdAt?: string;
     photo_url?: string;
+    role: string;
+    subscription: {
+        type: "monthly" | "quarterly" | "annual" | null;
+        startDate: Date | null;
+        endDate: Date | null;
+        isActive: boolean;
+        paymentId: string;
+    };
 }
 
 // Определение интерфейса UserExistsResponse
@@ -55,6 +63,7 @@ export default defineEventHandler(async (event): Promise<UserExistsResponse> => 
 
         return response;
     } catch (error: any) {
+        console.log(config)
         console.error('Ошибка при проверке существования пользователя:', error);
 
         throw createError({

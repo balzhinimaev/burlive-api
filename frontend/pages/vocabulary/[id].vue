@@ -60,8 +60,15 @@ const theme = ref<Theme | null>(null);
 const words = ref<Word[]>([]);
 const isLoading = ref(true);
 const error = ref<string | null>(null);
-
+const router = useRouter()
 onMounted(async () => {
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.BackButton.show();
+        window.Telegram.WebApp.BackButton.onClick(() => {
+            router.push({ path: `/vocabulary` });
+        });
+    }
+    
     const themeId = route.params.id as string;
     try {
         theme.value = await vocabularyStore.fetchThemeById(themeId);

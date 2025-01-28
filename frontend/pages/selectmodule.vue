@@ -6,8 +6,8 @@
                     <h2 class="heading">
                         <!-- Плейсхолдер для заголовка при загрузке -->
                         <template v-if="isFetching">
-                            <div class="loading-placeholder title-placeholder" style="margin: 0;">
-                                <div class="line" style="width: 90%; height: 0;"></div>
+                            <div class="loading-placeholder title-placeholder" style="margin: 0; height: 32px;">
+                                <div class="line" style="width: 90%; height: 32px; background-color: var(--background-component-color);"></div>
                             </div>
                         </template>
                         <!-- Реальный заголовок после загрузки -->
@@ -46,11 +46,12 @@
                 </div>
             </section>
 
-            <!-- Плейсхолдеры при загрузке -->
-            <template v-else-if="isFetching">
+            <!-- Плейсхолдеры при загрузке
+            <template v-if="!isFetching && modules.length > 0">
                 <div class="container">
+                    <p>Подтягивание данных</p>
                     <ul class="modules-list">
-                        <li v-for="n in 3" :key="n" class="loading-placeholder module-card-placeholder">
+                        <li v-for="n in 3" :key="n" class="">
                             <a href="javascript:void(0)" class="list-wrapper">
                                 <div class="number-placeholder">
                                     <div class="circle-placeholder"></div>
@@ -63,12 +64,14 @@
                         </li>
                     </ul>
                 </div>
-            </template>
+            </template> -->
 
             <!-- Отображение ошибки -->
             <section v-else-if="errorOnFetchingModules">
                 <div class="container">
-                    <p class="typography-body">{{ errorOnFetchingModules }}</p>
+                    <div class="content-wrapper">
+                        <p>{{ errorOnFetchingModules }}</p>
+                    </div>
                 </div>
             </section>
 
@@ -76,12 +79,12 @@
             <template v-else>
                 <div class="container">
                     <ul class="modules-list">
-                        <li v-for="n in 3" :key="n" class="loading-placeholder module-card-placeholder">
+                        <li v-for="n in 1" :key="n" class="loading-placeholder module-card-placeholder">
                             <a href="javascript:void(0)" class="list-wrapper">
                                 <div class="number-placeholder">
                                     <div class="circle-placeholder"></div>
                                 </div>
-                                <div class="content-placeholder">
+                                <div class="content-placeholder-100">
                                     <div class="module-title-placeholder"></div>
                                     <div class="module-description-placeholder"></div>
                                 </div>
@@ -139,9 +142,18 @@ onBeforeUnmount(() => {
 
 
 <style scoped lang="scss">
+.content-wrapper {
+    padding: 10px;
+    background-color: var(--background-component-color);
+    border-radius: var(--border-radius);
+    .typography-body {
+        margin-top: 0;
+    }
+}
 .modules-list {
     list-style-type: none;
-    padding: 0 0 0 15px;
+    // padding: 0 0 0 15px;
+    padding: 0;
     margin: 0;
 
     li {
@@ -159,7 +171,7 @@ onBeforeUnmount(() => {
         .list-wrapper {
             text-decoration: none;
             display: flex;
-            align-items: center;
+            // align-items: center;
 
             .module-title {
                 font-weight: 600;

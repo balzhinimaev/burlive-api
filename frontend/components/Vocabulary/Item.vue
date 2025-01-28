@@ -1,5 +1,6 @@
 <template>
-    <div class="theme-item-component" @click="goToTheme(theme._id)">
+    <div class="theme-item-component" @click="goToItem(theme._id)">
+        {{ theme._id }}
         <div class="header">
             <div class="title">
                 <p>{{ theme.name }}</p>
@@ -25,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
 import StarRating from '@/components/StarRating.vue';
 
 defineProps<{
@@ -34,8 +34,9 @@ defineProps<{
 
 const router = useRouter();
 
-function goToTheme(id: string) {
-    router.push('/vocabulary/' + id);
+function goToItem(id: string) {
+    console.log(router)
+    useRouter().push('/vocabulary/' + id);
 }
 </script>
 

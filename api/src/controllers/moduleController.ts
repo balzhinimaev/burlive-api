@@ -29,7 +29,7 @@ const moduleController = {
                     .skip(skipIndex)
                     .limit(limitNumber)
                     .sort({ order: 1 })
-                    .populate('lessons', 'title') // Предполагается, что есть модель Lesson
+                    .populate('title') // Предполагается, что есть модель Lesson
             ]);
 
             if (modules.length === 0) {

@@ -109,4 +109,9 @@ onBeforeUnmount(() => {
 .page.vocabulary-page {
     /* Ваши стили для страницы словаря */
 }
+
+.themes-list {
+    padding: 0;
+    margin: 0;
+}
 </style>

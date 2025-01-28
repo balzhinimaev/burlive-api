@@ -143,7 +143,7 @@ const telegramController = {
     try {
       const { id } = req.params;
       const user = await TelegramUserModel.findOne({ id: Number(id) }).select(
-        "_id id c_username email createdAt first_name rating theme photo_url"
+        "_id id c_username email createdAt first_name rating theme photo_url role subscription"
       ).populate("level");
 
       if (!user) {
@@ -165,7 +165,9 @@ const telegramController = {
           rating: user.rating,
           theme: user.theme,
           photo_url: user.photo_url,
-          level: user.level
+          level: user.level,
+          role: user.role,
+          subscription: user.subscription
         },
       });
       logger.info(`Получение данных ID ${id}`)
