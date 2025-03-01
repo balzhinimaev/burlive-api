@@ -21,4 +21,4 @@ RUN npx tsc
 EXPOSE 5000
 
 # Запускаем приложение
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
