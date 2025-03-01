@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
     const { lessonId, questionId } = event.context.params as { lessonId: string; questionId: string };
 
     console.log(`Айди урока ${lessonId}`)
+    console.log(`questionId: ${questionId}`)
 
     if (!lessonId || !questionId) {
         throw createError({

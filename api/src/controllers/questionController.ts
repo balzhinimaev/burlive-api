@@ -5,32 +5,59 @@ import Question from '../models/Lesson/Question';
 import Lesson from '../models/Lesson';
 import mongoose from 'mongoose';
 
-// Создание нового вопроса и привязка его к уроку (если указан lessonId)
-export const createQuestion = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { question, options, correct, type, lessonId, explanation } = req.body;
+export const createQuestion = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    // Собираем все поля
+    const {
+      type,
+      question,
+      explanation,
+      options,
+      correct,
+      correctAnswers,
+      blanks,
+      imageOptions,
+      correctImageIndex,
+      audioUrl,
+      lessonId,
+    } = req.body;
 
-        // Создаем новый вопрос
-        const newQuestion = new Question({ question, options, correct, type, explanation });
-        await newQuestion.save();
+    // Создаем новый вопрос
+    const newQuestion = new Question({
+      type,
+      question,
+      explanation,
+      options,
+      correct,
+      correctAnswers,
+      blanks,
+      imageOptions,
+      correctImageIndex,
+      audioUrl,
+    });
 
-        // Если указан lessonId, добавляем вопрос к уроку
-        if (lessonId && mongoose.Types.ObjectId.isValid(lessonId)) {
-            const lesson = await Lesson.findById(lessonId);
-            if (lesson) {
-                lesson.questions.push(newQuestion._id);
-                await lesson.save();
-            } else {
-                res.status(404).json({ message: 'Урок не найден' });
-                return 
-            }
-        }
+    await newQuestion.save();
 
-        res.status(201).json(newQuestion);
-    } catch (error) {
-        console.error('Ошибка при создании вопроса:', error);
-        next(error);
+    // Если указан lessonId — привязываем к уроку
+    if (lessonId && mongoose.Types.ObjectId.isValid(lessonId)) {
+      const lesson = await Lesson.findById(lessonId);
+      if (lesson) {
+        lesson.questions.push(newQuestion._id);
+        await lesson.save();
+      } else {
+        res.status(404).json({ message: 'Урок не найден' });
+      }
     }
+
+    res.status(201).json(newQuestion);
+  } catch (error) {
+    console.error('Ошибка при создании вопроса:', error);
+    next(error);
+  }
 };
 
 // Получение вопроса по ID

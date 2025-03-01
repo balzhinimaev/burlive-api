@@ -10,26 +10,37 @@ export interface ILesson extends Document {
     questions: Types.ObjectId[];
     viewsCounter: number;
     views: Types.ObjectId[];
+    complexity: number;
 }
-
+const allowedComplexities = [1, 1.5, 2, 2.5, 3];
 const LessonSchema: Schema = new Schema(
     {
         title: { type: String, required: true },
         description: { type: String, required: false },
         content: { type: String, required: true },
-        moduleId: { type: mongoose.Types.ObjectId, ref: 'Module', required: true },
+        moduleId: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Module',
+            required: true,
+        },
         order: { type: Number, required: true },
+        complexity: {
+            type: Number,
+            required: true,
+            enum: allowedComplexities,
+            default: 1,
+        },
         questions: {
             type: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
-            default: []
+            default: [],
         },
         viewsCounter: { type: Number, default: 0 },
         views: {
             type: [{ type: Schema.Types.ObjectId, ref: 'View' }],
-            default: []
-        }
+            default: [],
+        },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
 export default mongoose.model<ILesson>('Lesson', LessonSchema);

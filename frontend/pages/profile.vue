@@ -44,10 +44,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeMount } from 'vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
-import { gsap } from 'gsap';
 const isAnimating = ref(false);
 // Хранилища
 const themeStore = useThemeStore();

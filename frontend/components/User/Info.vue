@@ -4,7 +4,7 @@
             <div v-if="isFetching">Подтягивание данных</div>
             <div v-else-if="user">
                 <div class="user-wrapper-inner" v-if="user">
-                    <img v-if="user.photo_url" class="user-avatar" :src="user?.photo_url" alt="">
+                    <img v-if="user.photo_url" class="user-avatar has" :src="user?.photo_url" alt="">
                     <img v-else class="user-avatar" alt="">
                     <div class="user-data">
                         <h6 style="margin: 0;">{{ user.first_name ? user.first_name : user.username }}</h6>
@@ -119,11 +119,14 @@ const progressPercentage = computed(() => {
     border-radius: 10px;
 
     .user-avatar {
-        height: 64px;
-        width: 64px;
+        height: 48px;
+        width: 48px;
         background-color: #d7d7d7;
         border-radius: 50%;
-        margin: auto 15px;
+        margin: 5px 15px;
+        &.has {
+            background-color: transparent;
+        }
     }
 
     .user-data {

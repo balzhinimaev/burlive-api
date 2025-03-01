@@ -37,6 +37,7 @@ interface TelegramWebApp {
     platform: string;
     MainButton: any;
     isFullscreen: boolean;
+    enableClosingConfirmation: any;
     disableVerticalSwipes: any;
     colorScheme: "light" | "dark";
     onEvent: any;

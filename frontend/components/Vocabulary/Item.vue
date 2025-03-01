@@ -1,6 +1,5 @@
 <template>
     <div class="theme-item-component" @click="goToItem(theme._id)">
-        {{ theme._id }}
         <div class="header">
             <div class="title">
                 <p>{{ theme.name }}</p>

@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
             },
             body,
         });
-
+        console.log(response)
         return response;
     } catch (error: any) {
         console.error('Ошибка при добавлении вопроса:', error);

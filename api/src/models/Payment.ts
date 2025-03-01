@@ -30,6 +30,7 @@ export interface Payment extends Document {
         title: string;
         account_number: string;
     };
+    subscriptionType: 'monthly' | 'quarterly' | 'annual';
     captured_at?: Date;
     refunded_amount?: {
         value: string;
@@ -68,6 +69,10 @@ const PaymentSchema: Schema<Payment> = new Schema(
             },
             confirmation_url: { type: String },
         },
+        subscriptionType: {
+            type: String,
+            enum: ['monthly', 'quarterly', 'annual'],
+        },
         payment_method: {
             type: {
                 type: String,
@@ -88,13 +93,17 @@ const PaymentSchema: Schema<Payment> = new Schema(
         paid: { type: Boolean, required: true },
         refundable: { type: Boolean, required: true },
         metadata: {
-            userId: { type: Schema.Types.ObjectId, ref: 'telegram_user', required: true },
+            userId: {
+                type: Schema.Types.ObjectId,
+                ref: 'telegram_user',
+                required: true,
+            },
             paymentId: { type: String, required: true },
         },
     },
     {
         timestamps: true, // Поля createdAt и updatedAt не нужны, так как есть created_at
-    }
+    },
 );
 
 const PaymentModel = model<Payment>('Payment', PaymentSchema);

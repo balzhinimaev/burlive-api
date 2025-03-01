@@ -4,7 +4,7 @@ $light: #fff;
 // $light: #ddd;
 $dark: #1f1f1f;
 
-$dark-description-color: #373737;
+$dark-description-color: #727272;
 $dark-text-color: #d1d1d1;
 
 $light-description-color: #868686;
@@ -25,7 +25,7 @@ $border-radius: 10px;
 $custom-light-background: $light;
 $custom-light-secondary-background: #f6f6f6;
 
-$custom-dark-background: #1c1c1c;
+$custom-dark-background: #101010;
 $custom-dark-secondary-background: #0000002b;
 
 $custom-text-color-light: $dark;
@@ -57,3 +57,10 @@ $inner-shadow-color-light: #d7d7d7;
 $custom-shadow-color-dark: $darkness-shadow;
 $inner-shadow-color-dark: #1a1a1a;
 
+$option-container-correct-color-light: #d4edda;
+$option-container-incorrect-color-light: #f8d7da;
+$option-container-explanation-color-light: #f1f1f1;
+
+$option-container-correct-color-dark: #589174;
+$option-container-incorrect-color-dark: #c54b53;
+$option-container-explanation-color-dark: #1d1d1d;

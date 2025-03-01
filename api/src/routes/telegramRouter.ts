@@ -6,18 +6,27 @@ import checkSubscription from '../middleware/checkSubscription';
 
 const telegramRouter = express.Router();
 
-// Существующие маршруты
-telegramRouter.post("/", telegramController.create);
-telegramRouter.post("/payment-callback", subscriptionController.paymentCallback);
 telegramRouter.get("/user/is-exists/:id", telegramController.user_is_exists);
-telegramRouter.post("/create-user", telegramController.register_telegram_user);
-telegramRouter.post("/user/save-state", telegramController.save_user_state);
 telegramRouter.get("/user/get-state/:id", telegramController.get_user_state);
+telegramRouter.get("/user/theme/:id", telegramController.getUserTheme);
+telegramRouter.get("/user", telegramController.getAllUsers);
+
+telegramRouter.post("/payment-callback", subscriptionController.paymentCallback);
+telegramRouter.post("/create-user", telegramController.register_telegram_user);
 telegramRouter.post("/select-language-for-vocabular", telegramController.select_language_for_vocabular);
 telegramRouter.post("/new-word-translate-request", telegramController.new_word_translate_request);
-telegramRouter.get("/user/theme/:id", telegramController.getUserTheme);
+
+telegramRouter.post("/user/save-state", telegramController.save_user_state);
+telegramRouter.post("/user/save-user-action", telegramController.save_user_action);
 telegramRouter.post("/user/theme", telegramController.updateUserTheme);
-telegramRouter.get("/user", telegramController.getAllUsers);
+telegramRouter.post("/user/photo", telegramController.updateUserPhotoUrl);
+telegramRouter.post("/user/update-question-postition", telegramController.updateQuestionPosition);
+
+telegramRouter.post("/block", telegramController.blockUser);
+telegramRouter.post("/", telegramController.create);
+
+telegramRouter.put("/user/save-phone", telegramController.save_user_phone);
+
 
 // Маршруты для подписки
 telegramRouter.post('/subscribe', subscriptionController.subscribe);

@@ -64,7 +64,7 @@ export const useUserStore = defineStore({
      * @param telegramId ID пользователя в Telegram
      * @returns {Promise<boolean>}
      */
-    async checkUserExists(telegramId: number): Promise<boolean> {
+    async checkUserExists(telegramId: number, photo_url?: string): Promise<boolean> {
       this.on_fetching_user_result = true;
       this.error = null;
 
@@ -76,10 +76,23 @@ export const useUserStore = defineStore({
           }
         );
 
-        if (response.is_exists && response.user) {
+        if (response.is_exists && response.user) {  
           this.user = response.user; // Сохраняем данные пользователя в хранилище
           this.fetch_user_result = response.message;
           this.on_fetching_user_result = false;
+
+          if ((response.user.photo_url && response.user.photo_url !== photo_url) || response.user.photo_url === "") {
+            await $fetch(`/api/telegram/user/update-photo/${telegramId}`, {
+              method: "POST",
+              body: {
+                id: response.user.id,
+                photo_url,
+              },
+            });
+          }
+
+          this.user.photo_url = photo_url
+
           return true;
         } else {
           this.on_fetching_user_result = false;

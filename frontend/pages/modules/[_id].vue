@@ -1,40 +1,7 @@
 <template>
     <div class="page module-page">
-        <header>
-            <div class="container">
-                <div class="header-inner">
-                    <h2 class="heading">
-                        <template v-if="isFetching">
-                            <div class="loading-placeholder title-placeholder">
-                                <div class="line" style="width: 90%; height: 20px;"></div>
-                            </div>
-                        </template>
-                        <template v-else>
-                            {{ title }}
-                        </template>
-                    </h2>
-                    <p class="breadcrumb">
-                        <nuxt-link to="/">Главная</nuxt-link>
-                        <span class="split">/</span>
-                        <nuxt-link to="/selectmodule">Модули</nuxt-link>
-                        <span class="split">/</span>
-                        <nuxt-link :to="'/modules/' + _id">{{ short_title ? short_title : title }}</nuxt-link>
-                    </p>
-                    <p class="typography-body">
-                        <template v-if="isFetching">
-                            <div class="loading-placeholder description-placeholder">
-                                <div class="line" style="width: 100%; height: 16px;"></div>
-                                <div class="line" style="width: 80%; height: 16px;"></div>
-                                <div class="line" style="width: 90%; height: 16px;"></div>
-                            </div>
-                        </template>
-                        <template v-else>
-                            {{ description }}
-                        </template>
-                    </p>
-                </div>
-            </div>
-        </header>
+        <UserInfo />
+
         <main>
             <div class="container">
                 <!-- Плейсхолдеры при загрузке -->
@@ -52,18 +19,8 @@
                 <!-- Основной контент после загрузки -->
                 <template v-else-if="lessonsByModuleId && lessonsByModuleId.length > 0">
                     <section id="lessons-list">
-                        <LessonItem v-for="(lesson, index) in lessonsByModuleId" :key="lesson._id" :lesson=lesson />
-                        <!-- <a href="javascript:void(0)" @click.prevent="goToLesson(lesson._id)" class="lesson-card"
-                            v-for="(lesson, index) in lessonsByModuleId" :key="lesson._id">
-                            <div class="lesson-icon">
-                                {{ index + 1 }}
-                                <div class="circle"></div>
-                            </div>
-                            <div class="lesson-info">
-                                <h3 class="lesson-title">{{ lesson.title }}</h3>
-                                <p class="lesson-description">{{ lesson.description || '' }}</p>
-                            </div>
-                        </a> -->
+                        <LessonItem v-for="(lesson, index) in lessonsByModuleId" :key="lesson._id" :lesson="lesson"
+                            :ref="(el) => { if (el) lessonRefs[index] = el }" class="lesson-card-hidden" />
                     </section>
                 </template>
                 <!-- Отображение ошибки -->
@@ -91,9 +48,6 @@
 
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, computed, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-
 const lessonsStore = useLessonsStore();
 const route = useRoute();
 const router = useRouter();
@@ -108,6 +62,10 @@ const errorOnFetchingLessons = computed(() => lessonsStore.errorOnFetchingLesson
 const title = computed(() => lessonsStore.title);
 const description = computed(() => lessonsStore.description);
 const short_title = computed(() => lessonsStore.short_title);
+
+// Наблюдатель для прокрутки
+const observer = ref<IntersectionObserver | null>(null);
+const lessonRefs = ref<any>([]);
 
 // Функция для загрузки уроков по ID модуля
 function fetchLessons(telegramId?: number) {
@@ -124,64 +82,62 @@ onMounted(async () => {
             router.push({ path: '/selectmodule' });
         });
         if (window.Telegram.WebApp.initDataUnsafe) {
-            fetchLessons(window.Telegram.WebApp.initDataUnsafe.user.id);
+            if (lessonsStore.lessons.length > 0 && lessonsStore.title && lessonsStore.short_title) {
+
+            } else {
+                fetchLessons(window.Telegram.WebApp.initDataUnsafe.user.id);
+            }
         }
     }
+    observer.value = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                // Проверяем, виден ли элемент
+                if (entry.isIntersecting) {
+                    // Элемент виден: добавляем класс для анимации появления
+                    entry.target.classList.add('lesson-card-visible');
+                    entry.target.classList.remove('lesson-card-hidden');
+                } else {
+                    // Элемент не виден: удаляем класс анимации и добавляем скрытие
+                    entry.target.classList.remove('lesson-card-visible');
+                    entry.target.classList.add('lesson-card-hidden');
+                }
+            });
+        },
+        { threshold: 0.4 } // Порог видимости
+    );
 });
-onBeforeMount(async () => {
-    // fetchLessons()
-})
 
-// Наблюдаем за изменениями _id и вызываем fetchLessons при изменении
-watch(_id, () => {
-    fetchLessons();
-});
-
+watch(
+    lessonsByModuleId,
+    (newLessons) => {
+        if (newLessons && newLessons.length > 0) {
+            nextTick(() => {
+                lessonRefs.value.forEach((lessonItem: any) => {
+                    if (lessonItem && lessonItem.$el) {
+                        observer.value?.observe(lessonItem.$el);
+                    }
+                });
+            });
+        }
+    },
+    { immediate: true }
+);
 // Скрываем кнопку назад при размонтировании компонента
 onBeforeUnmount(() => {
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.BackButton.hide();
         window.Telegram.WebApp.BackButton.offClick();
     }
+    observer.value?.disconnect();
 });
 </script>
 
 
 <style scoped lang="scss">
 #lessons-list {
-    margin: -8px 0;
+    margin: 2rem 0 calc(-1rem - 20px);
 }
-.loading-placeholder {
-    position: relative;
-    overflow: hidden;
-    background-color: var(--background-component-color);
-    /* Цвет фона плейсхолдера */
-    border-radius: 4px;
-    margin-bottom: 16px;
-}
-
-/* Эффект мерцания (shimmer) */
-.loading-placeholder::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(100%);
-    }
-}
-
 /* Плейсхолдер для заголовка */
 .title-placeholder {
     width: 90%;
@@ -260,15 +216,37 @@ onBeforeUnmount(() => {
     }
 }
 
-/* Дополнительные стили для анимации плавности */
-.loading-placeholder,
-.title-placeholder,
-.description-placeholder,
-.lesson-card-placeholder,
-.lesson-icon-placeholder,
-.lesson-title-placeholder,
-.lesson-description-placeholder {
-    // background-color: #2c2c2c;
-    /* Общий цвет фона */
+.lesson-card-with-animation {
+    opacity: 0;
+    transform: translateY(10px);
+    /* Исходное положение */
+    animation: fadeInUp 0.6s ease-out forwards;
+    animation-delay: 0.1s;
+    /* Добавьте задержку для последовательного появления */
+
+    /* Появление при загрузке */
+    &.lesson-card-with-animation:nth-child(n) {
+        animation-delay: calc(0.1s * var(--index));
+    }
+}
+
+/* Ключевая анимация для плавного появления */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        /* Завершающее положение */
+    }
+}
+.lesson-card-hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.9s ease-out, transform 0.9s ease-out;
+}
+
+.lesson-card-visible {
+    opacity: 1;
+    transform: translateY(-20px);
+    transition: opacity 0.9s ease-out, transform 0.9s ease-out;
 }
 </style>

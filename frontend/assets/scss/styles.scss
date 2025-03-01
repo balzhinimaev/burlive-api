@@ -40,7 +40,8 @@ header {
     overflow: hidden;
     // padding: 32px 8px 0;
     color: var(--text-color);
-    padding: 16px 0;
+    // padding: 16px 0;
+    margin: .5rem 0 1rem;
     .header-inner {
       padding: 0 !important;
     }
@@ -143,4 +144,53 @@ header {
     background-color: #222;
     // background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     // animation: shimmer 1.5s infinite;
+}
+
+.form-control, .form-select, option {
+  background-color: var(--background-component-color);
+  &:active, &:focus {
+    background-color: var(--background-component-color);
+    color: var(--description-color);
+  }
+  color: var(--description-color);
+}
+/* Стили для элементов формы */
+.form-control,
+.form-select {
+  background-color: var(--background-component-color);
+  color: var(--description-color);
+}
+
+/* Стили для options */
+.form-select option {
+  background-color: var(--background-component-color);
+  color: var(--description-color);
+}
+
+/* Стили при фокусе и активации для .form-control и .form-select */
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--background-component-color);
+  color: var(--description-color);
+}
+
+/* Стили для option при фокусе (некоторые браузеры могут не поддерживать фокус на option) */
+.form-select option:focus {
+  background-color: var(--background-component-color);
+  color: var(--description-color);
+}
+
+/* Стили для active-состояния */
+.form-select option:active {
+  background-color: var(--background-component-color);
+  color: var(--description-color);
+}
+
+.content.typography-body {
+  padding: 15px;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  h4 {
+    // color: #3ef;
+  }
 }

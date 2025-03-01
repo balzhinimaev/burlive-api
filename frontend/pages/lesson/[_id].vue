@@ -1,5 +1,12 @@
 <template>
     <div class="lesson-page">
+        <UserInfo />
+        <div class="breadcrumb">
+            <div class="container">
+                <p>Главная / модули / урок</p>
+            </div>
+        </div>
+
         <header>
             <div class="container">
                 <div class="header-inner">
@@ -13,7 +20,7 @@
                             {{ lesson?.title }}
                         </template>
                     </h2>
-                    <p class="breadcrumb">
+                    <!-- <p class="breadcrumb">
                         <nuxt-link to="/">Главная</nuxt-link>
                         <span class="split">/</span>
                         <nuxt-link to="/selectmodule">Модули</nuxt-link>
@@ -21,55 +28,55 @@
                         <nuxt-link :to="'/modules/' + lesson?.moduleId._id">
                             {{ lesson?.moduleId.short_title ? lesson?.moduleId.short_title : '{module}' }}
                         </nuxt-link>
-                    </p>
+                    </p> -->
                 </div>
             </div>
         </header>
-        <main>
+        <!-- конец заголовка -->
+
+        <main ref="contentRef">
             <section>
                 {{ errorGo }}
                 <div class="container">
-                    <!-- Плейсхолдер при загрузке -->
                     <template v-if="isFetching">
                         <div class="loading-placeholder content-placeholder">
                             <div class="line" style="width: 90%; height: 20px;"></div>
                             <div class="line" style="width: 80%; height: 16px;"></div>
                             <div class="line" style="width: 95%; height: 16px;"></div>
                             <div class="line" style="width: 85%; height: 16px;"></div>
-                            <!-- Добавьте больше линий при необходимости -->
                         </div>
                     </template>
-                    <!-- Основной контент после загрузки -->
                     <template v-else>
-                        <!-- {{ user }} -->
-                        <!-- <button v-if="user?.role === 'admin'" class="btn btn-primary mb-3" @click="goToEditTests(lessonId)">+ Добавить тесты</button> -->
                         <div class="content typography-body" v-html="parsedContent"></div>
                     </template>
                 </div>
             </section>
         </main>
+        <!-- конец контента -->
+
+        <footer class="d-flex my-3" v-if="user?.role === 'admin'">
+            <!-- <button v-if="!isFetching" class="btn btn-primary m-auto" @click="startTest()">Перейти к тестированию</button> -->
+            <div><button v-if="!isFetching" class="btn btn-primary m-auto" @click="goToEditTests(_id)">Добавить
+                    тесты</button></div>
+        </footer>
     </div>
 </template>
 
 
 
 <script lang="ts" setup>
-import { ref, onBeforeMount, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { marked } from 'marked'; // Ensure you're importing from 'marked'
 import DOMPurify from 'dompurify';
 
 const lessonsStore = useLessonsStore();
 const userStore = useUserStore();
-
-const user = computed(() => userStore.getUser)
+const user = computed(() => useUserStore().getUser)
 const isFetching = computed(() => useLessonsStore().isFetching)
 const route = useRoute();
-const lessonId = ref<string>(useRoute().params._id as string);
-
 const router = useRouter();
 const _id = ref(<string>route.params._id);
 const errorGo = ref()
+const contentRef = ref<HTMLElement | null>(null);
 async function goToEditTests(gotoid: string) {
     try {
         router.push(`/lesson/${gotoid}/edit_tests`)
@@ -92,7 +99,7 @@ interface LessonData {
     // Add other fields if necessary
 }
 
-const lesson = ref<LessonData | null>(null);
+const lesson = ref<Lesson | null>(null);
 const parsedContent = ref<string>('');
 
 const parseContent = (content: string): string => {
@@ -106,27 +113,33 @@ const startTest = () => {
     }
 };
 
-// onBeforeMount(async () => {
-//     if (_id) {
-//         try {
-//             await lessonsStore.fetchLessonById(_id.value);
-//             lesson.value = lessonsStore.getLesson as LessonData;
+onBeforeMount(async () => {
+    if (_id) {
+        try {
+            lessonsStore.lessons.forEach(element => {
+                if (_id.value === element._id) {
+                    lessonsStore.lesson = element
+                }
+            })
+            // await lessonsStore.fetchLessonById(_id.value);
+            lesson.value = lessonsStore.getLesson as Lesson;
 
-//             if (lesson.value && lesson.value.content) {
-//                 parsedContent.value = parseContent(lesson.value.content);
-//             }
-//         } catch (error) {
-//             console.error('Error loading lesson:', error);
-//         }
-//     }
-// });
+            if (lesson.value && lesson.value.content) {
+                parsedContent.value = parseContent(lesson.value.content);
+            }
+        } catch (error) {
+            console.error('Error loading lesson:', error);
+        }
+    }
+});
 
 watch(
     () => lessonsStore.getLesson,
-    (newLesson: LessonData) => {
+    (newLesson: Lesson) => {
         lesson.value = newLesson;
         if (lesson.value && lesson.value.content) {
             parsedContent.value = parseContent(lesson.value.content);
+            // Проверяем позицию прокрутки после обновления контента
         }
     }
 );
@@ -135,52 +148,58 @@ onMounted(async () => {
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.BackButton.show();
         window.Telegram.WebApp.BackButton.onClick(() => {
-            if (lesson.value) {
-                router.push({ path: `/modules/${lesson.value.moduleId._id}` });
-            }
+            useRouter().push({ path: `/modules/${lesson.value?.moduleId}` });
         });
-        window.Telegram.WebApp.MainButton.setText('Продолжить');
+        window.Telegram.WebApp.MainButton.setText('Пройти тест');
+        window.Telegram.WebApp.MainButton.onClick(() => startTest());
         window.Telegram.WebApp.MainButton.show();
-        window.Telegram.WebApp.MainButton.enable();
-        // Добавляем обработчик нажатия на MainButton
-        window.Telegram.WebApp.MainButton.onClick(() => {
-            startTest();
-        });
-        if (_id) {
-            try {
-                await lessonsStore.fetchLessonById(_id.value);
-                lesson.value = lessonsStore.getLesson as LessonData;
-
-                if (lesson.value && lesson.value.content) {
-                    parsedContent.value = parseContent(lesson.value.content);
-                }
-            } catch (error) {
-                console.error('Error loading lesson:', error);
-            }
-        }
     }
+
+    // Загружаем урок
+    if (_id.value) {
+        // try {
+        //     await lessonsStore.fetchLessonById(_id.value);
+        //     lesson.value = lessonsStore.getLesson as LessonData;
+
+        //     if (lesson.value?.content) {
+        //         parsedContent.value = parseContent(lesson.value.content);
+        //     }
+        // } catch (error) {
+        //     console.error('Ошибка загрузки урока:', error);
+        // }
+    }
+
 });
 
 onBeforeUnmount(() => {
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.BackButton.hide();
         window.Telegram.WebApp.MainButton.hide();
-        window.Telegram.WebApp.MainButton.disable();
-        window.Telegram.WebApp.BackButton.offClick();
     }
 });
+
 </script>
 
 <style lang="scss" scoped>
-.lesson-page {
-    // background-color: #191919;
+div.breadcrumb {
+    margin: .3rem 1rem;
+    p {
+        font-size: 12px;
+    }
 }
-
 main,
 header {
     margin: 0;
+    h2 {
+        margin-bottom: 0;
+    }
 }
-
+header {
+    margin: 15px 15px 0;
+}
+main {
+    margin: 0
+}
 .content {
     color: var(--text-color);
     p, ul {

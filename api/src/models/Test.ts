@@ -1,18 +1,24 @@
-// src/models/Test.ts
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, Types, Document } from 'mongoose';
 
 export interface ITest extends Document {
-    title: string;
-    description: string;
-    level: Schema.Types.ObjectId;
-    questions: Schema.Types.ObjectId[];
+    lessonId: Types.ObjectId;
+    questions: Types.ObjectId[]; // Ссылки на вопросы
+    totalQuestions: number;
+    passingScore: number;
 }
 
-const TestSchema = new Schema<ITest>({
-    title: { type: String, required: true },
-    description: { type: String },
-    level: { type: Schema.Types.ObjectId, ref: 'Level', required: true },
-    questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
-});
+const TestSchema: Schema = new Schema(
+    {
+        lessonId: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Lesson',
+            required: true,
+        },
+        questions: [{ type: mongoose.Types.ObjectId, ref: 'Question' }],
+        totalQuestions: { type: Number, required: true },
+        passingScore: { type: Number, required: true },
+    },
+    { timestamps: true },
+);
 
-export default model<ITest>('Test', TestSchema);
+export default mongoose.model<ITest>('Test', TestSchema);

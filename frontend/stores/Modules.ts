@@ -2,14 +2,16 @@
 import { defineStore } from 'pinia';
 
 export interface Module {
-    _id: string;
-    title: string;
-    description: string;
-    short_title: string;
-    lessons: string[];
-    disabled: boolean;
-    order: number;
-    viewsCounter: number;
+  _id: string;
+  title: string;
+  description: string;
+  short_title: string;
+  lessons: string[];
+  disabled: boolean;
+  order: number;
+  complexity: number;
+  isPremium: boolean;
+  viewsCounter: number;
 }
 
 export const useModulesStore = defineStore({

@@ -14,6 +14,9 @@
     --inner-component-shadow: #{$inner-shadow-color-light};
     --button-hover-background: #{$button-hover-background-color-light};
     --description-color: #{$light-description-color};
+    --option-container-correct-color: #{$option-container-correct-color-light};
+    --option-container-incorrect-color: #{$option-container-incorrect-color-light};
+    --option-container-explanation-color: #{$option-container-explanation-color-light};
     --border-radius: 10px;
 }
 
@@ -40,4 +43,7 @@ body[data-theme='dark'] {
     --inner-component-shadow: #{$inner-shadow-color-dark};
     --button-hover-background: #{$button-hover-background-color-dark};
     --description-color: #{$dark-description-color};
+    --option-container-correct-color: #{$option-container-correct-color-dark};
+    --option-container-incorrect-color: #{$option-container-incorrect-color-dark};
+    --option-container-explanation-color: #{$option-container-explanation-color-dark};
 }

@@ -6,24 +6,31 @@ export default defineEventHandler(async (event) => {
     const jwtToken = config.jwtToken;
 
     // Извлекаем параметры пути
-    const { lessonId, question } = event.context.params as { lessonId: string; question: string };
-
-    if (!lessonId || !question) {
-        throw createError({
-            statusCode: 400,
-            statusMessage: 'Bad Request: lessonId and question are required',
-        });
+    const { lessonId, questionId } = event.context.params as {
+      lessonId: string;
+      questionId: string;
+    };
+    console.log(`lessonId: ${lessonId}`);
+    console.log(`question: ${questionId}`);
+    if (!lessonId || !questionId) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Bad Request: lessonId and question are required",
+      });
     }
 
     try {
         // Запрос к бэкенду
-        const response = await $fetch(`${apiBase}/lessons/${lessonId}/${question}`, {
-            method: 'PUT',
+        const response = await $fetch(
+          `${apiBase}/lessons/${lessonId}/${questionId}`,
+          {
+            method: "PUT",
             headers: {
-                Authorization: jwtToken,
+              Authorization: jwtToken,
             },
-        });
-
+          }
+        );
+        console.log(response)
         return response;
     } catch (error: any) {
         console.error('Ошибка при добавлении вопроса к уроку:', error);

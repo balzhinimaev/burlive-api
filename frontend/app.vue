@@ -26,7 +26,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, onMounted } from 'vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { useNotifyStore } from '@/stores/notifyStore';
@@ -98,6 +97,16 @@ async function applyTheme(colorScheme: string) {
 onMounted(async () => {
   await waitForTelegramWebApp();
   if (window.Telegram?.WebApp) {
+
+  // Расширяем до максимальной высоты
+  window.Telegram.WebApp.expand();
+  
+  // Отключаем вертикальные свайпы чтобы пользователь случайно не закрыл приложение
+  window.Telegram.WebApp.disableVerticalSwipes();
+  
+  // Опционально: отключаем подтверждение закрытия
+  window.Telegram.WebApp.enableClosingConfirmation();
+
     // Устанавливаем начальную тему
     await applyTheme(window.Telegram.WebApp.colorScheme);
     window.Telegram.WebApp.expand();
@@ -112,7 +121,7 @@ onMounted(async () => {
       user.value = window.Telegram.WebApp.initDataUnsafe.user;
       // userStore.photo_url = user.value.photo_url
       const telegram_id = user.value.id;
-      const is_exists = await userStore.checkUserExists(telegram_id);
+      const is_exists = await userStore.checkUserExists(telegram_id, user.value?.photo_url);
       if (!is_exists) {
         await userStore.createUser({
           id: user.value.id,

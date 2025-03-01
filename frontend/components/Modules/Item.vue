@@ -1,5 +1,5 @@
 <template>
-    <div class="lesson-item-component" @click="goToModule(module._id)">
+    <div class="lesson-item-component" @click="goToModule(module._id, module.isPremium)">
         <div class="header">
             <div class="title">
                 <div class="lock-icon" style="margin-left: 4px;" v-if="module.isPremium">
@@ -108,6 +108,9 @@ hr {
 </style>
 
 <script lang="ts" setup>
+const userStore = useUserStore();
+const user = computed(() => userStore.getUser)
+
 // Определение интерфейсов
 interface Module {
     _id: string;
@@ -121,12 +124,19 @@ interface Module {
     isPremium: boolean;
     viewsCounter: number;
 }
+
 // Определение props с использованием дженериков
 defineProps<{
     module: Module
 }>();
 // Функция перехода к уроку
-function goToModule(id: string) {
-    useRouter().push('/modules/' + id);
+function goToModule(id: string, isPremium: boolean) {
+    if (!isPremium) {
+        useRouter().push('/modules/' + id);
+    } else if (user.value?.subscription.isActive) {
+        useRouter().push('/modules/' + id);
+    } else {
+        alert("Подписка не оформлена. Отказано в доступе.")
+    }
 }
 </script>
