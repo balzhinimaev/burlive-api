@@ -90,9 +90,10 @@
   app.use(errorHandler);
 
   server.listen(PORT, () => {
-    console.log(`Сервер запущен`);
+    console.log(`Сервер запущен ${PORT}`);
   });
 
+  console.log(process.env.MONGO_URL)
   // Подключение к базе данных
   mongoose.connect(<string>process.env.MONGO_URL, {
     dbName: 'burlive'
