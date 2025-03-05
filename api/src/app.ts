@@ -42,7 +42,7 @@
   app.use(cors());
 
   // // Middleware для обработки сырых данных вебхука
-  app.post('/backendapi/telegram/payment-callback', bodyParser.raw({ type: 'application/json' }));
+  app.post('/telegram/payment-callback', bodyParser.raw({ type: 'application/json' }));
 
   app.use(bodyParser.json());
   app.use("/", async (req, res, next) => {
@@ -55,22 +55,22 @@
     }
     next()
   })
-  app.use('/backendapi/users', userRouter);
-  app.use('/backendapi/dialect', authenticateToken, dialectRouter);
-  app.use('/backendapi/sentences', authenticateToken, sentencesRouter);
-  app.use('/backendapi/vocabulary', authenticateToken, vocabularyRouter);
-  app.use('/backendapi/translations', authenticateToken, translationsRouter);
-  app.use('/backendapi/telegram', authenticateToken, telegramRouter);
+  app.use('/users', userRouter);
+  app.use('/dialect', authenticateToken, dialectRouter);
+  app.use('/sentences', authenticateToken, sentencesRouter);
+  app.use('/vocabulary', authenticateToken, vocabularyRouter);
+  app.use('/translations', authenticateToken, translationsRouter);
+  app.use('/telegram', authenticateToken, telegramRouter);
 
   // Новые маршруты для системы обучения
-  app.use('/backendapi/levels', authenticateToken, levelRoutes);
-  app.use('/backendapi/modules', authenticateToken, moduleRoutes);
-  app.use('/backendapi/lessons', authenticateToken, lessonsRouter);
-  app.use('/backendapi/themes', authenticateToken, themeRouter);
+  app.use('/levels', authenticateToken, levelRoutes);
+  app.use('/modules', authenticateToken, moduleRoutes);
+  app.use('/lessons', authenticateToken, lessonsRouter);
+  app.use('/themes', authenticateToken, themeRouter);
 
-  app.use(`/backendapi/questions`, authenticateToken, questionRouter)
-  app.use(`/backendapi/test`, authenticateToken, testRouter);
-  app.post(`/backendapi/pay-cb`, (req, _res) => {
+  app.use(`/questions`, authenticateToken, questionRouter)
+  app.use(`/test`, authenticateToken, testRouter);
+  app.post(`/pay-cb`, (req, _res) => {
     try {
       logger.info(`Получен успешный платеж`)
       console.log(req.body)
