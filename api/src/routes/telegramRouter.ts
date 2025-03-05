@@ -9,13 +9,19 @@ const telegramRouter = express.Router();
 telegramRouter.get("/user/is-exists/:id", telegramController.user_is_exists);
 telegramRouter.get("/user/get-state/:id", telegramController.get_user_state);
 telegramRouter.get("/user/theme/:id", telegramController.getUserTheme);
+telegramRouter.get(
+    '/user/referral/:id',
+    telegramController.getUserReferralInfo,
+);
 telegramRouter.get("/user", telegramController.getAllUsers);
+
 
 telegramRouter.post("/payment-callback", subscriptionController.paymentCallback);
 telegramRouter.post("/create-user", telegramController.register_telegram_user);
 telegramRouter.post("/select-language-for-vocabular", telegramController.select_language_for_vocabular);
 telegramRouter.post("/new-word-translate-request", telegramController.new_word_translate_request);
 
+telegramRouter.post('/user/track-referral', telegramController.trackReferral);
 telegramRouter.post("/user/save-state", telegramController.save_user_state);
 telegramRouter.post("/user/save-user-action", telegramController.save_user_action);
 telegramRouter.post("/user/theme", telegramController.updateUserTheme);

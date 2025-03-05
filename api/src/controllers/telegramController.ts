@@ -9,6 +9,8 @@ import TelegramUserState from '../models/Telegram/UserState';
 import { Types } from 'mongoose';
 import LevelModel from '../models/Level';
 import TelegramUserActionModel from '../models/Telegram/UserAction';
+import dotenv from 'dotenv';
+dotenv.config(); // Загружаем переменные окружения из файла .env
 // Импортируйте модель LevelModel
 const telegramController = {
     getAllUsers: async (
@@ -74,10 +76,10 @@ const telegramController = {
     blockUser: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.body;
-            
+
             if (!id) {
-                res.status(404).json({ message: 'ID должен быть указан' })
-                return
+                res.status(404).json({ message: 'ID должен быть указан' });
+                return;
             }
 
             await TelegramUserModel.findOneAndUpdate(
@@ -250,8 +252,9 @@ const telegramController = {
                 email,
                 photo_url,
                 platform,
+                referral,
             } = req.body;
-
+            logger.info(`${referral}`)
             // Проверка на существование пользователя
             const existingUser = await TelegramUserModel.findOne({ id });
             if (existingUser) {
@@ -282,6 +285,21 @@ const telegramController = {
                 email: email || '', // Обработка возможного отсутствия email
                 level: initialLevel._id, // Установка начального уровня
             });
+
+            // Если передан referral-код, найти реферера и обновить данные
+            if (referral) {
+                const referrer = await TelegramUserModel.findOne({
+                    referral_code: referral,
+                });
+                if (referrer) {
+                    newUser.referred_by = referrer._id;
+                    // Добавляем нового пользователя в список рефералов у реферера
+                    referrer.referrals_telegram.push(newUser._id);
+                    // Пример начисления бонуса (например, +10 к рейтингу)
+                    referrer.rating += 10;
+                    await referrer.save();
+                }
+            }
 
             await newUser.save();
 
@@ -551,6 +569,115 @@ const telegramController = {
             logger.error('Ошибка при обновлении фотографии:', error);
             res.status(500).json({ error: 'Ошибка сервера' });
             next(error);
+        }
+    },
+    // Новая функция: получение информации о рефералах пользователя
+    getUserReferralInfo: async (
+        req: Request,
+        res: Response,
+        _next: NextFunction,
+    ): Promise<void> => {
+        try {
+            const { id } = req.params;
+            const user = await TelegramUserModel.findOne({ id: Number(id) });
+            if (!user) {
+                res.status(404).json({ message: 'Пользователь не найден' });
+                return;
+            }
+
+            logger.info(
+                `Получение информации по рефереру ${user.username ? user.username : user.id}`,
+            );
+
+            // Находим всех пользователей, у которых поле referred_by равно _id текущего пользователя
+            const referrals = await TelegramUserModel.find({
+                referred_by: user._id,
+            });
+
+            user.rating += 10;
+            await user.save();
+
+            logger.info(
+                `Добавлено 1 очко за запрос информации по рефереру ${user.username ? user.username : user.id}`,
+            );
+
+            // Фильтруем тех, у кого активна подписка
+            const subscribedReferrals = referrals.filter(
+                (r) => r.subscription && r.subscription.isActive,
+            );
+            res.status(200).json({
+                referralCode: user.referral_code,
+                referralLink: `https://t.me/${<string>process.env.bot_username}?start=ref_${user.referral_code}`,
+                referralsCount: referrals.length,
+                subscribedReferralsCount: subscribedReferrals.length,
+                earnedBonus: subscribedReferrals.length * 174.5, // например, 100 руб. за каждую подписку
+            });
+
+            return;
+        } catch (error) {
+            console.error('Error getting referral info:', error);
+            res.status(500).json({ message: 'Ошибка сервера' });
+            return;
+        }
+    },
+    // Новая функция: отслеживание реферала при регистрации
+    trackReferral: async (
+        req: Request,
+        res: Response,
+        _next: NextFunction,
+    ): Promise<void> => {
+        try {
+            const { userId, referralCode } = req.body;
+            if (!userId || !referralCode) {
+                res.status(400).json({
+                    message: 'Не указан userId или referralCode',
+                });
+                return;
+            }
+            // Ищем реферера по referral_code
+            const referrer = await TelegramUserModel.findOne({
+                referral_code: referralCode,
+            });
+            if (!referrer) {
+                res.status(404).json({ message: 'Код реферала не найден' });
+                return;
+            }
+            // Проверяем, что пользователь не указывает себя в качестве реферера
+            if (referrer.id === Number(userId)) {
+                res.status(400).json({
+                    message: 'Нельзя быть своим рефералом',
+                });
+                return;
+            }
+            // Находим пользователя, который указывает код реферала
+            const user = await TelegramUserModel.findOne({
+                id: Number(userId),
+            });
+            if (!user) {
+                res.status(404).json({ message: 'Пользователь не найден' });
+                return;
+            }
+            // Если у пользователя ещё не задано поле referred_by, обновляем его
+            if (!user.referred_by) {
+                user.referred_by = referrer._id;
+                await user.save();
+                // Добавляем пользователя в список приглашённых у реферера, если его там ещё нет
+                if (!referrer.referrals_telegram.includes(user._id)) {
+                    referrer.referrals_telegram.push(user._id);
+                    await referrer.save();
+                }
+                res.status(200).json({ message: 'Реферал успешно засчитан' });
+                return;
+            } else {
+                res.status(400).json({
+                    message: 'У пользователя уже есть реферер',
+                });
+                return;
+            }
+        } catch (error) {
+            console.error('Error tracking referral:', error);
+            res.status(500).json({ message: 'Ошибка сервера' });
+            return;
         }
     },
 };

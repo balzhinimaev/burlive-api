@@ -7,7 +7,9 @@ export interface TelegramUser extends User {
   _id: Types.ObjectId;
   rating: number;
   level: Types.ObjectId | ILevel;
-  referrals_telegram?: Types.ObjectId[];
+  referrals_telegram: Types.ObjectId[];
+  referral_code: string;
+  referred_by: null | Types.ObjectId;
   id: number;
   email: string;
   c_username: string;
@@ -54,9 +56,6 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
         email: { type: String, required: false },
         phone: { type: String || Number, required: false },
         platform: { type: String, required: false },
-        referrals_telegram: [
-            { type: Schema.Types.ObjectId, ref: 'telegram_user' },
-        ],
 
         currentQuestion: {
             lessonId: { type: Schema.Types.ObjectId, ref: 'Lesson' },
@@ -97,9 +96,23 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
             endDate: { type: Date, default: null },
             isActive: { type: Boolean, default: false },
         },
+        referral_code: {
+            type: String,
+            unique: true,
+            default: generateReferralCode,
+        },
+        referred_by: {
+            type: Schema.Types.ObjectId,
+            ref: 'telegram_user',
+            default: null,
+        },
+        // referrals_telegram уже присутствует и хранит список ObjectId приглашённых пользователей
+        referrals_telegram: [
+            { type: Schema.Types.ObjectId, ref: 'telegram_user' },
+        ],
         blocked: {
-          type: Boolean
-        }
+            type: Boolean,
+        },
     },
     {
         timestamps: true,
@@ -166,5 +179,10 @@ const TelegramUserModel = model<TelegramUserDocument>(
   'telegram_user',
   TelegramUserSchema
 );
+
+function generateReferralCode(): string {
+    // Пример генерации кода – можно улучшить алгоритм
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
 
 export default TelegramUserModel;

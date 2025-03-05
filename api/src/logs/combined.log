@@ -27731,3 +27731,104 @@
 {"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-02-27T05:53:40.081Z"}
 {"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-02-27T05:53:40.092Z"}
 {"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-02-27T05:58:06.202Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:41:12.383Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T15:41:12.552Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:41:16.483Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T15:41:16.675Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:41:20.695Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:51:05.774Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T15:51:05.954Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:51:07.921Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T15:51:08.128Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:51:11.588Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:51:12.796Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T15:51:13.178Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:51:15.109Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T15:55:34.886Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T15:57:12.407Z"}
+{"level":"info","message":"Добавлено 10 очков за запрос информации по рефереру frntdev","timestamp":"2025-03-05T15:57:12.636Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:59:48.460Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T15:59:48.704Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:59:50.316Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T15:59:50.514Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T15:59:53.397Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T15:59:53.504Z"}
+{"level":"info","message":"Добавлено 1 очко за запрос информации по рефереру frntdev","timestamp":"2025-03-05T15:59:53.699Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:02:03.702Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:02:03.886Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:02:09.657Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T16:02:09.764Z"}
+{"level":"info","message":"Добавлено 1 очко за запрос информации по рефереру frntdev","timestamp":"2025-03-05T16:02:09.953Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:02:33.365Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:08:40.874Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:08:41.083Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:13:45.490Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:13:45.672Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:13:48.003Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:13:49.186Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:13:49.367Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:14:40.185Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:14:40.378Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:14:41.978Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:14:42.176Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:14:45.570Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T16:14:45.672Z"}
+{"level":"info","message":"Добавлено 1 очко за запрос информации по рефереру frntdev","timestamp":"2025-03-05T16:14:45.863Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:14:58.936Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 8029502709,\n  username: 'testusername2013',\n  c_username: '',\n  first_name: 'Добби Свободен',\n  email: '',\n  currentQuestion: { questionPosition: 1 },\n  rating: 1,\n  level: new ObjectId('677803da00eae1e31f3eece5'),\n  actions: [],\n  via_app: false,\n  photo_url: '',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  referred_by: null,\n  referrals_telegram: [],\n  _id: new ObjectId('67c87883eb9c8f72bc2dbae5'),\n  referral_code: '6VT3W4',\n  createdAt: 2025-03-05T16:14:59.894Z,\n  updatedAt: 2025-03-05T16:14:59.894Z,\n  __v: 0\n}","timestamp":"2025-03-05T16:14:59.993Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:15:57.829Z"}
+{"level":"info","message":"Получение данных ID 8029502709","timestamp":"2025-03-05T16:15:58.005Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:20:45.075Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 8029502709,\n  username: 'testusername2013',\n  c_username: '',\n  first_name: '4ZQ047',\n  email: '',\n  currentQuestion: { questionPosition: 1 },\n  rating: 1,\n  level: new ObjectId('677803da00eae1e31f3eece5'),\n  actions: [],\n  via_app: false,\n  photo_url: '',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  referred_by: null,\n  referrals_telegram: [],\n  _id: new ObjectId('67c879deeb9c8f72bc2dbafc'),\n  referral_code: '2T9X1L',\n  createdAt: 2025-03-05T16:20:46.110Z,\n  updatedAt: 2025-03-05T16:20:46.110Z,\n  __v: 0\n}","timestamp":"2025-03-05T16:20:46.211Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:21:02.890Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:21:03.092Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:21:04.798Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:21:04.987Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:21:09.446Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T16:21:09.546Z"}
+{"level":"info","message":"Добавлено 1 очко за запрос информации по рефереру frntdev","timestamp":"2025-03-05T16:21:09.738Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:21:59.428Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:22:15.544Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:22:26.812Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:22:41.221Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:22:58.541Z"}
+{"level":"info","message":"Добби Свободен","timestamp":"2025-03-05T16:22:59.320Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 8029502709,\n  username: 'testusername2013',\n  c_username: '',\n  first_name: '4ZQ047',\n  email: '',\n  currentQuestion: { questionPosition: 1 },\n  rating: 1,\n  level: new ObjectId('677803da00eae1e31f3eece5'),\n  actions: [],\n  via_app: false,\n  photo_url: '',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  referred_by: null,\n  referrals_telegram: [],\n  _id: new ObjectId('67c87a638cba3a4f4e450589'),\n  referral_code: 'CE7DTT',\n  createdAt: 2025-03-05T16:22:59.596Z,\n  updatedAt: 2025-03-05T16:22:59.596Z,\n  __v: 0\n}","timestamp":"2025-03-05T16:22:59.693Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:23:08.404Z"}
+{"level":"info","message":"Получение данных ID 8029502709","timestamp":"2025-03-05T16:23:08.584Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:24:11.230Z"}
+{"level":"info","message":"Добби Свободен","timestamp":"2025-03-05T16:24:12.001Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 8029502709,\n  username: 'testusername2013',\n  c_username: '',\n  first_name: '4ZQ047',\n  email: '',\n  currentQuestion: { questionPosition: 1 },\n  rating: 1,\n  level: new ObjectId('677803da00eae1e31f3eece5'),\n  actions: [],\n  via_app: false,\n  photo_url: '',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  referred_by: null,\n  referrals_telegram: [],\n  _id: new ObjectId('67c87aac8cba3a4f4e4505a1'),\n  referral_code: 'NLL77P',\n  createdAt: 2025-03-05T16:24:12.279Z,\n  updatedAt: 2025-03-05T16:24:12.279Z,\n  __v: 0\n}","timestamp":"2025-03-05T16:24:12.381Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:26:13.775Z"}
+{"level":"info","message":"4ZQ047","timestamp":"2025-03-05T16:26:14.548Z"}
+{"level":"info","message":"Пользователь успешно зарегистрирован: {\n  id: 8029502709,\n  username: 'testusername2013',\n  c_username: '',\n  first_name: 'Добби Свободен',\n  email: '',\n  currentQuestion: { questionPosition: 1 },\n  rating: 1,\n  level: new ObjectId('677803da00eae1e31f3eece5'),\n  actions: [],\n  via_app: false,\n  photo_url: '',\n  role: 'user',\n  vocabular: { selected_language_for_translate: 'russian' },\n  theme: 'light',\n  subscription: { type: null, startDate: null, endDate: null, isActive: false },\n  referred_by: new ObjectId('67c84dc550e327cf9a35dce5'),\n  referrals_telegram: [],\n  _id: new ObjectId('67c87b268cba3a4f4e4505b0'),\n  referral_code: 'EUI77W',\n  createdAt: 2025-03-05T16:26:14.928Z,\n  updatedAt: 2025-03-05T16:26:14.928Z,\n  __v: 0\n}","timestamp":"2025-03-05T16:26:15.029Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:26:44.108Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:26:44.940Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:26:45.317Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:26:50.435Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T16:26:50.505Z"}
+{"level":"info","message":"Добавлено 1 очко за запрос информации по рефереру frntdev","timestamp":"2025-03-05T16:26:50.688Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:27:01.544Z"}
+{"level":"info","message":"Получение данных ID 8029502709","timestamp":"2025-03-05T16:27:01.709Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:27:03.300Z"}
+{"level":"info","message":"Получение данных ID 8029502709","timestamp":"2025-03-05T16:27:03.464Z"}
+{"level":"info","message":"Phone number saving","timestamp":"2025-03-05T16:27:06.522Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:27:06.527Z"}
+{"level":"info","message":"Получение данных ID 8029502709","timestamp":"2025-03-05T16:27:07.472Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:27:10.229Z"}
+{"level":"info","message":"Получение данных ID 8029502709","timestamp":"2025-03-05T16:27:10.424Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:27:43.167Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:27:44.684Z"}
+{"level":"info","message":"Получение данных ID 8029502709","timestamp":"2025-03-05T16:27:45.055Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:27:48.623Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:27:59.910Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:28:00.110Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:28:02.750Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T16:28:02.848Z"}
+{"level":"info","message":"Добавлено 1 очко за запрос информации по рефереру frntdev","timestamp":"2025-03-05T16:28:03.038Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:49:10.360Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:49:12.273Z"}
+{"level":"info","message":"Получение данных ID 1272270574","timestamp":"2025-03-05T16:49:12.658Z"}
+{"level":"info","message":"Сохранение действие пользователя","timestamp":"2025-03-05T16:49:15.552Z"}
+{"level":"info","message":"Получение информации по рефереру frntdev","timestamp":"2025-03-05T16:49:15.650Z"}
+{"level":"info","message":"Добавлено 1 очко за запрос информации по рефереру frntdev","timestamp":"2025-03-05T16:49:15.836Z"}
