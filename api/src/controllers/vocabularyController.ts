@@ -195,6 +195,11 @@ const vocabularyController = {
 
             // Поиск исходного слова в базе данных
             const existingWord = await WordModel.findById(word_id);
+            if (!telegram_author) {
+                res.status(404).json({ message: 'Пользователь не найден!' });
+                return;
+            }
+            
             if (!existingWord) {
                 res.status(404).json({ message: 'Исходное слово не найдено' });
                 return;
@@ -261,6 +266,8 @@ const vocabularyController = {
                     });
                     return;
                 }
+
+                updateRating(telegram_author._id, 15);
 
                 logger.info(
                     `Предложенное слово успешно сохранено с ID: ${savedSuggestedWord._id}`,
@@ -593,8 +600,8 @@ const vocabularyController = {
         const { userInput, target_language, telegram_user_id } = req.body;
 
         try {
-            console.log('Целевой язык:', target_language);
-            console.log('Telegram ID пользователя:', telegram_user_id);
+
+            logger.info(`Целевой язык: ${target_language}\nTelegram ID пользователя: ${telegram_user_id}`)
 
             // Нормализация входного слова
             const normalized_userInput = userInput.toLocaleLowerCase().trim();
@@ -617,21 +624,21 @@ const vocabularyController = {
             let burlivedb: any = [];
 
             if (existingWord) {
-                console.log('Найденное слово в базе данных:', existingWord);
+                logger.info(`Найденное слово в базе данных:\n ${existingWord}`);
 
                 if (existingWord.translations.length) {
                     burlivedb = existingWord.translations;
                 }
 
-                console.log(
-                    'Найденные предложенные переводы в базе данных:',
-                    existingWord?.translations_u,
+                logger.info(
+                    `Найденные предложенные переводы в базе данных: ${existingWord?.translations_u}`,
                 );
             }
 
-            console.log(
-                `Тут надо добавить функцион добавления искомого слова в бд на проверку для дальнейшего перевода`,
-            );
+            // console.log(
+            //     `Тут надо добавить функцион добавления искомого слова в бд на проверку для дальнейшего перевода`,
+            // );
+            
             logger.info(`${normalized_userInput}`);
             const user: TelegramUser | null = await TelegramUserModel.findOne({
                 id: telegram_user_id,
@@ -639,23 +646,50 @@ const vocabularyController = {
             if (!user) {
                 throw Error;
             }
-            const existsWord: IWordModel | null =
-                await SearchedWordModel.findOne({
+
+            const searchResultExists: IWordModel | null = await SearchedWordModel.findOne({
+                normalized_text: normalized_userInput
+            })
+            if (searchResultExists === null) {
+                await new SearchedWordModel({
                     normalized_text: normalized_userInput,
-                });
-            if (existsWord) {
-                await SearchedWordModel.findByIdAndUpdate(existsWord._id, {
-                    $addToSet: { users: user._id },
-                });
-                logger.info(`Пользователь добавлен в искомое слово`);
-            } else {
-                new SearchedWordModel({
                     text: userInput,
-                    normalized_text: normalized_userInput,
                     language: target_language,
-                    users: [user._id],
-                }).save();
+                    users: [user?._id]
+                }).save()
+                logger.info(`Создана история поиска`)
+            } else {
+                await SearchedWordModel.findByIdAndUpdate(searchResultExists._id, {
+                    $addToSet: { users: user._id }
+                })
+                logger.info(`Пользователь добавлен в поле users`)
             }
+            logger.info(`Пользователь проверяет на существование искомого слова в таблице searched-word`)
+            // logger.info(searchResultExists)
+            // const searchWord = await new SearchedWordModel({
+            //     normalized_text: normalized_userInput,
+            //     text: userInput,
+            //     language: target_language,
+            //     users: [user?._id]
+            // })
+
+            // const existsWord: IWordModel | null =
+            //     await SearchedWordModel.findOne({
+            //         normalized_text: normalized_userInput,
+            //     });
+            // if (existsWord) {
+            //     await SearchedWordModel.findByIdAndUpdate(existsWord._id, {
+            //         $addToSet: { users: user._id },
+            //     });
+            //     logger.info(`Пользователь добавлен в искомое слово`);
+            // } else {
+            //     new SearchedWordModel({
+            //         text: userInput,
+            //         normalized_text: normalized_userInput,
+            //         language: target_language,
+            //         users: [user._id],
+            //     }).save();
+            // }
             // await new SearchedWordModel({
             //   text: userInput,
             //   normalized_text: normalized_userInput,
@@ -767,7 +801,7 @@ const vocabularyController = {
 
             // (Опционально) Обновление рейтинга пользователя
             // await updateRating(new ObjectId(telegram_user_id), 10); // Например, добавить 10 баллов
-
+            await updateRating(user.id, 1)
             res.status(200).json({
                 message: burlang_translate_result,
                 burlivedb,

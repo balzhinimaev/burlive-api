@@ -8,6 +8,7 @@ interface ISearchData {
 }
 
 export interface IWordModel extends Document {
+  _id: string;
   text: string;
   normalized_text: string; // Новый атрибут для нормализованного текста
   language: string;

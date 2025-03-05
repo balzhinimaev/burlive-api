@@ -14,21 +14,21 @@ services:
     networks:
       - burlive
 
-  # bot:
-  #   build: ../burlang-
-  #   container_name: telegram-bot
-  #   restart: always
-  #   environment:
-  #     - API_URL=http://express-api:5000
-  #     - BOT_TOKEN=${BOT_TOKEN}
-  #   ports: 
-  #     - "1337:1337"
-  #   depends_on:
-  #     - api
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - burlive
+  bot:
+    build: ../burlive-bot
+    container_name: telegram-bot
+    restart: always
+    environment:
+      - API_URL=http://express-api:5000
+      - BOT_TOKEN=${BOT_TOKEN}
+    ports: 
+      - "1442:1442"
+    env_file:
+      - ../burlive-bot/.env
+    depends_on:
+      - api
+    networks:
+      - burlive
 
   api:
     build: ./api
