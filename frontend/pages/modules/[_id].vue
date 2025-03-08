@@ -1,11 +1,10 @@
 <template>
     <div class="page module-page">
         <UserInfo />
-
         <main>
             <div class="container">
                 <!-- Плейсхолдеры при загрузке -->
-                <template v-if="isFetching">
+                <template v-if="!isFetching">
                     <section id="lessons-list">
                         <div class="loading-placeholder lesson-card-placeholder" v-for="n in 3" :key="n">
                             <div class="lesson-icon-placeholder"></div>
@@ -30,7 +29,7 @@
                     </div>
                 </template>
                 <!-- Плейсхолдеры по умолчанию (опционально можно удалить) -->
-                <template v-else>
+                <!-- <template v-else>
                     <section id="lessons-list">
                         <div class="loading-placeholder lesson-card-placeholder" v-for="n in 3" :key="n">
                             <div class="lesson-icon-placeholder"></div>
@@ -40,7 +39,7 @@
                             </div>
                         </div>
                     </section>
-                </template>
+                </template> -->
             </div>
         </main>
     </div>
@@ -82,11 +81,7 @@ onMounted(async () => {
             router.push({ path: '/selectmodule' });
         });
         if (window.Telegram.WebApp.initDataUnsafe) {
-            if (lessonsStore.lessons.length > 0 && lessonsStore.title && lessonsStore.short_title) {
-
-            } else {
-                fetchLessons(window.Telegram.WebApp.initDataUnsafe.user.id);
-            }
+            fetchLessons(window.Telegram.WebApp.initDataUnsafe.user.id);
         }
     }
     observer.value = new IntersectionObserver(

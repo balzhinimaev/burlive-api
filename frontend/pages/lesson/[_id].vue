@@ -3,7 +3,7 @@
         <UserInfo />
         <div class="breadcrumb">
             <div class="container">
-                <p>Главная / модули / урок</p>
+                <p>Главная / {{ lesson?.moduleId.short_title }} / {{ lesson?.title }}</p>
             </div>
         </div>
 
@@ -74,7 +74,8 @@ const user = computed(() => useUserStore().getUser)
 const isFetching = computed(() => useLessonsStore().isFetching)
 const route = useRoute();
 const router = useRouter();
-const _id = ref(<string>route.params._id);
+const _id = computed(() => route.params._id as string);
+// const _id = route;
 const errorGo = ref()
 const contentRef = ref<HTMLElement | null>(null);
 async function goToEditTests(gotoid: string) {
@@ -83,20 +84,6 @@ async function goToEditTests(gotoid: string) {
     } catch (error) {
         errorGo.value = error
     }
-}
-interface Module {
-    _id: string;
-    short_title?: string;
-}
-
-interface LessonData {
-    _id: string;
-    title: string;
-    description: string;
-    content: string;
-    moduleId: Module;
-    questions: Question[];
-    // Add other fields if necessary
 }
 
 const lesson = ref<Lesson | null>(null);
@@ -116,12 +103,12 @@ const startTest = () => {
 onBeforeMount(async () => {
     if (_id) {
         try {
-            lessonsStore.lessons.forEach(element => {
-                if (_id.value === element._id) {
-                    lessonsStore.lesson = element
-                }
-            })
-            // await lessonsStore.fetchLessonById(_id.value);
+            // lessonsStore.lessons.forEach(element => {
+            //     if (_id.value === element._id) {
+            //         lessonsStore.lesson = element
+            //     }
+            // })
+            await lessonsStore.fetchLessonById(_id.value);
             lesson.value = lessonsStore.getLesson as Lesson;
 
             if (lesson.value && lesson.value.content) {
@@ -148,7 +135,7 @@ onMounted(async () => {
     if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.BackButton.show();
         window.Telegram.WebApp.BackButton.onClick(() => {
-            useRouter().push({ path: `/modules/${lesson.value?.moduleId}` });
+            useRouter().push({ path: `/modules/${lesson.value?.moduleId._id}` });
         });
         window.Telegram.WebApp.MainButton.setText('Пройти тест');
         window.Telegram.WebApp.MainButton.onClick(() => startTest());
