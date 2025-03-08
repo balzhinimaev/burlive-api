@@ -644,6 +644,9 @@ const vocabularyController = {
                 id: telegram_user_id,
             });
             if (!user) {
+                logger.error("Попытка перевести слово без telegram_user_id")    
+                res.status(404).json({ message: "Пользователь не найден" })
+                return
                 throw Error;
             }
 
@@ -744,6 +747,8 @@ const vocabularyController = {
                 translateUrl = `https://burlang.ru/api/v1/buryat-word/translate?q=${encodeURIComponent(normalized_userInput)}`;
             }
 
+            logger.info(`url перевода ${translateUrl}`);
+
             // Выполняем запрос к API перевода
             const translateResponse = await fetch(translateUrl, {
                 method: 'GET',
@@ -801,13 +806,14 @@ const vocabularyController = {
 
             // (Опционально) Обновление рейтинга пользователя
             // await updateRating(new ObjectId(telegram_user_id), 10); // Например, добавить 10 баллов
-            await updateRating(user.id, 1)
+            await updateRating(user._id, 2)
             res.status(200).json({
                 message: burlang_translate_result,
                 burlivedb,
                 // translatedText,
             });
         } catch (error: any) {
+            logger.error(error)
             logger.error(`Ошибка при переводе слова: ${error.message}`);
             res.status(500).json({ message: 'Ошибка при переводе слова' });
             next(error);
