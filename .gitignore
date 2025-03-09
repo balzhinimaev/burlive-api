@@ -140,3 +140,4 @@ dist
 api/src/logs/combined.log
 
 ./uploads
+uploads
