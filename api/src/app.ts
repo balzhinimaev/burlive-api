@@ -63,7 +63,7 @@ app.post(
 );
 
 app.use(bodyParser.json());
-app.use('', async (req, res, next) => {
+app.use('/', async (req, res, next) => {
     // console.log(req)
     let body = req.body;
     if (body.type) {

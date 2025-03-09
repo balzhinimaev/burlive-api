@@ -11,7 +11,7 @@ $light-description-color: #868686;
 $light-text-color: #333;
 
 $darkness-dark: #1c1c1c;
-$darkness-shadow: #1e1e1e;
+$darkness-shadow: #292929;
 $dark-hover: #121212;
 $light-hover: $light;
 
@@ -64,3 +64,10 @@ $option-container-explanation-color-light: #f1f1f1;
 $option-container-correct-color-dark: #589174;
 $option-container-incorrect-color-dark: #c54b53;
 $option-container-explanation-color-dark: #1d1d1d;
+
+
+$background-page-color-dark: #121113;
+$background-page-color-light: #d3d3d3;
+
+$background-rating-item-light: linear-gradient(270.75deg, rgba(99, 96, 183, 0.44) 0.65%, rgba(54, 78, 235, 0.44) 99.46%);
+$background-rating-item-dark: linear-gradient(269.75deg, rgba(29, 29, 29, 0.2) 0.17%, rgba(36, 33, 33, 0.2) 99.74%);

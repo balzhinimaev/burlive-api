@@ -5,6 +5,7 @@
 
 :root {
     --background-color: #{$custom-light-background};
+    --background-page-color: #{$background-page-color-light};
     --background-component-color: #{$custom-light-secondary-background};
     --text-color: #{$custom-text-color-light};
     --shadow-color: #{$custom-shadow-color-light};
@@ -18,6 +19,8 @@
     --option-container-incorrect-color: #{$option-container-incorrect-color-light};
     --option-container-explanation-color: #{$option-container-explanation-color-light};
     --border-radius: 10px;
+
+    --background-rating-item: #{$background-rating-item-light};
 }
 
 body {
@@ -34,6 +37,7 @@ a {
 
 body[data-theme='dark'] {
     --background-color: #{$custom-dark-background};
+    --background-page-color: #{$background-page-color-dark};
     --background-component-color: #{$custom-dark-secondary-background};
     --text-color: #{$dark-text-color};
     --shadow-color: #{$custom-shadow-color-dark};
@@ -46,4 +50,6 @@ body[data-theme='dark'] {
     --option-container-correct-color: #{$option-container-correct-color-dark};
     --option-container-incorrect-color: #{$option-container-incorrect-color-dark};
     --option-container-explanation-color: #{$option-container-explanation-color-dark};
+    
+    --background-rating-item: #{$background-rating-item-dark};
 }
