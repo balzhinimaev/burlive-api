@@ -1,6 +1,7 @@
 // src/controllers/participationController.ts
 import { Request, Response } from 'express';
 import Participation from '../models/Participation';
+import logger from '../utils/logger';
 
 class ParticipationController {
     /**
@@ -55,12 +56,16 @@ class ParticipationController {
                 points: 0,
             });
             await participation.save();
+            logger.info(`Новый участник розыгрыша ${userId}:${promotionId}`)
             res.status(201).json({
                 message: 'Участие зарегистрировано',
                 participation,
             });
         } catch (error) {
             console.error(error);
+            logger.info(
+                `Ошибка регистрации участника розыгрыша`,
+            );
             res.status(500).json({ message: 'Ошибка при регистрации участия' });
             return;
         }
