@@ -254,7 +254,7 @@ const telegramController = {
                 platform,
                 referral,
             } = req.body;
-            logger.info(`${referral}`)
+            logger.info(`${referral}`);
             // Проверка на существование пользователя
             const existingUser = await TelegramUserModel.findOne({ id });
             if (existingUser) {
@@ -676,6 +676,29 @@ const telegramController = {
             }
         } catch (error) {
             console.error('Error tracking referral:', error);
+            res.status(500).json({ message: 'Ошибка сервера' });
+            return;
+        }
+    },
+    // Новая функция: получение лидерборда
+    getLeaderboard: async (
+        _req: Request,
+        res: Response,
+        _next: NextFunction,
+    ): Promise<void> => {
+        try {
+            // Предполагается, что в модели есть поле dailyRating для рейтинга за сутки.
+            const leaderboard = await TelegramUserModel.find({})
+                .select(
+                    'username id first_name dailyRating photo level subscription rating',
+                )
+                .sort({ dailyRating: -1, createdAt: 1 })
+                .limit(10); // Возвращаем топ-10
+            logger.info(`${leaderboard.length} лидеров получено`)
+            res.json(leaderboard);
+            return
+        } catch (error) {
+            console.error('Error get leaderboard:', error);
             res.status(500).json({ message: 'Ошибка сервера' });
             return;
         }

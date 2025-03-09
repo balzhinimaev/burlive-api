@@ -3,6 +3,7 @@ import express from 'express';
 import telegramController from '../controllers/telegramController';
 import subscriptionController from '../controllers/subscriptionController';
 import checkSubscription from '../middleware/checkSubscription';
+import refferalController from '../controllers/refferalController';
 
 const telegramRouter = express.Router();
 
@@ -13,10 +14,12 @@ telegramRouter.get(
     '/user/referral/:id',
     telegramController.getUserReferralInfo,
 );
+telegramRouter.get("/leaderboard", telegramController.getLeaderboard);
 telegramRouter.get("/user", telegramController.getAllUsers);
 
 
 telegramRouter.post("/payment-callback", subscriptionController.paymentCallback);
+telegramRouter.post("/check-subscription", refferalController.checkSubscription);
 telegramRouter.post("/create-user", telegramController.register_telegram_user);
 telegramRouter.post("/select-language-for-vocabular", telegramController.select_language_for_vocabular);
 telegramRouter.post("/new-word-translate-request", telegramController.new_word_translate_request);
