@@ -4,41 +4,41 @@ import { User } from "telegraf/typings/core/types/typegram";
 import LevelModel, { ILevel } from "./Level";
 
 export interface TelegramUser extends User {
-  _id: Types.ObjectId;
-  rating: number;
-  level: Types.ObjectId | ILevel;
-  referrals_telegram: Types.ObjectId[];
-  referral_code: string;
-  referred_by: null | Types.ObjectId;
-  id: number;
-  email: string;
-  c_username: string;
-  theme: "light" | "dark";
-  platform: string;
-  via_app: boolean;
-  photo_url: string;
-  phone?: string | number;
-  role: "admin" | "user" | "moderator" | undefined;
+    _id: Types.ObjectId;
+    rating: number;
+    level: Types.ObjectId | ILevel;
+    referrals_telegram: Types.ObjectId[];
+    referral_code: string;
+    referred_by: null | Types.ObjectId;
+    id: number;
+    email: string;
+    c_username: string;
+    theme: 'light' | 'dark';
+    platform: string;
+    via_app: boolean;
+    photo_url: string;
+    phone?: string | number;
+    role: 'admin' | 'user' | 'moderator' | undefined;
+    dailyRating: number;
+    actions: Types.ObjectId[];
 
-  actions: Types.ObjectId[];
-
-  vocabular: {
-    selected_language_for_translate: "russian" | "buryat";
-  };
-  currentQuestion: {
-    lessonId: Types.ObjectId;
-    questionPosition: number;
-  },
-  subscription: {
-    type: "monthly" | "quarterly" | "annual" | null;
-    startDate: Date | null;
-    endDate: Date | null;
-    isActive: boolean;
-    paymentId: Types.ObjectId;
-  };
-  blocked?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    vocabular: {
+        selected_language_for_translate: 'russian' | 'buryat';
+    };
+    currentQuestion: {
+        lessonId: Types.ObjectId;
+        questionPosition: number;
+    };
+    subscription: {
+        type: 'monthly' | 'quarterly' | 'annual' | null;
+        startDate: Date | null;
+        endDate: Date | null;
+        isActive: boolean;
+        paymentId: Types.ObjectId;
+    };
+    blocked?: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface TelegramUserDocument extends TelegramUser, Document {
@@ -63,6 +63,7 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
         },
 
         rating: { type: Number, required: true, default: 1 },
+        dailyRating: { type: Number, required: true, default: 1 },
         level: { type: Schema.Types.ObjectId, ref: 'Level', required: true },
         actions: [{ type: Schema.Types.ObjectId, ref: 'TelegramUserAction' }],
         via_app: { type: Boolean, required: false, default: false },
