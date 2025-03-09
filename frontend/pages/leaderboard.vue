@@ -2,11 +2,13 @@
     <div class="leaderboard-page">
         <section>
             <div class="container">
-                <div class="frame">
-                    <h3>Топ 5 пользователей</h3>
+
+                <UserInfo />
+                <div class="frame mt-4">
+                    <h4 style="text-align: left;">Топ 5 пользователей</h4>
                 </div>
-                
-                {{ user }}
+
+
 
                 <!-- Индикатор загрузки -->
                 <div v-if="isLeaderboardFetch" class="loading-indicator">
@@ -25,23 +27,25 @@
                     <div v-for="(userLeaderboard, index) in leaderboard.slice(0, 5)" :key="userLeaderboard.id"
                         :class="['leaderboard-row', { highlight: userLeaderboard.id === currentUserId }]">
                         <div class="rank-column">{{ index + 1 }}</div>
-                        <div class="user-column">
-                            {{ userLeaderboard.username || userLeaderboard.first_name }}
+                        <div class="user-column" v-if="userLeaderboard.username || userLeaderboard.first_name">
+                            <p class="user-column-name">{{ truncate(userLeaderboard.username || userLeaderboard.first_name) }}</p>
                         </div>
-                        <div class="rating-column">{{ userLeaderboard.rating }}</div>
+                        <div class="rating-column">{{ userLeaderboard.dailyRating }}</div>
                     </div>
                 </div>
 
                 <!-- Если данных нет -->
                 <p v-else class="no-data-message">Нет данных для отображения</p>
 
+
+
                 <!-- Если текущий пользователь не входит в топ-10 -->
-                <div v-if="!isUserInTop10 && userRank && userRank > 50" class="user-rank-block">
+                <div v-if="!isUserInTop10 && userRank && userRank > 4" class="user-rank-block">
                     <p>
                         Ваше место:
                         <strong>{{ userRank }}</strong>
                         <br />
-                        {{ user.username || user.first_name }} — {{ userRating }}
+                        {{ user?.username ? user?.username : user?.first_name }} — {{ userRating }}
                     </p>
                 </div>
             </div>
@@ -66,7 +70,10 @@ import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import type { ITask } from '~/server/api/tasks.get'
 import type { User } from '@/stores/userStore'
-
+const truncate = (value: string | undefined, maxLength = 10): string => {
+    if (!value) return ''
+    return value.length > maxLength ? value.slice(0, maxLength) + '...' : value
+}
 const promotionId = ref("67ccfb6cab6af833b096470d")
 
 const userStore = useUserStore()
@@ -275,7 +282,7 @@ watch(() => user.value, (newUser) => {
 const userRating = computed(() => {
     if (!leaderboard.value || !currentUserId.value) return null
     const found = leaderboard.value.find((u) => u.id === currentUserId.value)
-    return found ? found.rating : null
+    return found ? found.dailyRating : null
 })
 
 // Определяем позицию пользователя в общем списке
@@ -290,13 +297,13 @@ const userRank = computed(() => {
 // Проверяем, входит ли пользователь в топ-10
 const isUserInTop10 = computed(() => {
     if (!userRank.value) return false
-    return userRank.value <= 10
+    return userRank.value <= 5
 })
 </script>
 
 <style lang="scss" scoped>
 .leaderboard-page {
-    padding: 2rem 10px;
+    padding: 1rem 10px;
     background-color: var(--background-page-color);
 
     .frame {
