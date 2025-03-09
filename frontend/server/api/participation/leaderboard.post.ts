@@ -1,0 +1,56 @@
+import { defineEventHandler, createError, setHeader } from 'h3';
+import { User } from '~/stores/userStore';
+
+export interface leaderboardUser {
+    id: number;
+    _id: string;
+    rating: number;
+    username?: string;
+    first_name?: string;
+}
+
+export interface leaderboardItem {
+    _id: string;
+    promotion: string;
+    user: leaderboardUser;
+    points: number;
+    tasksCompleted: string[]; //????
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface getLeaderboardResponse {
+    userRank: number,
+    leaderboard: leaderboardItem[]
+}
+
+export default defineEventHandler(
+  async (event): Promise<getLeaderboardResponse> => {
+    const config = useRuntimeConfig();
+    const apiBase = config.apiBase;
+    const jwtToken = config.jwtToken;
+
+    const body = await readBody(event);
+
+    try {
+      // Прокси-запрос к бэкенду
+      const response: getLeaderboardResponse = await $fetch(
+        `${apiBase}/participation/leaderboard`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: jwtToken,
+          },
+          body,
+        }
+      );
+
+      return response;
+    } catch (error: any) {
+      throw createError({
+        statusCode: error.response?.status || 500,
+        statusMessage: error.message || "Internal Server Error",
+      });
+    }
+  }
+);

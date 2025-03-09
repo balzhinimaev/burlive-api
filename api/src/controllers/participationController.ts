@@ -11,7 +11,17 @@ class ParticipationController {
      */
     async getParticipation(req: Request, res: Response): Promise<void> {
         try {
+
+            
             const { promotionId, userId } = req.params;
+            
+            logger.info(`Проверка пользователя на участие в розыгрыше ${promotionId}:${userId}`)
+            
+            if (!promotionId || !userId) {
+                res.status(400).json({ message: "Не все поля указаны" })
+                return
+            }
+
             const participation = await Participation.findOne({
                 promotion: promotionId,
                 user: userId,
@@ -39,6 +49,9 @@ class ParticipationController {
     async joinPromotion(req: Request, res: Response): Promise<void> {
         try {
             const { promotionId, userId } = req.body;
+
+            logger.info(`Присоединение пользователя ${userId} к розыгрышу ${promotionId}`)
+
             // Проверка существования записи участия
             let participation = await Participation.findOne({
                 promotion: promotionId,
@@ -53,7 +66,7 @@ class ParticipationController {
             participation = new Participation({
                 promotion: promotionId,
                 user: userId,
-                points: 0,
+                points: 1,
             });
             await participation.save();
             logger.info(`Новый участник розыгрыша ${userId}:${promotionId}`)
@@ -115,6 +128,8 @@ class ParticipationController {
         try {
             const { currentUserId, promotionId } = req.body;
 
+            logger.info(`Получение лидерборда пользователем ${currentUserId}:${promotionId}`)
+
             if (!currentUserId) {
                 res.status(404).json({
                     message: 'Поле currentUserId обязателен',
@@ -132,7 +147,7 @@ class ParticipationController {
                 promotion: promotionId,
             })
                 .sort({ points: -1 })
-                .populate('user', 'username first_name rating');
+                .populate('user', 'id username first_name rating dailyRating');
 
             let userRank: number | null = null;
             if (currentUserId) {

@@ -24,20 +24,18 @@
                         <div class="rating-column">Рейтинг</div>
                     </div>
                     <!-- Ряды списка -->
-                    <div v-for="(userLeaderboard, index) in leaderboard.slice(0, 5)" :key="userLeaderboard.id"
-                        :class="['leaderboard-row', { highlight: userLeaderboard.id === currentUserId }]">
+                    <div v-for="(userLeaderboard, index) in leaderboard.slice(0, 5)" :key="userLeaderboard.user.id"
+                        :class="['leaderboard-row', { highlight: userLeaderboard.user.id === currentUserId }]">
                         <div class="rank-column">{{ index + 1 }}</div>
-                        <div class="user-column" v-if="userLeaderboard.username || userLeaderboard.first_name">
-                            <p class="user-column-name">{{ truncate(userLeaderboard.username || userLeaderboard.first_name) }}</p>
+                        <div class="user-column" v-if="userLeaderboard.user.username || userLeaderboard.user.first_name">
+                            {{ truncate(userLeaderboard.user.username || userLeaderboard.user.first_name) }}
                         </div>
-                        <div class="rating-column">{{ userLeaderboard.dailyRating }}</div>
+                        <div class="rating-column">{{ userLeaderboard.points }}</div>
                     </div>
                 </div>
 
                 <!-- Если данных нет -->
                 <p v-else class="no-data-message">Нет данных для отображения</p>
-
-
 
                 <!-- Если текущий пользователь не входит в топ-10 -->
                 <div v-if="!isUserInTop10 && userRank && userRank > 4" class="user-rank-block">
@@ -92,6 +90,7 @@ const user = computed(() => userStore.user)
 const currentUserId = computed(() => user.value?.id || null)
 
 const tasks = ref(<ITask[]>[])
+const isParticipation = computed(() => userStore.getResponseCheckParicipation)
 
 /**
  * Функция для проверки доступности localStorage
@@ -228,7 +227,7 @@ onBeforeMount(async () => {
 
     try {
         // Загружаем лидерборд и задачи
-        await userStore.fetchLeaderboard()
+        await userStore.fetchLeaderboard(promotionId.value)
         const response = await $fetch("/api/tasks")
         tasks.value = response.tasks
     } catch (error) {
@@ -238,12 +237,30 @@ onBeforeMount(async () => {
 
 // Дополнительная логика при полном монтировании компонента
 onMounted(async () => {
+    
+    // Попытка загрузить данные из localStorage
+    const storedUser = getUserFromLocalStorage()
+    if (storedUser) {
+        // console.log('Найден пользователь в localStorage:', storedUser)
+        // Используем существующие методы для установки пользователя
+        await checkAndSetUser(storedUser)
+    }
+
     // Логика для Telegram WebApp
     if (window.Telegram?.WebApp) {
         // Настройка кнопки участия
-        window.Telegram.WebApp.MainButton.setText("Участвую")
-        window.Telegram.WebApp.MainButton.onClick(() => toParticipation())
-        window.Telegram.WebApp.MainButton.show()
+        await userStore.checkParticipation(promotionId.value)
+        
+        if (isParticipation.value === 404) {
+            // alert("Пользователь отсутствует")
+            window.Telegram.WebApp.MainButton.setText("Участвую")
+            window.Telegram.WebApp.MainButton.show()
+            window.Telegram.WebApp.MainButton.onClick(async () => {
+                await userStore.joinToLeaderboard(promotionId.value)
+                window.Telegram?.WebApp.MainButton.hide()
+                await userStore.fetchLeaderboard(promotionId.value)
+            })
+        }
 
         // Получение данных пользователя из Telegram WebApp
         if (window.Telegram.WebApp.initDataUnsafe?.user) {
@@ -262,10 +279,7 @@ async function toParticipation() {
     console.log('Пользователь нажал кнопку участия')
     try {
         // Пример запроса для участия
-        // await $fetch('/api/participate', {
-        //     method: 'POST',
-        //     body: { userId: currentUserId.value, promotionId: promotionId.value }
-        // })
+        await userStore.joinToLeaderboard(promotionId.value)
     } catch (error) {
         console.error('Ошибка при участии:', error)
     }
@@ -281,15 +295,15 @@ watch(() => user.value, (newUser) => {
 // Вычисляем рейтинг пользователя
 const userRating = computed(() => {
     if (!leaderboard.value || !currentUserId.value) return null
-    const found = leaderboard.value.find((u) => u.id === currentUserId.value)
-    return found ? found.dailyRating : null
+    const found = leaderboard.value.find((u) => u.user.id === currentUserId.value)
+    return found ? found.points : null
 })
 
 // Определяем позицию пользователя в общем списке
 const userRank = computed(() => {
     if (!leaderboard.value || !currentUserId.value) return null
     const index = leaderboard.value.findIndex(
-        (u) => u.id === currentUserId.value
+        (u) => u.user.id === currentUserId.value
     )
     return index >= 0 ? index + 1 : null
 })

@@ -195,7 +195,7 @@ const telegramController = {
             const { id } = req.params;
             const user = await TelegramUserModel.findOne({ id: Number(id) })
                 .select(
-                    '_id id c_username email createdAt first_name rating theme photo_url role subscription phone',
+                    '_id id username email createdAt first_name rating theme photo_url role subscription phone',
                 )
                 .populate('level');
 
@@ -217,7 +217,7 @@ const telegramController = {
                 user: {
                     _id: user._id,
                     id: user.id,
-                    c_username: user.c_username,
+                    username: user.username,
                     createdAt: user.createdAt,
                     first_name: user.first_name,
                     rating: user.rating,

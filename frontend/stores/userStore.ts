@@ -1,5 +1,7 @@
 // stores/user.ts
 import { defineStore } from 'pinia';
+import type { participationJoinResponse } from '~/server/api/participation/join.post';
+import type { getLeaderboardResponse, leaderboardItem, leaderboardUser } from '~/server/api/participation/leaderboard.post';
 
 // Определение интерфейсов
 export interface User {
@@ -47,14 +49,26 @@ export const useUserStore = defineStore({
     on_fetching_user_result: true as boolean,
     photo_url: null as string | null,
     error: null as string | null, // Состояние ошибки
-    leaderboard: null as User[] | null,
+
+    leaderboard: null as leaderboardItem[] | null,
+    userRank: null as number | null,
+
+    joining: false as boolean,
+    joined: false as boolean,
+
+    joinResponse: null as string | null,
+    userSuccessJoined: null as boolean | null,
+
     isLeaderboardFetch: true,
+
+    checkParicipationResponse: null as any
   }),
 
   // Геттеры
   getters: {
     isFetching: (state) => state.on_fetching_user_result,
     getUser: (state) => state.user,
+    getResponseCheckParicipation: (state) => state.checkParicipationResponse,
     getLeaderboard: (state) => state.leaderboard,
     fetchMessage: (state) => state.fetch_user_result,
     getPhotoUrl: (state) => state.photo_url,
@@ -153,18 +167,75 @@ export const useUserStore = defineStore({
       }
     },
 
-    async fetchLeaderboard() {
+    async fetchLeaderboard(promotionId: string) {
       this.isLeaderboardFetch = true;
       try {
-        const response = await $fetch<User[]>(`/api/telegram/leaderboard`);
+        const response = await $fetch<getLeaderboardResponse>(
+          `/api/participation/leaderboard`,
+          {
+            method: "POST",
+            body: {
+              promotionId,
+              currentUserId: this.user?._id,
+            },
+          }
+        );
         if (!response) {
           throw new Error(`Некорректный формат ответа от API`);
         }
-        this.leaderboard = response;
+        this.leaderboard = response.leaderboard;
       } catch (error) {
         return false;
       } finally {
         this.isLeaderboardFetch = false;
+      }
+    },
+
+    async joinToLeaderboard(promotionId: string) {
+      this.joining = true;
+      this.joined = false;
+      try {
+        const response = await $fetch<participationJoinResponse>(
+          `/api/participation/join`,
+          {
+            method: "POST",
+            body: {
+              promotionId,
+              userId: this.user?._id,
+            },
+          }
+        );
+        if (!response) {
+          throw new Error(`Некорректный формат ответа от API`);
+        }
+        this.joinResponse = response.message;
+        if (response.participation) {
+          this.userSuccessJoined = true
+        }
+
+      } catch (error) {
+        return false;
+      } finally {
+        this.joining = false;
+      }
+    },
+
+    async checkParticipation(promotionId: string) {
+      try {
+        const response: any = await $fetch(
+          `/api/participation/${promotionId}/user/${this.user?._id}`,
+          {
+            method: "GET",
+          }
+        );
+        if (!response) {
+          throw new Error(`Некорректный формат ответа от API`);
+        }
+        this.checkParicipationResponse = response;
+      } catch (error: any) {
+        const message = `Ошибка при проверке пользователя на существование в розыгрыше`;
+        this.checkParicipationResponse = error.data.statusCode
+        return message;
       }
     },
   },

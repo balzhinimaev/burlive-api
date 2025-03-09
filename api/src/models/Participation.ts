@@ -22,7 +22,7 @@ const ParticipationSchema: Schema = new Schema(
             ref: 'telegram_user',
             required: true,
         },
-        points: { type: Number, required: true, default: 0 },
+        points: { type: Number, required: true, default: 1 },
         tasksCompleted: [
             { type: Schema.Types.ObjectId, ref: 'TaskCompletion' },
         ],
