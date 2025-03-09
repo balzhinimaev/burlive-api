@@ -43,10 +43,12 @@
             </div>
         </div>
 
-        <!-- Стилизованное модальное окно с плавным появлением -->
+        <!-- Стилизованное модальное окно -->
         <div v-show="isModalVisible" class="modal-overlay" @click.self="closeModal">
-            <div class="modal-content" :class="{ 'slide-active': isModalOpen }">
-                <!-- Шапка модального окна с полоской для перетаскивания -->
+            <!-- Обработчики перетаскивания назначены на весь блок модального окна -->
+            <div ref="modalContentEl" class="modal-content" :class="{ 'slide-active': isModalOpen }" :style="dragStyle"
+                @mousedown="onDragStart" @touchstart="onDragStart">
+                <!-- Шапка модального окна с визуальной полоской -->
                 <div class="modal-header">
                     <div class="drag-handle"></div>
                     <button class="modal-close" @click="closeModal">
@@ -59,7 +61,6 @@
 
                 <!-- Основной контент модального окна -->
                 <div class="modal-body">
-                    <!-- Изображение и заголовок -->
                     <div class="modal-task-header">
                         <div class="modal-task-image" v-if="selectedTask?.imageUrl">
                             <NuxtImg width="80" height="80"
@@ -70,43 +71,88 @@
                         </div>
                     </div>
 
-                    <!-- Описание задачи -->
                     <div class="modal-task-description">
                         <p>{{ selectedTask?.description }}</p>
                     </div>
 
-                    <!-- Информация о преимуществах -->
                     <div class="modal-task-benefits" v-if="selectedTask?.taskType === 'subscription'">
                         <h3>Преимущества подписки</h3>
                         <ul class="benefits-list">
                             <li>
                                 <span class="benefit-icon">✓</span>
-                                <span class="benefit-text">Ранний доступ к новым урокам</span>
+                                <span class="benefit-text">
+                                    Ранний доступ к новым урокам
+                                </span>
                             </li>
                             <li>
                                 <span class="benefit-icon">✓</span>
-                                <span class="benefit-text">Эксклюзивные материалы по изучению бурятского языка</span>
+                                <span class="benefit-text">
+                                    Эксклюзивные материалы по изучению бурятского языка
+                                </span>
                             </li>
                             <li>
                                 <span class="benefit-icon">✓</span>
-                                <span class="benefit-text">Мгновенные уведомления о новом контенте</span>
+                                <span class="benefit-text">
+                                    Мгновенные уведомления о новом контенте
+                                </span>
                             </li>
                         </ul>
                     </div>
+
+                    <div class="subscription-reward" v-if="
+                        selectedTask?.taskType === 'subscription' &&
+                        selectedTask.rewardPoints
+                    ">
+                        <p>
+                            За подписку вы получите {{ selectedTask.rewardPoints }} очков.
+                        </p>
+                    </div>
                 </div>
 
-                <!-- Футер модального окна с кнопкой действия -->
+                <!-- Футер модального окна -->
                 <div class="modal-footer">
-                    <button class="action-button" @click="subscribeChannel">
-                        <span v-if="selectedTask?.taskType === 'subscription'">Подписаться на канал</span>
-                        <span v-else-if="selectedTask?.taskType === 'friend'">Пригласить друга</span>
-                        <span v-else>Продолжить</span>
-
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </button>
+                    <template v-if="selectedTask?.taskType === 'subscription'">
+                        <button class="action-button" @click="subscribeChannel">
+                            <span>Подписаться на канал</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                        <button class="action-button secondary" @click="checkSubscription">
+                            <span>Проверить подписку</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                        <p class="subscription-note">
+                            Отписываться можно не ранее, чем через 5 дней, чтобы рейтинг не был
+                            списан.
+                        </p>
+                    </template>
+                    <template v-else-if="selectedTask?.taskType === 'friend'">
+                        <button class="action-button" @click="inviteFriend">
+                            <span>Пригласить друга</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </template>
+                    <template v-else>
+                        <button class="action-button">
+                            <span>Продолжить</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </template>
                 </div>
             </div>
         </div>
@@ -114,7 +160,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { ITask } from '~/server/api/tasks.get'
 
 interface Props {
@@ -126,11 +172,19 @@ const isModalOpen = ref(false)
 const isModalVisible = ref(false)
 const selectedTask = ref<ITask | null>(null)
 
+// Переменные для драггинга
+const isDragging = ref(false)
+const startY = ref(0)
+const dragOffset = ref(0)
+const DRAG_THRESHOLD = 150
+let initialHeight = 0
+
+const modalContentEl = ref<HTMLElement | null>(null)
+
 const openSubscriptionModal = (task: ITask) => {
     selectedTask.value = task
     isModalVisible.value = true
 
-    // Небольшая задержка для гарантированного применения анимации
     setTimeout(() => {
         isModalOpen.value = true
     }, 10)
@@ -138,12 +192,11 @@ const openSubscriptionModal = (task: ITask) => {
 
 const closeModal = () => {
     isModalOpen.value = false
-
-    // Задержка перед скрытием всего оверлея, чтобы анимация могла завершиться
+    dragOffset.value = 0
     setTimeout(() => {
         isModalVisible.value = false
         selectedTask.value = null
-    }, 300) // Соответствует времени transition в CSS
+    }, 300)
 }
 
 const subscribeChannel = () => {
@@ -155,6 +208,10 @@ const subscribeChannel = () => {
     }
 }
 
+const checkSubscription = () => {
+    alert("Проверка подписки...")
+}
+
 const inviteFriend = () => {
     const inviteLink = `https://t.me/share/url?url=https://t.me/burlang_bot&text=Присоединяйся ко мне в изучении и продвижении бурятского языка!`
     if (window.Telegram?.WebApp) {
@@ -163,6 +220,58 @@ const inviteFriend = () => {
         window.open(inviteLink, '_blank')
     }
 }
+
+// Начало перетаскивания (игнорируем, если событие исходит от кнопки)
+const onDragStart = (event: MouseEvent | TouchEvent) => {
+    if ((event.target as HTMLElement).closest('button')) return
+
+    isDragging.value = true
+    startY.value = event instanceof TouchEvent ? event.touches[0].clientY : event.clientY
+
+    // Запоминаем исходную высоту модального окна
+    initialHeight = modalContentEl.value?.offsetHeight || 0
+
+    document.addEventListener('mousemove', onDragMove)
+    document.addEventListener('mouseup', onDragEnd)
+    document.addEventListener('touchmove', onDragMove)
+    document.addEventListener('touchend', onDragEnd)
+}
+
+// Обработка перемещения
+const onDragMove = (event: MouseEvent | TouchEvent) => {
+    if (!isDragging.value) return
+    const currentY = event instanceof TouchEvent ? event.touches[0].clientY : event.clientY
+    dragOffset.value = currentY - startY.value
+}
+
+// По окончании перетаскивания
+const onDragEnd = () => {
+    document.removeEventListener('mousemove', onDragMove)
+    document.removeEventListener('mouseup', onDragEnd)
+    document.removeEventListener('touchmove', onDragMove)
+    document.removeEventListener('touchend', onDragEnd)
+
+    if (dragOffset.value > DRAG_THRESHOLD) {
+        closeModal()
+    } else {
+        // Сбрасываем смещение для обоих направлений
+        dragOffset.value = 0
+    }
+    isDragging.value = false
+}
+
+// Вычисляемый стиль для перетаскивания:
+// Если смещение вниз – используем translateY,
+// если смещение вверх (dragOffset < 0) – увеличиваем высоту модального окна
+const dragStyle = computed(() => {
+    if (!isDragging.value) return {}
+    if (dragOffset.value < 0) {
+        const newHeight = Math.min(initialHeight + Math.abs(dragOffset.value), window.innerHeight)
+        return { height: `${newHeight}px`, transform: 'none', transition: 'none' }
+    } else {
+        return { transform: `translateY(${dragOffset.value}px)`, transition: 'none' }
+    }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -210,7 +319,6 @@ const inviteFriend = () => {
 .item-header-content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
 
     .item-header-content-title {
         font-size: 1rem;
@@ -256,8 +364,8 @@ const inviteFriend = () => {
     position: relative;
     overflow-y: auto;
     transform: translateY(100%);
-    transition: transform 0.3s ease-out;
-    will-change: transform;
+    transition: transform 0.3s ease-out, height 0.3s ease-out;
+    will-change: transform, height;
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -281,6 +389,7 @@ const inviteFriend = () => {
     background-color: #ddd;
     border-radius: 4px;
     margin-bottom: 12px;
+    cursor: grab;
 }
 
 .modal-close {
@@ -306,7 +415,7 @@ const inviteFriend = () => {
 
 /* Основная часть модального окна */
 .modal-body {
-    padding: 20px 24px;
+    padding: 20px 24px 10px;
     flex: 1;
 }
 
@@ -394,11 +503,21 @@ const inviteFriend = () => {
     }
 }
 
+/* Информация о начисляемых очках */
+.subscription-reward {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary-color, #666);
+    margin-bottom: 24px;
+}
+
 /* Футер модального окна */
 .modal-footer {
-    padding: 16px 24px 32px;
+    padding: 8px 24px 32px;
+    /* уменьшен верхний отступ */
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .action-button {
@@ -430,5 +549,16 @@ const inviteFriend = () => {
     svg {
         stroke: white;
     }
+}
+
+.action-button.secondary {
+    margin-top: 12px;
+}
+
+.subscription-note {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: var(--text-secondary-color, #666);
+    text-align: center;
 }
 </style>
