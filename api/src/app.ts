@@ -25,6 +25,8 @@
   import bodyParser from 'body-parser';
   import logger from './utils/logger';
   import subscriptionController from './controllers/subscriptionController';
+import participationRouter from './routes/participationRouter';
+import promotionRouter from './routes/promotionRouter';
 
   const app = express();
   const server = createServer(app);
@@ -56,6 +58,8 @@
     next()
   })
   app.use('/users', userRouter);
+  app.use('/promotion', promotionRouter);
+  app.use('/participation', participationRouter);
   app.use('/dialect', authenticateToken, dialectRouter);
   app.use('/sentences', authenticateToken, sentencesRouter);
   app.use('/vocabulary', authenticateToken, vocabularyRouter);
