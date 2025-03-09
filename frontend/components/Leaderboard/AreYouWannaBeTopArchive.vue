@@ -67,7 +67,7 @@ const inviteFriend = () => {
     }
 };</script>
 
-<style>
+<style lang="scss" scoped>
 .frame-wrapper {
     /* Frame 21 */
 
@@ -92,7 +92,7 @@ const inviteFriend = () => {
         padding: 16px;
         gap: 8px;
         width: 100%;
-        background: var(--background-rating-item);
+        background: var(--background-component-color);
         box-shadow: 0px 4px 4px rgba(16, 16, 16, 0.25);
         border-radius: 15px;
 
@@ -143,16 +143,13 @@ const inviteFriend = () => {
                     font-size: 16px;
                     line-height: 21px;
 
-                    color: #FFFFFF;
-
                 }
 
                 .item-header-content-description {
 
-                    font-size: 12px;
+                    font-size: 14px;
                     line-height: 16px;
 
-                    color: #FFFFFF;
                 }
 
             }
@@ -205,7 +202,7 @@ const inviteFriend = () => {
                 /* +300 очков за подписку */
 
                 font-weight: 400;
-                font-size: 12px;
+                font-size: 14px;
                 line-height: 16px;
                 /* identical to box height */
 

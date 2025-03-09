@@ -3,8 +3,10 @@
         <section>
             <div class="container">
                 <div class="frame">
-                    <h2>Топ рейтинг</h2>
+                    <h3>Топ 5 пользователей</h3>
                 </div>
+                
+                {{ user }}
 
                 <!-- Индикатор загрузки -->
                 <div v-if="isLeaderboardFetch" class="loading-indicator">
@@ -20,7 +22,7 @@
                         <div class="rating-column">Рейтинг</div>
                     </div>
                     <!-- Ряды списка -->
-                    <div v-for="(userLeaderboard, index) in leaderboard.slice(0, 10)" :key="userLeaderboard.id"
+                    <div v-for="(userLeaderboard, index) in leaderboard.slice(0, 5)" :key="userLeaderboard.id"
                         :class="['leaderboard-row', { highlight: userLeaderboard.id === currentUserId }]">
                         <div class="rank-column">{{ index + 1 }}</div>
                         <div class="user-column">
@@ -34,7 +36,7 @@
                 <p v-else class="no-data-message">Нет данных для отображения</p>
 
                 <!-- Если текущий пользователь не входит в топ-10 -->
-                <div v-if="!isUserInTop10 && userRank && userRank > 10" class="user-rank-block">
+                <div v-if="!isUserInTop10 && userRank && userRank > 50" class="user-rank-block">
                     <p>
                         Ваше место:
                         <strong>{{ userRank }}</strong>
@@ -42,19 +44,12 @@
                         {{ user.username || user.first_name }} — {{ userRating }}
                     </p>
                 </div>
-
-                <!-- Отладочная информация (можно удалить в production) -->
-                <!-- <div class="debug-info">
-                <p>User ID: {{ currentUserId }}</p>
-                <p>User Rank: {{ userRank }}</p>
-                <p>Is in Top 10: {{ isUserInTop10 }}</p>
-            </div> -->
             </div>
         </section>
         <section>
-            <div class="container">
-                <h4>Хочешь быть в топе?</h4>
-                <LeaderboardAreYouWannaBeTop />
+            <div class="container" v-if="tasks.length">
+                <h4>Кампании</h4>
+                <LeaderboardAreYouWannaBeTop :tasks="tasks" />
             </div>
         </section>
         <section>
@@ -67,8 +62,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeMount, ref, watch } from 'vue'
+import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useUserStore } from '@/stores/userStore'
+import type { ITask } from '~/server/api/tasks.get'
+import type { User } from '@/stores/userStore'
+
+const promotionId = ref("67ccfb6cab6af833b096470d")
 
 const userStore = useUserStore()
 
@@ -79,51 +78,197 @@ const leaderboard = computed(() => userStore.getLeaderboard)
 const isLeaderboardFetch = computed(() => userStore.isLeaderboardFetch)
 
 // Текущий пользователь из Telegram
-const user = ref<any>(null)
+const isFetching = computed(() => userStore.on_fetching_user_result)
+const user = computed(() => userStore.user)
 
 // Получаем ID текущего пользователя
 const currentUserId = computed(() => user.value?.id || null)
 
-// При монтировании запрашиваем лидерборд и проверяем пользователя
-onBeforeMount(async () => {
+const tasks = ref(<ITask[]>[])
+
+/**
+ * Функция для проверки доступности localStorage
+ */
+function isLocalStorageAvailable() {
     try {
-        await userStore.fetchLeaderboard()
+        const test = '__test__'
+        localStorage.setItem(test, test)
+        localStorage.removeItem(test)
+        return true
+    } catch (e) {
+        console.error('localStorage недоступен:', e)
+        return false
+    }
+}
+
+/**
+ * Функция для сохранения пользовательских данных в localStorage
+ */
+function saveUserToLocalStorage(userData: any) {
+    if (!isLocalStorageAvailable() || !userData) return
+    try {
+        localStorage.setItem('userData', JSON.stringify(userData))
+        console.log('Пользовательские данные сохранены в localStorage')
     } catch (error) {
-        console.log(`Error loading leaderboard`, error)
+        console.error('Ошибка при сохранении в localStorage:', error)
+    }
+}
+
+/**
+ * Функция для получения данных пользователя из localStorage
+ */
+function getUserFromLocalStorage() {
+    if (!isLocalStorageAvailable()) return null
+    try {
+        const storedUser = localStorage.getItem('userData')
+        return storedUser ? JSON.parse(storedUser) : null
+    } catch (error) {
+        console.error('Ошибка при получении из localStorage:', error)
+        return null
+    }
+}
+
+/**
+ * Функция для сохранения данных с временем истечения
+ * @param {string} key - Ключ для сохранения
+ * @param {any} value - Значение для сохранения
+ * @param {number} ttl - Время жизни в миллисекундах
+ */
+function saveWithExpiry(key: any, value: any, ttl: any) {
+    if (!isLocalStorageAvailable()) return
+    try {
+        const now = new Date()
+        const item = {
+            value: value,
+            expiry: now.getTime() + ttl,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+    } catch (error) {
+        console.error('Ошибка при сохранении с истечением срока:', error)
+    }
+}
+
+/**
+ * Функция для получения данных с проверкой времени истечения
+ * @param {string} key - Ключ для получения
+ */
+function getWithExpiry(key: any) {
+    if (!isLocalStorageAvailable()) return null
+    try {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return null
+
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+            localStorage.removeItem(key)
+            return null
+        }
+        return item.value
+    } catch (error) {
+        console.error('Ошибка при получении данных с истечением срока:', error)
+        return null
+    }
+}
+
+/**
+ * Функция для проверки и установки данных пользователя
+ * Использует существующие методы userStore
+ */
+async function checkAndSetUser(telegramUser: any) {
+    if (!telegramUser || !telegramUser.id) {
+        console.error('Нет данных пользователя для проверки')
+        return false
     }
 
+    try {
+        // Проверяем существование пользователя
+        const exists = await userStore.checkUserExists(
+            telegramUser.id,
+            telegramUser.photo_url
+        )
+
+        // Если пользователя нет, создаем его
+        if (!exists) {
+            await userStore.createUser({
+                id: telegramUser.id,
+                first_name: telegramUser.first_name,
+                username: telegramUser.username,
+                photo_url: telegramUser.photo_url,
+                platform: window.Telegram?.WebApp?.platform || 'web'
+            })
+            // После создания снова проверяем существование, чтобы получить данные
+            await userStore.checkUserExists(telegramUser.id)
+        }
+
+        return true
+    } catch (error) {
+        console.error('Ошибка при проверке/создании пользователя:', error)
+        return false
+    }
+}
+
+// При монтировании запрашиваем лидерборд и проверяем пользователя
+onBeforeMount(async () => {
+    // Попытка загрузить данные из localStorage
+    const storedUser = getUserFromLocalStorage()
+    if (storedUser) {
+        // console.log('Найден пользователь в localStorage:', storedUser)
+        // Используем существующие методы для установки пользователя
+        await checkAndSetUser(storedUser)
+    }
+
+    try {
+        // Загружаем лидерборд и задачи
+        await userStore.fetchLeaderboard()
+        const response = await $fetch("/api/tasks")
+        tasks.value = response.tasks
+    } catch (error) {
+        console.error('Ошибка при загрузке данных:', error)
+    }
+})
+
+// Дополнительная логика при полном монтировании компонента
+onMounted(async () => {
     // Логика для Telegram WebApp
     if (window.Telegram?.WebApp) {
-        const initData = window.Telegram.WebApp.initDataUnsafe
-        if (initData?.user) {
-            user.value = initData.user
-            const telegram_id = user.value.id
+        // Настройка кнопки участия
+        window.Telegram.WebApp.MainButton.setText("Участвую")
+        window.Telegram.WebApp.MainButton.onClick(() => toParticipation())
+        window.Telegram.WebApp.MainButton.show()
 
-            try {
-                const is_exists = await userStore.checkUserExists(
-                    telegram_id,
-                    user.value?.photo_url
-                )
-                if (!is_exists) {
-                    await userStore.createUser({
-                        id: user.value.id,
-                        first_name: user.value.first_name,
-                        username: user.value?.username,
-                        photo_url: user.value?.photo_url,
-                        platform: window.Telegram.WebApp.platform,
-                    })
-                    await userStore.checkUserExists(telegram_id)
-                }
-            } catch (error) {
-                console.error('Ошибка при проверке/создании пользователя:', error)
-            }
+        // Получение данных пользователя из Telegram WebApp
+        if (window.Telegram.WebApp.initDataUnsafe?.user) {
+            const telegramUser = window.Telegram.WebApp.initDataUnsafe.user
+            // Сохраняем в localStorage
+            saveUserToLocalStorage(telegramUser)
+            // Проверяем и устанавливаем пользователя через существующие методы
+            await checkAndSetUser(telegramUser)
         }
     }
 })
 
-// Следим за изменением данных пользователя
-watch([user, leaderboard], () => {
-    console.log('User or leaderboard updated')
+// Функция для участия в кампании
+async function toParticipation() {
+    // Здесь логика участия в кампании
+    console.log('Пользователь нажал кнопку участия')
+    try {
+        // Пример запроса для участия
+        // await $fetch('/api/participate', {
+        //     method: 'POST',
+        //     body: { userId: currentUserId.value, promotionId: promotionId.value }
+        // })
+    } catch (error) {
+        console.error('Ошибка при участии:', error)
+    }
+}
+
+// Слежение за изменениями данных пользователя
+watch(() => user.value, (newUser) => {
+    if (newUser) {
+        saveUserToLocalStorage(newUser)
+    }
 }, { deep: true })
 
 // Вычисляем рейтинг пользователя
@@ -151,8 +296,9 @@ const isUserInTop10 = computed(() => {
 
 <style lang="scss" scoped>
 .leaderboard-page {
-    padding: 1rem 10px;
+    padding: 2rem 10px;
     background-color: var(--background-page-color);
+
     .frame {
         margin-bottom: 1rem;
         text-align: center;
@@ -160,6 +306,7 @@ const isUserInTop10 = computed(() => {
 
     section {
         margin-bottom: 16px;
+
         &:last-child {
             margin: 0;
         }
@@ -192,6 +339,12 @@ const isUserInTop10 = computed(() => {
     padding: 0.5rem 1.3rem;
     align-items: center;
     text-align: left;
+}
+
+.leaderboard-row {
+    &:last-child {
+        padding-bottom: 1rem;
+    }
 }
 
 .leaderboard-header {
@@ -257,14 +410,5 @@ const isUserInTop10 = computed(() => {
         margin: 0;
         font-weight: 500;
     }
-}
-
-.debug-info {
-    margin-top: 1rem;
-    padding: 0.5rem;
-    border: 1px dashed #ccc;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    color: #999;
 }
 </style>

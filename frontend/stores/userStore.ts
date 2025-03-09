@@ -44,7 +44,7 @@ export const useUserStore = defineStore({
     userData: null,
     user: null as User | null,
     fetch_user_result: "" as string,
-    on_fetching_user_result: false as boolean,
+    on_fetching_user_result: true as boolean,
     photo_url: null as string | null,
     error: null as string | null, // Состояние ошибки
     leaderboard: null as User[] | null,

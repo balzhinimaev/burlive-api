@@ -1,21 +1,8 @@
 <template>
   <div ref="appContainer" :class="['app-container', themeClass]">
-    <!-- <div class="container"> -->
-      <!-- <p class="typography-body my-2">{ Здесь может быть ваша реклама }</p> -->
-    <!-- </div> -->
-
     <div class="page-wrapper">
-      <!-- <div style="color: var(--text-color); padding: 1rem;">
-        <p>
-          {{ backgroundColorValue }}
-        </p>
-      </div> -->
-
-      <!-- Display user information -->
       <NuxtPage class="single-page" />
     </div>
-
-    <!-- <BottomNav /> -->
 
     <!-- Уведомления -->
     <div class="app-notify" v-if="notifications.length > 0">
@@ -29,21 +16,61 @@
 import { useThemeStore } from '@/stores/themeStore';
 import { useUserStore } from '@/stores/userStore';
 import { useNotifyStore } from '@/stores/notifyStore';
-const user = ref();
+
 // Подключение хранилищ
 const themeStore = useThemeStore();
 const userStore = useUserStore();
 const notifyStore = useNotifyStore();
-const viewThemeParam = ref();
-const newparams = ref();
+
 // Реактивные переменные
 const notifications = computed(() => notifyStore.notifications);
 const appContainer = ref<HTMLElement | null>(null);
-
-const backgroundColorValue = ref()
+const user = ref();
 
 // Вычисляемый класс для темы
 const themeClass = computed(() => themeStore.isDarkMode ? 'dark-mode' : 'light-mode');
+
+/**
+ * Функция для проверки доступности localStorage
+ */
+function isLocalStorageAvailable() {
+  try {
+    const test = '__test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch (e) {
+    console.error('localStorage недоступен:', e);
+    return false;
+  }
+}
+
+/**
+ * Функция для сохранения пользовательских данных в localStorage
+ */
+function saveUserToLocalStorage(userData: any) {
+  if (!isLocalStorageAvailable() || !userData) return;
+  try {
+    localStorage.setItem('userData', JSON.stringify(userData));
+    console.log('Пользовательские данные сохранены в localStorage');
+  } catch (error) {
+    console.error('Ошибка при сохранении в localStorage:', error);
+  }
+}
+
+/**
+ * Функция для получения данных пользователя из localStorage
+ */
+function getUserFromLocalStorage() {
+  if (!isLocalStorageAvailable()) return null;
+  try {
+    const storedUser = localStorage.getItem('userData');
+    return storedUser ? JSON.parse(storedUser) : null;
+  } catch (error) {
+    console.error('Ошибка при получении из localStorage:', error);
+    return null;
+  }
+}
 
 // Функция для обновления атрибута темы на body
 const updateBodyTheme = async () => {
@@ -51,11 +78,11 @@ const updateBodyTheme = async () => {
   if (window.Telegram) {
     const colorScheme = window.Telegram.WebApp.colorScheme;
     document.body.setAttribute('data-theme', colorScheme);
-    
+
     const rootStyles = getComputedStyle(document.body);
     let backgroundColor = rootStyles.getPropertyValue('--background-color').trim();
-    window.Telegram.WebApp.themeParams.section_bg_color = backgroundColor
-    window.Telegram.WebApp.themeParams.bottom_bar_bg_color = backgroundColor
+    window.Telegram.WebApp.themeParams.section_bg_color = backgroundColor;
+    window.Telegram.WebApp.themeParams.bottom_bar_bg_color = backgroundColor;
     window.Telegram.WebApp.setHeaderColor(backgroundColor);
   }
 };
@@ -79,118 +106,103 @@ const waitForTelegramWebApp = () => {
 // Обработчик события themeChanged
 function handleThemeChanged() {
   if (window.Telegram?.WebApp) {
-    const themeParams = window.Telegram.WebApp.themeParams;
-    // console.log('Theme changed:', themeParams);
-    // Предполагается, что colorScheme может быть 'light' или 'dark'
-    const colorScheme = window.Telegram.WebApp.colorScheme || (themeParams && themeParams.theme) || 'light';
-    newparams.value = colorScheme;
+    const colorScheme = window.Telegram.WebApp.colorScheme || 'light';
     applyTheme(colorScheme);
   }
 }
 
 async function applyTheme(colorScheme: string) {
-  // document.documentElement.setAttribute('data-theme', colorScheme);
   await updateBodyTheme();
+}
+
+/**
+ * Функция для проверки и установки данных пользователя
+ */
+async function checkAndSetUser(telegramUser: any) {
+  if (!telegramUser || !telegramUser.id) {
+    console.error('Нет данных пользователя для проверки');
+    return false;
+  }
+
+  try {
+    // Проверяем существование пользователя
+    const exists = await userStore.checkUserExists(
+      telegramUser.id,
+      telegramUser.photo_url
+    );
+
+    // Если пользователя нет, создаем его
+    if (!exists) {
+      await userStore.createUser({
+        id: telegramUser.id,
+        first_name: telegramUser.first_name,
+        username: telegramUser.username,
+        photo_url: telegramUser.photo_url,
+        platform: window.Telegram?.WebApp?.platform || 'web'
+      });
+      // После создания снова проверяем существование, чтобы получить данные
+      await userStore.checkUserExists(telegramUser.id);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Ошибка при проверке/создании пользователя:', error);
+    return false;
+  }
 }
 
 // Инициализация пользователя и установка начальной темы
 onMounted(async () => {
+  // Попытка загрузить данные из localStorage
+  const storedUser = getUserFromLocalStorage();
+  if (storedUser) {
+    console.log('Найден пользователь в localStorage');
+    user.value = storedUser;
+    // Используем существующие методы для установки пользователя
+    await checkAndSetUser(storedUser);
+  }
+
   await waitForTelegramWebApp();
   if (window.Telegram?.WebApp) {
+    // Расширяем до максимальной высоты
+    window.Telegram.WebApp.expand();
 
-  // Расширяем до максимальной высоты
-  window.Telegram.WebApp.expand();
-  
-  // Отключаем вертикальные свайпы чтобы пользователь случайно не закрыл приложение
-  window.Telegram.WebApp.disableVerticalSwipes();
-  
-  // Опционально: отключаем подтверждение закрытия
-  window.Telegram.WebApp.enableClosingConfirmation();
+    // Отключаем вертикальные свайпы чтобы пользователь случайно не закрыл приложение
+    window.Telegram.WebApp.disableVerticalSwipes();
+
+    // Опционально: отключаем подтверждение закрытия
+    window.Telegram.WebApp.enableClosingConfirmation();
 
     // Устанавливаем начальную тему
     await applyTheme(window.Telegram.WebApp.colorScheme);
-    window.Telegram.WebApp.expand();
-    window.Telegram.WebApp.disableVerticalSwipes();
-    console.log('Telegram Web App initialized:', window.Telegram.WebApp);
-    console.log('Init data unsafe:', window.Telegram.WebApp.initDataUnsafe);
-    
+
     // Подписываемся на изменение темы
     window.Telegram.WebApp.onEvent('themeChanged', handleThemeChanged);
 
     if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
       user.value = window.Telegram.WebApp.initDataUnsafe.user;
-      // userStore.photo_url = user.value.photo_url
-      const telegram_id = user.value.id;
-      const is_exists = await userStore.checkUserExists(telegram_id, user.value?.photo_url);
-      if (!is_exists) {
-        await userStore.createUser({
-          id: user.value.id,
-          first_name: user.value.first_name,
-          username: user.value?.username,
-          photo_url: user.value?.photo_url,
-          platform: window.Telegram.WebApp.platform
-        })
-        await userStore.checkUserExists(telegram_id);
-      }
+      // Сохраняем пользователя в localStorage
+      saveUserToLocalStorage(user.value);
+
+      // Проверяем и создаем пользователя при необходимости
+      await checkAndSetUser(user.value);
     }
-
-    // await updateBodyTheme(); // Присваиваем тему после загрузки
-    // await nextTick();  // Wait for DOM to apply changes
-  
-
-    // Получаем значение цвета из CSS-переменной
-    // const rootStyles = getComputedStyle(document.body);
-    // let backgroundColor = rootStyles.getPropertyValue('--background-color').trim();
-    // backgroundColorValue.value = backgroundColor
-    
-    // Устанавливаем цвет шапки
-    // window.Telegram.WebApp.setHeaderColor(backgroundColor);
-
-    // Устанавливаем цвет фона
-    // window.Telegram.WebApp.setBackgroundColor(backgroundColor);
-
-    // window.Telegram.WebApp.themeParams.section_bg_color = backgroundColor
-    // window.Telegram.WebApp.themeParams.bottom_bar_bg_color = backgroundColor
-
   } else {
     console.error('Telegram Web App is not available.');
   }
 
-  updateBodyTheme(); // Присваиваем тему после загрузки
+  updateBodyTheme();
 });
+
+// Следим за изменениями пользователя
+watch(() => user.value, (newUser) => {
+  if (newUser) {
+    saveUserToLocalStorage(newUser);
+  }
+}, { deep: true });
 </script>
 
 <style scoped lang="scss">
-.user-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-}
-.user-wrapper {
-  padding: 15px 0;
-  margin: 15px;
-  border-radius: 10px;
-  background-color: var(--background-component-color);
-}
-.user-wrapper-inner {
-  display: flex;
-  .user-avatar {
-    margin: auto 0;
-  }
-  .user-data {
-    margin: auto 0 auto 15px;
-    p {
-      font-size: 14px;
-      line-height: 14px;
-      margin: 0;
-    }
-    h5 {
-      font-size: 18px;
-      line-height: 18px;
-      margin-bottom: 5px;
-    }
-  }
-}
 .app-container {
   overflow: hidden;
   display: flex;
@@ -204,18 +216,8 @@ onMounted(async () => {
 .page-wrapper {
   flex: 1;
   height: 100%;
-  // margin: 16px 16px 0 16px;
   overflow: hidden;
   box-shadow: 0 0 2px 3px var(--shadow-color);
-}
-
-.page {
-  // background-color: var(--background-color);
-  color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
-  flex: 1;
-  // padding: 16px;
-  height: 100%;
 }
 
 .app-notify {

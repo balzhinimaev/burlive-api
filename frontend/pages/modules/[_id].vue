@@ -4,7 +4,7 @@
         <main>
             <div class="container">
                 <!-- Плейсхолдеры при загрузке -->
-                <template v-if="!isFetching">
+                <template v-if="isFetching">
                     <section id="lessons-list">
                         <div class="loading-placeholder lesson-card-placeholder" v-for="n in 3" :key="n">
                             <div class="lesson-icon-placeholder"></div>
@@ -28,18 +28,6 @@
                         <p class="typography-body">{{ errorOnFetchingLessons }}</p>
                     </div>
                 </template>
-                <!-- Плейсхолдеры по умолчанию (опционально можно удалить) -->
-                <!-- <template v-else>
-                    <section id="lessons-list">
-                        <div class="loading-placeholder lesson-card-placeholder" v-for="n in 3" :key="n">
-                            <div class="lesson-icon-placeholder"></div>
-                            <div class="lesson-info-placeholder">
-                                <div class="lesson-title-placeholder"></div>
-                                <div class="lesson-description-placeholder"></div>
-                            </div>
-                        </div>
-                    </section>
-                </template> -->
             </div>
         </main>
     </div>
@@ -75,15 +63,32 @@ function fetchLessons(telegramId?: number) {
 
 // Вызываем fetchLessons при монтировании компонента
 onMounted(async () => {
-    if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.BackButton.show();
-        window.Telegram.WebApp.BackButton.onClick(() => {
-            router.push({ path: '/selectmodule' });
-        });
-        if (window.Telegram.WebApp.initDataUnsafe) {
-            fetchLessons(window.Telegram.WebApp.initDataUnsafe.user.id);
+    // Безопасная проверка Telegram.WebApp и его методов
+    const telegramApp = window.Telegram?.WebApp;
+
+    if (telegramApp) {
+        // Настраиваем кнопку "Назад"
+        if (telegramApp.BackButton) {
+            telegramApp.BackButton.show();
+            telegramApp.BackButton.onClick(() => {
+                router.push({ path: '/selectmodule' });
+            });
         }
+
+        // Безопасно извлекаем ID пользователя
+        const userId = telegramApp.initDataUnsafe?.user?.id;
+        if (userId) {
+            fetchLessons(userId);
+        } else {
+            // Если ID пользователя недоступен, загружаем уроки без него
+            fetchLessons();
+        }
+    } else {
+        // Если Telegram.WebApp недоступен, просто загружаем уроки
+        fetchLessons();
     }
+
+    // Инициализация IntersectionObserver для анимации
     observer.value = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
@@ -118,9 +123,10 @@ watch(
     },
     { immediate: true }
 );
+
 // Скрываем кнопку назад при размонтировании компонента
 onBeforeUnmount(() => {
-    if (window.Telegram?.WebApp) {
+    if (window.Telegram?.WebApp?.BackButton) {
         window.Telegram.WebApp.BackButton.hide();
         window.Telegram.WebApp.BackButton.offClick();
     }
@@ -133,6 +139,7 @@ onBeforeUnmount(() => {
 #lessons-list {
     margin: 2rem 0 calc(-1rem - 20px);
 }
+
 /* Плейсхолдер для заголовка */
 .title-placeholder {
     width: 90%;
@@ -233,6 +240,7 @@ onBeforeUnmount(() => {
         /* Завершающее положение */
     }
 }
+
 .lesson-card-hidden {
     opacity: 0;
     transform: translateY(-20px);

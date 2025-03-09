@@ -39,6 +39,7 @@ interface TelegramWebApp {
     isFullscreen: boolean;
     enableClosingConfirmation: any;
     disableVerticalSwipes: any;
+    showPopup: any;
     colorScheme: "light" | "dark";
     onEvent: any;
     // Другие свойства и методы WebApp
