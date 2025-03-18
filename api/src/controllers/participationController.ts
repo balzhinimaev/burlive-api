@@ -131,6 +131,7 @@ class ParticipationController {
             logger.info(`Получение лидерборда пользователем ${currentUserId}:${promotionId}`)
 
             if (!currentUserId) {
+                logger.info(`Поле currentUserId обязателен`);
                 res.status(404).json({
                     message: 'Поле currentUserId обязателен',
                 });
@@ -164,6 +165,7 @@ class ParticipationController {
             }
 
             res.status(200).json({ leaderboard, userRank });
+            logger.info(`Лидерборд получен пользователем ${ currentUserId }, его место ${userRank}`)
         } catch (error) {
             console.error(error);
             res.status(500).json({

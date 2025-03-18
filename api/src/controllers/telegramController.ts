@@ -253,6 +253,7 @@ const telegramController = {
                 photo_url,
                 platform,
                 referral,
+                botusername
             } = req.body;
             logger.info(`${referral}`);
             // Проверка на существование пользователя
@@ -284,6 +285,7 @@ const telegramController = {
                 platform,
                 email: email || '', // Обработка возможного отсутствия email
                 level: initialLevel._id, // Установка начального уровня
+                botusername
             });
 
             // Если передан referral-код, найти реферера и обновить данные
@@ -388,21 +390,24 @@ const telegramController = {
         next: NextFunction,
     ): Promise<void> => {
         try {
-            logger.info(`Сохранение действие пользователя`);
+            // logger.info(`Сохранение действие пользователя`);
             const { userId, updateType, data } = req.body;
-            const action = await new TelegramUserActionModel({
+            
+            await new TelegramUserActionModel({
                 userId,
                 updateType,
                 data,
             }).save();
-            await TelegramUserModel.findOneAndUpdate(
-                { id: userId },
-                {
-                    $push: {
-                        actions: action._id,
-                    },
-                },
-            );
+
+            // await TelegramUserModel.findOneAndUpdate(
+            //     { id: userId },
+            //     {
+            //         $push: {
+            //             actions: action._id,
+            //         },
+            //     },
+            // );
+
             res.status(200).json({ message: 'State saved successfully' });
             return;
         } catch (error) {

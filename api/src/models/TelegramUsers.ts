@@ -20,7 +20,7 @@ export interface TelegramUser extends User {
     phone?: string | number;
     role: 'admin' | 'user' | 'moderator' | undefined;
     dailyRating: number;
-    actions: Types.ObjectId[];
+    // actions: Types.ObjectId[];
 
     vocabular: {
         selected_language_for_translate: 'russian' | 'buryat';
@@ -36,6 +36,7 @@ export interface TelegramUser extends User {
         isActive: boolean;
         paymentId: Types.ObjectId;
     };
+    botusername: string;
     blocked?: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -65,7 +66,7 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
         rating: { type: Number, required: true, default: 1 },
         dailyRating: { type: Number, required: true, default: 1 },
         level: { type: Schema.Types.ObjectId, ref: 'Level', required: true },
-        actions: [{ type: Schema.Types.ObjectId, ref: 'TelegramUserAction' }],
+        // actions: [{ type: Schema.Types.ObjectId, ref: 'TelegramUserAction' }],
         via_app: { type: Boolean, required: false, default: false },
         photo_url: { type: String, required: false, default: '' },
         role: {
@@ -111,6 +112,7 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
         referrals_telegram: [
             { type: Schema.Types.ObjectId, ref: 'telegram_user' },
         ],
+        botusername: { type: String },
         blocked: {
             type: Boolean,
         },

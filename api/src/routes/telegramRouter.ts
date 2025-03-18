@@ -19,7 +19,10 @@ telegramRouter.get("/user", telegramController.getAllUsers);
 
 
 telegramRouter.post("/payment-callback", subscriptionController.paymentCallback);
+
+// Запрос на проверку подписки на канал пользователя по telegram id
 telegramRouter.post("/check-subscription", refferalController.checkSubscription);
+
 telegramRouter.post("/create-user", telegramController.register_telegram_user);
 telegramRouter.post("/select-language-for-vocabular", telegramController.select_language_for_vocabular);
 telegramRouter.post("/new-word-translate-request", telegramController.new_word_translate_request);
