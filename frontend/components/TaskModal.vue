@@ -24,11 +24,31 @@
                     </div>
                 </div>
 
-                <div class="modal-task-description">
+                <div class="modal-task-description" v-if="selectedTask?.taskType !== 'friend'">
                     <p>{{ selectedTask?.description }}</p>
                 </div>
 
-                <div class="modal-task-benefits" v-if="selectedTask?.taskType === 'subscription'">
+                <!-- Сообщение о результате проверки подписки -->
+                <div v-if="subscriptionStatus !== null"
+                    :class="['subscription-status', subscriptionStatus ? 'success' : 'error']">
+                    <div class="status-icon">
+                        <svg v-if="subscriptionStatus" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 13L9 17L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <span>{{ subscriptionStatus ? 'Подписка подтверждена!' : 'Подписка не найдена. Пожалуйста, подпишитесь на канал и повторите проверку.' }}</span>
+                </div>
+
+                <!-- Статичный контент для подписки -->
+                <div class="modal-task-benefits"
+                    v-if="selectedTask?.taskType === 'subscription' && selectedTask.telegram_channel == 'bur_live'">
                     <h3>Преимущества подписки</h3>
                     <ul class="benefits-list">
                         <li>
@@ -46,10 +66,15 @@
                     </ul>
                 </div>
 
-                <div class="subscription-reward"
-                    v-if="selectedTask?.taskType === 'subscription' && selectedTask.rewardPoints">
-                    <p>За подписку вы получите {{ selectedTask.rewardPoints }} очков.</p>
-                </div>
+                <!-- Статичный контент для приглашения друзей -->
+                <template v-else-if="selectedTask?.taskType === 'friend'">
+                    <div class="modal-friend-description">
+                        <p class="mb-2">Приглашая друзей, вы не только помогаете расширять наше сообщество, но и получаете бонусные
+                            очки!</p>
+                        <p>Каждый новый участник повышает ваш рейтинг и открывает доступ к эксклюзивным возможностям.
+                        </p>
+                    </div>
+                </template>
             </div>
 
             <!-- Футер модального окна -->
@@ -62,9 +87,11 @@
                                 stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </button>
-                    <button class="action-button secondary" @click="$emit('checkSubscription')">
-                        <span>Проверить подписку</span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <button class="action-button secondary" @click="checkSubscription" :disabled="isChecking">
+                        <span v-if="!isChecking">Проверить подписку</span>
+                        <div v-else class="spinner"></div>
+                        <svg v-if="!isChecking" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
@@ -97,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { ITask } from '~/server/api/tasks.get'
 
 const props = defineProps<{
@@ -112,6 +139,49 @@ const emit = defineEmits<{
     (e: 'checkSubscription'): void
     (e: 'invite'): void
 }>()
+
+// Состояние проверки подписки
+const isChecking = ref(false)
+const subscriptionStatus = ref<boolean | null>(null)
+
+// Функция проверки подписки
+const checkSubscription = async () => {
+    // Сбрасываем предыдущий статус при новой проверке
+    subscriptionStatus.value = null
+    isChecking.value = true
+
+    try {
+        // Вызываем событие для проверки подписки
+        emit('checkSubscription')
+
+        // Имитация задержки сетевого запроса
+        await new Promise(resolve => setTimeout(resolve, 1500))
+
+        // Здесь должна быть логика обработки результата проверки
+        // Например, подождать ответа от API и обновить статус
+
+        // Мы можем либо обновлять статус здесь, либо использовать пропс для получения результата
+
+    } catch (error) {
+        console.error('Ошибка при проверке подписки:', error)
+        subscriptionStatus.value = false
+    } finally {
+        isChecking.value = false
+    }
+}
+
+// Сбрасываем статус при закрытии модального окна
+watch(() => props.isVisible, (newValue) => {
+    if (!newValue) {
+        subscriptionStatus.value = null
+    }
+})
+
+// Для обновления статуса подписки извне
+// Этот метод можно экспортировать или использовать в паре с emit/watch
+const updateSubscriptionStatus = (status: boolean) => {
+    subscriptionStatus.value = status
+}
 
 // Переменные для драггинга
 const isDragging = ref(false)
@@ -165,6 +235,10 @@ const dragStyle = computed(() => {
     } else {
         return { transform: `translateY(${dragOffset.value}px)`, transition: 'none' }
     }
+})
+
+defineExpose({
+    updateSubscriptionStatus
 })
 </script>
 
@@ -275,8 +349,45 @@ const dragStyle = computed(() => {
     margin: 0;
 }
 
+/* Стили для статуса подписки */
+.subscription-status {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    font-size: 0.95rem;
+}
+
+.subscription-status.success {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.subscription-status.error {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.status-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.subscription-status.success .status-icon svg {
+    stroke: #2ecc71;
+}
+
+.subscription-status.error .status-icon svg {
+    stroke: #e74c3c;
+}
+
 .modal-task-benefits {
-    margin-bottom: 24px;
+    margin: 24px 0;
 }
 
 .modal-task-benefits h3 {
@@ -362,10 +473,42 @@ const dragStyle = computed(() => {
     margin-top: 12px;
 }
 
+.action-button:disabled {
+    background-color: #7fb9d6;
+    cursor: not-allowed;
+}
+
+/* Стили для спиннера */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .subscription-note {
     margin-top: 12px;
     font-size: 0.85rem;
     color: var(--text-secondary-color, #666);
     text-align: center;
+}
+
+/* Дополнительные стили для статичного контента приглашения друзей */
+.modal-friend-description {
+    margin-bottom: 16px;
+    font-size: 1rem;
+    color: var(--text-secondary-color, #666);
 }
 </style>

@@ -1,13 +1,22 @@
-import { defineEventHandler, createError, readBody, setHeader } from 'h3';
+import { defineEventHandler, createError, readBody, setHeader } from "h3";
 
 // Определение интерфейса CreateUserResponse
-interface CheckSubscriptionResponse {
-    status: string;
-    subscribed: boolean;
+interface TaskCompletionResponse {
+  message: string;
+  taskCompletion: {
+    _id: string;
+    task: string;
+    user: string;
+    promotion: string;
+    rewardPoints: number;
+    completedAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+  };
 }
 
 export default defineEventHandler(
-  async (event): Promise<CheckSubscriptionResponse> => {
+  async (event): Promise<TaskCompletionResponse> => {
     const config = useRuntimeConfig();
     const apiBase = config.apiBase;
     const jwtToken = config.jwtToken;
@@ -17,8 +26,8 @@ export default defineEventHandler(
       const telegramUser = await readBody(event);
 
       // Прокси-запрос к бэкенду
-      const response: CheckSubscriptionResponse = await $fetch(
-        `${apiBase}/telegram/check-subscription`,
+      const response: TaskCompletionResponse = await $fetch(
+        `${apiBase}/tasks/complete`,
         {
           method: "POST",
           headers: {
@@ -29,7 +38,7 @@ export default defineEventHandler(
         }
       );
 
-      console.log(response)
+      console.log(response);
 
       return response;
     } catch (error: any) {

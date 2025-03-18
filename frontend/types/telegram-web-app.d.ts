@@ -14,6 +14,7 @@ interface TelegramWebApp {
             last_name?: string;
             username?: string;
             language_code?: string;
+            photo_url?: string;
         };
         [key: string]: any; // Позволяет расширять объект дополнительными свойствами
     };

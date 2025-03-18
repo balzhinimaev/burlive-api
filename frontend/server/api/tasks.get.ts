@@ -11,10 +11,24 @@ export interface ITask {
   order?: number;
   imageUrl?: string;
   telegram_channel?: string;
+  telegram_chat_id?: number;
+  status: "active" | "inactive" | "completed"; // Добавлен статус задачи
 }
 
-interface getTasksResponse {
-    tasks: ITask[]
+export interface getTasksResponse {
+  tasks: ITask[] | null;
+  completedTasks: ITask[] | null;
+  completedTaskRecords: {
+        _id: string;
+        task: ITask;
+        user: string;
+        promotion: string;
+        rewardPoints: number;
+        completedAt: string;
+        createdAt: string;
+        updatedAt: string;
+      }[]
+    | [];
 }
 
 export default defineEventHandler(

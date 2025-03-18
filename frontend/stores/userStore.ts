@@ -1,7 +1,11 @@
 // stores/user.ts
-import { defineStore } from 'pinia';
-import type { participationJoinResponse } from '~/server/api/participation/join.post';
-import type { getLeaderboardResponse, leaderboardItem, leaderboardUser } from '~/server/api/participation/leaderboard.post';
+import { defineStore } from "pinia";
+import type { participationJoinResponse } from "~/server/api/participation/join.post";
+import type {
+  getLeaderboardResponse,
+  leaderboardItem,
+  leaderboardUser,
+} from "~/server/api/participation/leaderboard.post";
 
 // Определение интерфейсов
 export interface User {
@@ -49,6 +53,7 @@ export const useUserStore = defineStore({
     on_fetching_user_result: true as boolean,
     photo_url: null as string | null,
     error: null as string | null, // Состояние ошибки
+    errorFetchLeaderborad: null as string | null | number, // Состояние ошибки подтягивания лидерборда
 
     leaderboard: null as leaderboardItem[] | null,
     userRank: null as number | null,
@@ -61,7 +66,7 @@ export const useUserStore = defineStore({
 
     isLeaderboardFetch: true,
 
-    checkParicipationResponse: null as any
+    checkParicipationResponse: null as any,
   }),
 
   // Геттеры
@@ -73,6 +78,9 @@ export const useUserStore = defineStore({
     fetchMessage: (state) => state.fetch_user_result,
     getPhotoUrl: (state) => state.photo_url,
     hasError: (state) => !!state.error,
+
+    isFetchingLeaderboard: (state) => state.isLeaderboardFetch,
+    isFetchingLeaderboardError: (state) => state.errorFetchLeaderborad,
   },
 
   // Действия
@@ -167,27 +175,49 @@ export const useUserStore = defineStore({
       }
     },
 
-    async fetchLeaderboard(promotionId: string) {
+    async fetchLeaderboard(promotionId: string, telegramId?: number) {
       this.isLeaderboardFetch = true;
       try {
+
+        if (!this.user && telegramId) {
+          await this.checkUserExists(telegramId)
+          if (!this.user) {
+            return 
+          }
+        }
+
+        if (!this.user) {
+          return
+        }
+
         const response = await $fetch<getLeaderboardResponse>(
           `/api/participation/leaderboard`,
           {
             method: "POST",
             body: {
               promotionId,
-              currentUserId: this.user?._id,
+              currentUserId: this.user._id,
             },
           }
         );
-        if (!response) {
-          throw new Error(`Некорректный формат ответа от API`);
-        }
-        this.leaderboard = response.leaderboard;
-      } catch (error) {
-        return false;
-      } finally {
+
+        // Filter out entries with null user
+        this.leaderboard = response.leaderboard.filter(
+          (item) => item.user !== null
+        );
+        this.userRank = response.userRank;
+        this.errorFetchLeaderborad = null;
         this.isLeaderboardFetch = false;
+      } catch (error: any) {
+        if (error.statusCode === 404) {
+          this.errorFetchLeaderborad = error.statusCode;
+        } else {
+          this.errorFetchLeaderborad = error.statusCode || "unknown";
+        }
+        this.leaderboard = []; // Set to empty array on error
+        this.isLeaderboardFetch = false;
+      } finally {
+        this.isLeaderboardFetch = false; // Always set to false when done
       }
     },
 
@@ -210,9 +240,8 @@ export const useUserStore = defineStore({
         }
         this.joinResponse = response.message;
         if (response.participation) {
-          this.userSuccessJoined = true
+          this.userSuccessJoined = true;
         }
-
       } catch (error) {
         return false;
       } finally {
@@ -234,7 +263,7 @@ export const useUserStore = defineStore({
         this.checkParicipationResponse = response;
       } catch (error: any) {
         const message = `Ошибка при проверке пользователя на существование в розыгрыше`;
-        this.checkParicipationResponse = error.data.statusCode
+        this.checkParicipationResponse = error.data.statusCode;
         return message;
       }
     },

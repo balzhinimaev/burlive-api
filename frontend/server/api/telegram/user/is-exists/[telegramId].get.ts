@@ -56,7 +56,7 @@ export default defineEventHandler(async (event): Promise<UserExistsResponse> => 
             },
         });
 
-        console.log(`Fetched user existence for telegramId: ${telegramId}`, response);
+        // console.log(`Fetched user existence for telegramId: ${telegramId}`, response);
 
         // Установка заголовков кэширования (опционально)
         // setHeader(event, 'Cache-Control', `public, max-age=300`);

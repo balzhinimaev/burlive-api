@@ -33,6 +33,9 @@ export default defineEventHandler(
     const body = await readBody(event);
 
     try {
+
+      console.log(`Пользователь ${body.currentUserId} подтягивает лидерборд`)
+
       // Прокси-запрос к бэкенду
       const response: getLeaderboardResponse = await $fetch(
         `${apiBase}/participation/leaderboard`,
@@ -43,6 +46,10 @@ export default defineEventHandler(
           },
           body,
         }
+      );
+
+      console.log(
+        `Лидерборд получен, количество участников: ${response.leaderboard.length}. Позиция пользователя: ${response.userRank}`
       );
 
       return response;

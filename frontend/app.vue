@@ -153,46 +153,35 @@ async function checkAndSetUser(telegramUser: any) {
 
 // Инициализация пользователя и установка начальной темы
 onMounted(async () => {
-  // Попытка загрузить данные из localStorage
-  const storedUser = getUserFromLocalStorage();
-  if (storedUser) {
-    console.log('Найден пользователь в localStorage');
-    user.value = storedUser;
-    // Используем существующие методы для установки пользователя
-    await checkAndSetUser(storedUser);
+  await waitForTelegramWebApp();
+
+  let telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+
+  if (telegramUser) {
+    user.value = telegramUser;
+  } else {
+    const storedUser = getUserFromLocalStorage();
+    if (storedUser) {
+      user.value = storedUser;
+    }
   }
 
-  await waitForTelegramWebApp();
+  if (user.value) {
+    await checkAndSetUser(user.value);
+    saveUserToLocalStorage(user.value);
+  }
+
   if (window.Telegram?.WebApp) {
-    // Расширяем до максимальной высоты
     window.Telegram.WebApp.expand();
-
-    // Отключаем вертикальные свайпы чтобы пользователь случайно не закрыл приложение
     window.Telegram.WebApp.disableVerticalSwipes();
-
-    // Опционально: отключаем подтверждение закрытия
     window.Telegram.WebApp.enableClosingConfirmation();
-
-    // Устанавливаем начальную тему
     await applyTheme(window.Telegram.WebApp.colorScheme);
-
-    // Подписываемся на изменение темы
     window.Telegram.WebApp.onEvent('themeChanged', handleThemeChanged);
-
-    if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-      user.value = window.Telegram.WebApp.initDataUnsafe.user;
-      // Сохраняем пользователя в localStorage
-      saveUserToLocalStorage(user.value);
-
-      // Проверяем и создаем пользователя при необходимости
-      await checkAndSetUser(user.value);
-    }
-  } else {
-    console.error('Telegram Web App is not available.');
   }
 
   updateBodyTheme();
 });
+
 
 // Следим за изменениями пользователя
 watch(() => user.value, (newUser) => {
@@ -210,7 +199,8 @@ watch(() => user.value, (newUser) => {
   flex-direction: column;
   transition: background-color 0.3s ease, color 0.3s ease;
   height: 100vh;
-  margin: 0;
+  margin: 0 auto;
+  // max-width: 576px;
 }
 
 .page-wrapper {

@@ -29,9 +29,10 @@
 * {
   user-select: none;
 }
-body {
+body, html {
   font-family: 'Nunito', sans-serif;
   color: var(--text-color);
+  background-color: var(--background-color);
 }
 
 header {
