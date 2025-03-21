@@ -27,6 +27,8 @@ services:
       - ../burlive-bot/.env
     depends_on:
       - api
+    volumes:
+      - /opt/burlive-bot/src/logs:/app/src/logs
     networks:
       - burlive
 
@@ -44,6 +46,7 @@ services:
       - .env
     volumes:
       - ./uploads:/var/www/burlive/uploads
+      - ./api/src/logs:/app/src/logs
     networks:
       - burlive
 

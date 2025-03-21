@@ -10,7 +10,9 @@ declare global {
             user?: IUser;
             suggestedWord?: ISuggestedWordModel; // If you have other custom properties
             telegram_user_id?: number;
-            file?: Express.Multer.File;        }
+            file?: Express.Multer.File;
+            requestId?: string;
+        }
     }
 }
 
