@@ -20,7 +20,6 @@ services:
     restart: always
     environment:
       - API_URL=http://express-api:5000
-      - BOT_TOKEN=${BOT_TOKEN}
     ports: 
       - "1442:1442"
     env_file:
