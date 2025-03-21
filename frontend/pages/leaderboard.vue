@@ -51,7 +51,6 @@
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import type { getTasksResponse, ITask } from '~/server/api/tasks.get'
-import type { User } from '@/stores/userStore'
 import HistoryComponent from '~/components/Leaderboard/HistoryComponent.vue';
 import Top5Component from '~/components/Leaderboard/Top5Component.vue';
 import GiveawayComponent, { type Giveaway } from '~/components/Leaderboard/GiveawayComponent.vue';
@@ -349,7 +348,7 @@ onMounted(async () => {
             // Проверяем и устанавливаем пользователя через существующие методы
             await checkAndSetUser(telegramUser)
             await userStore.checkParticipation(promotionId.value)
-            // await userStore.fetchLeaderboard(promotionId.value)
+            await userStore.fetchLeaderboard(promotionId.value)
         }
 
         // if (isLeaderboardFetchError.value === 404) {
@@ -366,28 +365,12 @@ onMounted(async () => {
     }
 })
 
-// Функция для участия в кампании
-async function toParticipation() {
-    // Здесь логика участия в кампании
-    console.log('Пользователь нажал кнопку участия')
-    try {
-        // Пример запроса для участия
-        await userStore.joinToLeaderboard(promotionId.value)
-    } catch (error) {
-        console.error('Ошибка при участии:', error)
-    }
-}
-
 // Слежение за изменениями данных пользователя
 watch(() => user.value, (newUser) => {
     if (newUser) {
         saveUserToLocalStorage(newUser)
     }
 }, { deep: true })
-
-
-// Получаем ID текущего пользователя
-const currentUserId = computed(() => user.value?.id || null)
 
 </script>
 

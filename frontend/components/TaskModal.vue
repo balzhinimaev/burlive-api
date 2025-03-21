@@ -15,16 +15,54 @@
 
             <!-- Контент модального окна -->
             <div class="modal-body">
+                <!-- Заголовок модалки с иконкой -->
                 <div class="modal-task-header">
-                    <div class="modal-task-image" v-if="selectedTask?.imageUrl">
-                        <NuxtImg width="80" height="80" :src="'https://burlive.ru/uploads/' + selectedTask.imageUrl" />
+                    <div class="modal-task-image" v-if="selectedTask?.imageUrl || isRegistrationSuccess">
+                        <NuxtImg v-if="selectedTask?.imageUrl" width="80" height="80"
+                            :src="'https://burlive.ru/uploads/' + selectedTask.imageUrl" />
+                        <div v-else-if="isRegistrationSuccess" class="success-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="#4CAF50" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M22 4L12 14.01l-3-3" stroke="#4CAF50" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
                     </div>
                     <div class="modal-task-title">
-                        <h2>{{ selectedTask?.title }}</h2>
+                        <h2 v-if="isRegistrationSuccess">Участие подтверждено!</h2>
+                        <h2 v-else-if="isAlreadyRegistered">Вы уже участвуете</h2>
+                        <h2 v-else>{{ selectedTask?.title }}</h2>
                     </div>
                 </div>
 
-                <div class="modal-task-description" v-if="selectedTask?.taskType !== 'friend'">
+                <!-- Сообщение об успешной регистрации -->
+                <div v-if="isRegistrationSuccess" class="registration-success-message">
+                    <p>Вы успешно зарегистрированы в конкурсе. Теперь вы можете выполнять задания и зарабатывать баллы!
+                    </p>
+                    <div class="registration-points">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M8 1.33334L9.32933 5.50668H13.7147L10.1927 8.15999L11.5227 12.3333L8 9.68001L4.47733 12.3333L5.80733 8.15999L2.28533 5.50668H6.67067L8 1.33334Z"
+                                fill="#4CAF50" />
+                        </svg>
+                        <span>+10 баллов</span>
+                    </div>
+                </div>
+
+                <!-- Сообщение о том, что пользователь уже участвует -->
+                <div v-else-if="isAlreadyRegistered" class="already-registered-message">
+                    <p>Вы уже зарегистрированы в этом конкурсе. Продолжайте выполнять задания и повышайте свой рейтинг!
+                    </p>
+                    <div class="user-rank-info">
+                        <p>Ваше текущее место в рейтинге:</p>
+                        <div class="user-rank-number">{{ userRank || '-' }}</div>
+                    </div>
+                </div>
+
+                <!-- Стандартное описание задания -->
+                <div class="modal-task-description" v-else-if="selectedTask?.taskType !== 'friend'">
                     <p>{{ selectedTask?.description }}</p>
                 </div>
 
@@ -69,7 +107,8 @@
                 <!-- Статичный контент для приглашения друзей -->
                 <template v-else-if="selectedTask?.taskType === 'friend'">
                     <div class="modal-friend-description">
-                        <p class="mb-2">Приглашая друзей, вы не только помогаете расширять наше сообщество, но и получаете бонусные
+                        <p class="mb-2">Приглашая друзей, вы не только помогаете расширять наше сообщество, но и
+                            получаете бонусные
                             очки!</p>
                         <p>Каждый новый участник повышает ваш рейтинг и открывает доступ к эксклюзивным возможностям.
                         </p>
@@ -79,7 +118,16 @@
 
             <!-- Футер модального окна -->
             <div class="modal-footer">
-                <template v-if="selectedTask?.taskType === 'subscription'">
+                <template v-if="isRegistrationSuccess || isAlreadyRegistered">
+                    <button class="action-button" @click="$emit('close')">
+                        <span>Продолжить</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </template>
+                <template v-else-if="selectedTask?.taskType === 'subscription'">
                     <button class="action-button" @click="$emit('subscribe')">
                         <span>Подписаться на канал</span>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -110,9 +158,11 @@
                     </button>
                 </template>
                 <template v-else>
-                    <button class="action-button">
-                        <span>Продолжить</span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <button class="action-button" @click="$emit('register')" :disabled="isRegistering">
+                        <span v-if="!isRegistering">Принять участие</span>
+                        <div v-else class="spinner"></div>
+                        <svg v-if="!isRegistering" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
                             <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
@@ -131,6 +181,9 @@ const props = defineProps<{
     isVisible: boolean
     isOpen: boolean
     selectedTask: ITask | null
+    isRegistrationSuccess?: boolean
+    isAlreadyRegistered?: boolean
+    userRank?: number | null
 }>()
 
 const emit = defineEmits<{
@@ -138,10 +191,12 @@ const emit = defineEmits<{
     (e: 'subscribe'): void
     (e: 'checkSubscription'): void
     (e: 'invite'): void
+    (e: 'register'): void
 }>()
 
 // Состояние проверки подписки
 const isChecking = ref(false)
+const isRegistering = ref(false)
 const subscriptionStatus = ref<boolean | null>(null)
 
 // Функция проверки подписки
@@ -160,8 +215,6 @@ const checkSubscription = async () => {
         // Здесь должна быть логика обработки результата проверки
         // Например, подождать ответа от API и обновить статус
 
-        // Мы можем либо обновлять статус здесь, либо использовать пропс для получения результата
-
     } catch (error) {
         console.error('Ошибка при проверке подписки:', error)
         subscriptionStatus.value = false
@@ -178,9 +231,13 @@ watch(() => props.isVisible, (newValue) => {
 })
 
 // Для обновления статуса подписки извне
-// Этот метод можно экспортировать или использовать в паре с emit/watch
 const updateSubscriptionStatus = (status: boolean) => {
     subscriptionStatus.value = status
+}
+
+// Для обновления статуса регистрации
+const setRegistering = (status: boolean) => {
+    isRegistering.value = status
 }
 
 // Переменные для драггинга
@@ -238,7 +295,8 @@ const dragStyle = computed(() => {
 })
 
 defineExpose({
-    updateSubscriptionStatus
+    updateSubscriptionStatus,
+    setRegistering
 })
 </script>
 
@@ -333,6 +391,18 @@ defineExpose({
     overflow: hidden;
     margin-right: 16px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.success-icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(76, 175, 80, 0.1);
 }
 
 .modal-task-title h2 {
@@ -347,6 +417,64 @@ defineExpose({
     line-height: 1.5;
     color: var(--text-secondary-color, #666);
     margin: 0;
+}
+
+/* Стили для сообщения об успешной регистрации */
+.registration-success-message {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.registration-success-message p {
+    margin: 0 0 12px 0;
+    color: var(--text-color, #333);
+}
+
+.registration-points {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #4CAF50;
+    font-size: 1.1rem;
+}
+
+/* Стили для сообщения "уже участвует" */
+.already-registered-message {
+    background-color: rgba(33, 150, 243, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.already-registered-message p {
+    margin: 0 0 12px 0;
+    color: var(--text-color, #333);
+}
+
+.user-rank-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.user-rank-info p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.user-rank-number {
+    font-weight: 600;
+    font-size: 1.2rem;
+    background-color: rgba(0, 102, 204, 0.1);
+    padding: 4px 14px;
+    border-radius: 12px;
+    color: #0066cc;
 }
 
 /* Стили для статуса подписки */
@@ -510,5 +638,41 @@ defineExpose({
     margin-bottom: 16px;
     font-size: 1rem;
     color: var(--text-secondary-color, #666);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .modal-task-title h2 {
+        font-size: 1.3rem;
+    }
+
+    .registration-points {
+        font-size: 1rem;
+    }
+
+    .user-rank-number {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-task-image {
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+    }
+
+    .modal-task-title h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-body {
+        padding: 16px 20px;
+    }
+
+    .registration-success-message,
+    .already-registered-message {
+        padding: 14px;
+    }
 }
 </style>

@@ -242,6 +242,7 @@ export const useUserStore = defineStore({
         if (response.participation) {
           this.userSuccessJoined = true;
         }
+        return "success"
       } catch (error) {
         return false;
       } finally {

@@ -94,6 +94,9 @@
                 </div>
             </div>
         </div>
+        <TaskModal v-if="isModalVisible" :isVisible="isModalVisible" :isOpen="isModalVisible" :selectedTask="null"
+            :isRegistrationSuccess="true" :isAlreadyRegistered="false" :userRank="userRank" :subscriptionStatus="null"
+            :isChecking="false" :isRegistering="false" @close="isModalVisible = false" />
     </div>
 </template>
 
@@ -106,6 +109,8 @@ interface Props {
     promotionId: string
 }
 const props = defineProps<Props>()
+
+const isModalVisible = ref(false)
 
 // Проверяем, загружается ли лидерборд
 const userStore = useUserStore()
@@ -120,7 +125,17 @@ const truncate = (value: string | undefined, maxLength = 16): string => {
 
 // Получаем данные лидерборда
 const leaderboard = computed(() => userStore.getLeaderboard)
-
+// В вашем компоненте leaderboard.vue:
+const closeModal = () => {
+    isModalVisible.value = false;
+    // Обновляем данные после закрытия модального окна
+    if (window.Telegram?.WebApp.initDataUnsafe?.user?.id) {
+        userStore.fetchLeaderboard(
+            props.promotionId,
+            window.Telegram?.WebApp.initDataUnsafe?.user.id
+        );
+    }
+}
 // Получаем ID текущего пользователя
 const currentUserId = computed(() => props.user.id)
 
@@ -164,25 +179,28 @@ const getNounPluralForm = (number: number, one: string, two: string, five: strin
 }
 const isParticipation = computed(() => userStore.getResponseCheckParicipation)
 const shouldShowMainButton = computed(() => {
-    // Показываем кнопку, если произошла ошибка 404
-    // или если список лидерборда пустой и пользователь не найден
-    const noError = isLeaderboardFetchError.value === null;
-    const emptyLeaderboard = leaderboard.value?.length === 0;
-    const userNotFound = leaderboard.value
-        ? !leaderboard.value.find(item => item.user?.id === currentUserId.value)
-        : true;
+    // Проверяем статус участия пользователя
+    // Обратите внимание: 404 означает, что пользователь не участвует
     return isParticipation.value === 404;
 });
 
+// Обработчик клика по кнопке "Принять участие"
 watch(shouldShowMainButton, (newVal) => {
-    if (newVal && window.Telegram?.WebApp && window.Telegram) {
+    if (newVal && window.Telegram?.WebApp) {
         window.Telegram.WebApp.MainButton.setText("Принять участие");
         window.Telegram.WebApp.MainButton.show();
         window.Telegram.WebApp.MainButton.onClick(async () => {
-            await userStore.joinToLeaderboard(props.promotionId);
+            const response = await userStore.joinToLeaderboard(props.promotionId);
             window.Telegram?.WebApp.MainButton.hide();
-            if (window.Telegram?.WebApp.initDataUnsafe?.user.id) {
-                await userStore.fetchLeaderboard(props.promotionId, window.Telegram?.WebApp.initDataUnsafe?.user.id);
+            // Если регистрация успешна, показываем модальное окно
+            if (response && response === 'success') {
+                isModalVisible.value = true;
+            }
+            if (window.Telegram?.WebApp.initDataUnsafe?.user?.id) {
+                await userStore.fetchLeaderboard(
+                    props.promotionId,
+                    window.Telegram?.WebApp.initDataUnsafe?.user.id
+                );
             }
         });
     }
