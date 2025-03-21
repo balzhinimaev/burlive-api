@@ -102,7 +102,8 @@ import { useUserStore, type User } from '@/stores/userStore'
 import { computed } from 'vue'
 
 interface Props {
-    user: User
+    user: User,
+    promotionId: string
 }
 const props = defineProps<Props>()
 
@@ -161,6 +162,31 @@ const getNounPluralForm = (number: number, one: string, two: string, five: strin
     }
     return five;
 }
+const isParticipation = computed(() => userStore.getResponseCheckParicipation)
+const shouldShowMainButton = computed(() => {
+    // Показываем кнопку, если произошла ошибка 404
+    // или если список лидерборда пустой и пользователь не найден
+    const noError = isLeaderboardFetchError.value === null;
+    const emptyLeaderboard = leaderboard.value?.length === 0;
+    const userNotFound = leaderboard.value
+        ? !leaderboard.value.find(item => item.user?.id === currentUserId.value)
+        : true;
+    return isParticipation.value === 404;
+});
+
+watch(shouldShowMainButton, (newVal) => {
+    if (newVal && window.Telegram?.WebApp && window.Telegram) {
+        window.Telegram.WebApp.MainButton.setText("Принять участие");
+        window.Telegram.WebApp.MainButton.show();
+        window.Telegram.WebApp.MainButton.onClick(async () => {
+            await userStore.joinToLeaderboard(props.promotionId);
+            window.Telegram?.WebApp.MainButton.hide();
+            if (window.Telegram?.WebApp.initDataUnsafe?.user.id) {
+                await userStore.fetchLeaderboard(props.promotionId, window.Telegram?.WebApp.initDataUnsafe?.user.id);
+            }
+        });
+    }
+});
 </script>
 
 <style lang="scss" scoped>

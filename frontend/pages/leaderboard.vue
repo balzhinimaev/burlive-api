@@ -9,7 +9,7 @@
         </section>
         <section>
             <div class="container">
-                <Top5Component v-if="user" :user="user" />
+                <Top5Component v-if="user" :promotion-id="promotionId" :user="user" />
             </div>
         </section>
 
@@ -19,6 +19,13 @@
             </div>
         </section>
         <!-- {{ tasks }} -->
+
+        <section>
+            <div class="container">
+                <AvailableTasks />
+            </div>
+        </section>
+
         <section>
             <div class="container" v-if="tasks.tasks?.length">
                 <!-- <h4>Кампании</h4> -->
@@ -48,6 +55,7 @@ import type { User } from '@/stores/userStore'
 import HistoryComponent from '~/components/Leaderboard/HistoryComponent.vue';
 import Top5Component from '~/components/Leaderboard/Top5Component.vue';
 import GiveawayComponent, { type Giveaway } from '~/components/Leaderboard/GiveawayComponent.vue';
+import AvailableTasks from '~/components/Leaderboard/AvailableTasks.vue';
 
 function isTelegramWebAppProperlyInitialized() {
     const webApp = window.Telegram?.WebApp;
@@ -115,8 +123,6 @@ const formattedEndDate = computed(() =>
     })
 )
 
-
-
 const isLeaderboardFetchError = computed(() => userStore.isFetchingLeaderboardError)
 
 // Текущий пользователь из Telegram
@@ -126,7 +132,6 @@ const isFetching = computed(() => userStore.on_fetching_user_result)
 
 const tasks = ref<getTasksResponse>({ tasks: [], completedTasks: [], completedTaskRecords: [] });
 
-const isParticipation = computed(() => userStore.getResponseCheckParicipation)
 
 /**
  * Функция для проверки доступности localStorage
@@ -379,30 +384,7 @@ watch(() => user.value, (newUser) => {
         saveUserToLocalStorage(newUser)
     }
 }, { deep: true })
-const shouldShowMainButton = computed(() => {
-    // Показываем кнопку, если произошла ошибка 404
-    // или если список лидерборда пустой и пользователь не найден
-    const noError = isLeaderboardFetchError.value === null;
-    const emptyLeaderboard = leaderboard.value?.length === 0;
-    const userNotFound = leaderboard.value
-        ? !leaderboard.value.find(item => item.user?.id === currentUserId.value)
-        : true;
-    return isParticipation.value === 404;
-});
 
-watch(shouldShowMainButton, (newVal) => {
-    if (newVal && window.Telegram?.WebApp && window.Telegram) {
-        window.Telegram.WebApp.MainButton.setText("Принять участие");
-        window.Telegram.WebApp.MainButton.show();
-        window.Telegram.WebApp.MainButton.onClick(async () => {
-            await userStore.joinToLeaderboard(promotionId.value);
-            window.Telegram?.WebApp.MainButton.hide();
-            if (window.Telegram?.WebApp.initDataUnsafe?.user.id) {
-                await userStore.fetchLeaderboard(promotionId.value, window.Telegram?.WebApp.initDataUnsafe?.user.id);
-            }
-        });
-    }
-});
 
 // Получаем ID текущего пользователя
 const currentUserId = computed(() => user.value?.id || null)

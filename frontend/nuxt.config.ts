@@ -2,7 +2,6 @@
 export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ["@pinia/nuxt", "@nuxt/image"],
-
   app: {
     head: {
       title: "Заголовок по умолчанию для всего сайта",
@@ -24,7 +23,7 @@ export default defineNuxtConfig({
         {
           src: 'https://telegram.org/js/telegram-web-app.js?56"',
           // async: true,
-          defer: true
+          defer: true,
         },
       ],
     },
@@ -37,15 +36,18 @@ export default defineNuxtConfig({
   },
 
   css: [
-    'bootstrap/scss/bootstrap.scss',
-    '@fortawesome/fontawesome-free/css/all.css',
-    'bootstrap-icons/font/bootstrap-icons.css',
-    '@/assets/scss/textStyles.scss',
-    'swiper/css', // Используем swiper/css вместо swiper-bundle.min.css
-    '@/assets/scss/styles.scss'
+    "bootstrap/scss/bootstrap.scss",
+    "@fortawesome/fontawesome-free/css/all.css",
+    "bootstrap-icons/font/bootstrap-icons.css",
+    "@/assets/scss/textStyles.scss",
+    "swiper/css", // Используем swiper/css вместо swiper-bundle.min.css
+    "@/assets/scss/styles.scss",
   ],
 
   vite: {
+    server: {
+      allowedHosts: ["anoname.xyz"],
+    },
     css: {
       preprocessorOptions: {
         scss: {
