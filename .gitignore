@@ -1,5 +1,9 @@
 mongo_data
 mongo
+
+mongo-keyfile
+config
+
 .env
 node_modules
 .log
