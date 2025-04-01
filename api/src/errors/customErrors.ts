@@ -87,12 +87,35 @@ export class ConfigurationError extends AppError {
     }
 }
 
-// Общая ошибка базы данных (500 Internal Server Error)
+/**
+ * Представляет ошибку, возникшую при взаимодействии с базой данных.
+ * Обычно соответствует HTTP статусу 500 (Internal Server Error).
+ * Позволяет сохранить исходную ошибку в поле `cause` для отладки.
+ */
 export class DatabaseError extends AppError {
+    /**
+     * Дополнительная информация об исходной ошибке, если она доступна.
+     * Полезно для отладки ошибок, возникших на уровне драйвера БД или ORM.
+     * @type {Error | undefined}
+     */
+    public readonly cause?: Error;
+
+    /**
+     * Создает экземпляр DatabaseError.
+     * @param {string} [message='Произошла ошибка при обращении к базе данных'] - Сообщение об ошибке, понятное пользователю или для логов.
+     * @param {Error} [cause] - (Опционально) Исходная ошибка, которая привела к возникновению DatabaseError.
+     */
     constructor(
         message: string = 'Произошла ошибка при обращении к базе данных',
+        cause?: Error, // Добавляем опциональный параметр cause
     ) {
-        super(message, 500);
+        super(message, 500); // Вызываем конструктор AppError со статусом 500
+        this.cause = cause; // Сохраняем исходную ошибку
+
+        // Установка прототипа выполняется в базовом классе AppError через new.target.prototype,
+        // поэтому явный вызов Object.setPrototypeOf здесь обычно не требуется,
+        // если только не нужна специфическая логика для этого конкретного класса.
+        // Object.setPrototypeOf(this, DatabaseError.prototype);
     }
 }
 
@@ -111,10 +134,10 @@ export class ExternalServiceError extends AppError {
 
 // Определяем LevelUpdateError где-то (можно в customErrors.ts)
 export class LevelUpdateError extends AppError {
-  cause: Error | undefined;
-  constructor(message: string, cause?: Error) {
-    super(message, 500); // Или другой статус
-    this.cause = cause;
-    Object.setPrototypeOf(this, LevelUpdateError.prototype);
-  }
+    public readonly cause?: Error; // Поле cause уже было здесь
+    constructor(message: string, cause?: Error) {
+        super(message, 500); // Или другой статус
+        this.cause = cause;
+        Object.setPrototypeOf(this, LevelUpdateError.prototype); // Здесь может быть нужен, если есть своя логика
+    }
 }
