@@ -11,7 +11,8 @@ export interface IWordModel extends Document {
   _id: string;
   text: string;
   normalized_text: string; // Новый атрибут для нормализованного текста
-  language: string;
+  target_language: string;
+  source_language: string;
   users: Types.ObjectId[];
   search_data: ISearchData[];
   createdAt: Date;
@@ -31,17 +32,23 @@ const SearchDataSchema = new Schema({
 });
 
 const WordSchema = new Schema(
-  {
-    text: { type: String, required: true, unique: true },
-    normalized_text: { type: String, required: true, lowercase: true }, // Новый атрибут
-    language: { type: String },
-    users: [{ type: Schema.Types.ObjectId, ref: "telegram_user" }],
-    search_data: [SearchDataSchema],
-  },
-  {
-    timestamps: true,
-  }
+    {
+        text: { type: String, required: true },
+        normalized_text: {
+            type: String,
+            required: true,
+            lowercase: true,
+            unique: true,
+        }, // Новый атрибут
+        target_language: { type: String },
+        source_language: { type: String },
+        users: [{ type: Schema.Types.ObjectId, ref: 'telegram_user' }],
+        search_data: [SearchDataSchema],
+    },
+    {
+        timestamps: true,
+    },
 );
 
-const SearchedWordModel = model<IWordModel>("searched-word", WordSchema);
+const SearchedWordModel = model<IWordModel>("searched-word-russian", WordSchema);
 export default SearchedWordModel;
