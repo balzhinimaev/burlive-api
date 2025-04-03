@@ -42,10 +42,9 @@ export class AddRatingHandler implements IAddRatingHandler {
 
     async execute(input: AddRatingInput): Promise<TelegramUserDocument> {
         // Деструктурируем обновленный input
-        const { userObjectId, amount } = input; // <-- ИЗМЕНЕНО
+        const { userObjectId, amount, session } = input;
         this.logger.info(
-            // Обновляем лог
-            `Executing AddRatingHandler: Adding ${amount} rating points to user ObjectId ${userObjectId}.`, // <-- ИЗМЕНЕНО
+            `Executing AddRatingHandler: Adding ${amount} rating points to user ObjectId ${userObjectId}. ${session ? 'Within transaction.' : 'Outside transaction.'}`,
         );
 
         // 1. Валидация входных данных
@@ -64,9 +63,11 @@ export class AddRatingHandler implements IAddRatingHandler {
         try {
             // 2. Проверка существования пользователя по ObjectId
             // Используем _id вместо id
-            const userExists = await this.telegramUserModel.exists({
-                _id: userObjectId,
-            }); // <-- ИЗМЕНЕНО
+            const userExists = await this.telegramUserModel
+                .exists({
+                    _id: userObjectId,
+                })
+                .session(session || null); // <-- ИЗМЕНЕНО
             if (!userExists) {
                 this.logger.warn(
                     // Обновляем лог/ошибку
@@ -79,14 +80,18 @@ export class AddRatingHandler implements IAddRatingHandler {
             }
 
             // 3. Обновление рейтинга по ObjectId и получение пользователя
-            const updatedUser = await this.telegramUserModel
-                .findOneAndUpdate(
-                    { _id: userObjectId }, // <-- ИЗМЕНЕНО: ищем по _id
-                    { $inc: { rating: amount } },
-                    { new: true, runValidators: true },
-                )
-                .populate('level')
-                .exec();
+           const updatedUser = await this.telegramUserModel
+               .findOneAndUpdate(
+                   { _id: userObjectId },
+                   { $inc: { rating: amount } },
+                   {
+                       new: true,
+                       runValidators: true,
+                       session: session, // <-- ПЕРЕДАЕМ СЕССИЮ СЮДА
+                   },
+               )
+               .populate('level')
+               .exec();
 
             // 4. Проверка, что пользователь был найден и обновлен
             if (!updatedUser) {
