@@ -1,14 +1,13 @@
 // src/middleware/attachSuggestedWord.ts
 import { Request, Response, NextFunction } from 'express';
 import SuggestedWordModel from '../models/Vocabulary/SuggestedWordModel';
-import { Types } from 'mongoose';
 
 const attachSuggestedWord = async (
     req: Request,
     res: Response,
     next: NextFunction,
 ) => {
-    const { suggestedWordId, id, language } = req.body;
+    const { suggestedWordId } = req.body;
 
     const suggestedWord = await SuggestedWordModel.findById(suggestedWordId);
     if (!suggestedWord) {

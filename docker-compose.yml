@@ -44,7 +44,7 @@ services:
     depends_on:
       - mongo
     env_file:
-      - .env
+      - ./api/.env
     volumes:
       - ./uploads:/var/www/burlive/uploads
       - ./api/src/logs:/app/src/logs

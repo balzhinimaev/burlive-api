@@ -15,8 +15,8 @@ import bodyParser from 'body-parser';
 
 // Third-party middleware & utilities
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import cors from 'cors';
-import helmet from 'helmet';
+// import cors from 'cors';
+// import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
 
@@ -78,17 +78,17 @@ const io = new SocketIOServer(server, {
 
 // --- Core Middleware Pipeline (Order Matters) ---
 
-// 1. Security Headers
-app.use(helmet());
+// // 1. Security Headers
+// app.use(helmet());
 
-// 2. Cross-Origin Resource Sharing
-app.use(
-    cors({
-        origin: [FRONTEND_URL, 'http://localhost:3000'], // Match IO origins
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        credentials: true, // If using cookies or auth headers across origins
-    }),
-);
+// // 2. Cross-Origin Resource Sharing
+// app.use(
+//     cors({
+//         origin: [FRONTEND_URL, 'http://localhost:3000', 'http://express-api:5000'], // Match IO origins
+//         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//         credentials: true, // If using cookies or auth headers across origins
+//     }),
+// );
 
 // 3. Rate Limiting (Applied globally)
 const limiter = rateLimit({
