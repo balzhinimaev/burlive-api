@@ -33,7 +33,7 @@ const getDateForDirNameYear = () => {
 };
 
 // Формат для консоли с человеко-понятным временем по улан-удэнскому времени
-const humanReadableConsoleFormat = winston.format.printf(({ level, message, timestamp }) => {
+const humanReadableConsoleFormat = winston.format.printf(({ level, message, timestamp }: any) => {
     const localTime = new Date(timestamp).toLocaleString('ru-RU', { timeZone: 'Asia/Ulaanbaatar' });
     return `${localTime} [${level}]: ${message}`;
 });

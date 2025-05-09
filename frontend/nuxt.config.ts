@@ -33,6 +33,7 @@ export default defineNuxtConfig({
     // Доступно только на сервере
     apiBase: process.env.API_BASE,
     jwtToken: process.env.JWT_TOKEN,
+    telegramBotUsername: process.env.TELEGRAM_BOT_USERNAME,
   },
 
   css: [

@@ -13,11 +13,11 @@
             </div>
         </section>
 
-        <section>
+        <!-- <section>
             <div class="container">
                 <GiveawayComponent :giveaway="giveaway" />
             </div>
-        </section>
+        </section> -->
         <!-- {{ tasks }} -->
 
         <section>
@@ -301,7 +301,7 @@ onBeforeMount(async () => {
         try {
             console.log("User ID found:", window.Telegram.WebApp.initDataUnsafe.user.id);
             const response = await $fetch<any>(`/api/tasks/${userStore.user?._id}/${promotionId.value}`);
-            await userStore.fetchLeaderboard(promotionId.value, window.Telegram.WebApp.initDataUnsafe.user.id);
+            // await userStore.fetchLeaderboard(promotionId.value, window.Telegram.WebApp.initDataUnsafe.user.id);
             // alert("is ok");
             console.log(response)
             tasks.value = response;
@@ -314,7 +314,7 @@ onBeforeMount(async () => {
         if (storedUser?.id && userStore.user?._id) {
             try {
                 const response = await $fetch<any>(`/api/tasks/${userStore.user._id}/${promotionId.value}`);
-                await userStore.fetchLeaderboard(promotionId.value, storedUser.id);
+                // await userStore.fetchLeaderboard(promotionId.value, storedUser.id);
                 tasks.value = response;
             } catch (error) {
                 console.error('Ошибка при использовании данных из localStorage:', error);
@@ -348,7 +348,7 @@ onMounted(async () => {
             // Проверяем и устанавливаем пользователя через существующие методы
             await checkAndSetUser(telegramUser)
             await userStore.checkParticipation(promotionId.value)
-            await userStore.fetchLeaderboard(promotionId.value)
+            // await userStore.fetchLeaderboard(promotionId.value)
         }
 
         // if (isLeaderboardFetchError.value === 404) {

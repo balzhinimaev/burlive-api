@@ -1,27 +1,27 @@
 // src/models/TelegramUser.ts
-import { Document, Schema, Types, model } from "mongoose";
-import { User } from "telegraf/typings/core/types/typegram";
-import LevelModel, { ILevel } from "./Level";
+import { Document, Schema, Types, model } from 'mongoose';
+import { User } from 'telegraf/typings/core/types/typegram';
+import LevelModel, { ILevel } from './Level';
+const { customAlphabet } = require('nanoid');
+import { LevelUpdateError } from '../errors/customErrors';
 
 export interface TelegramUser extends User {
     _id: Types.ObjectId;
     rating: number;
+    custom_username: string;
     level: Types.ObjectId | ILevel;
-    referrals_telegram: Types.ObjectId[];
+    referrals: Types.ObjectId[];
     referral_code: string;
     referred_by: null | Types.ObjectId;
     id: number;
     email: string;
-    c_username: string;
     theme: 'light' | 'dark';
     platform: string;
     via_app: boolean;
-    photo_url: string;
-    phone?: string | number;
-    role: 'admin' | 'user' | 'moderator' | undefined;
+    photo_url: string | null;
+    phone: string | null;
+    role: 'admin' | 'user' | 'moderator'
     dailyRating: number;
-    // actions: Types.ObjectId[];
-
     vocabular: {
         selected_language_for_translate: 'russian' | 'buryat';
     };
@@ -42,20 +42,25 @@ export interface TelegramUser extends User {
     updatedAt: Date;
 }
 
-interface TelegramUserDocument extends TelegramUser, Document {
-  id: number;
-  _id: Types.ObjectId;
-  updateLevel(): Promise<void>;
+export interface TelegramUserDocument extends TelegramUser, Document {
+    id: number;
+    _id: Types.ObjectId;
+    updateLevel(): Promise<void>;
+    hasActiveSubscription(): boolean; // <--- Добавил тип возвращаемого значения
+    activateSubscription( // <--- Улучшил типизацию и добавил async/await
+        type: 'monthly' | 'quarterly' | 'annual',
+        paymentId: Types.ObjectId,
+    ): Promise<void>;
 }
 
 const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
     {
-        id: { type: Number, required: true },
+        id: { type: Number, required: true, unique: true },
         username: { type: String, required: false },
-        c_username: { type: String, required: false, default: '' },
+        custom_username: { type: String, required: false, default: '' },
         first_name: { type: String, required: false },
-        email: { type: String, required: false },
-        phone: { type: String || Number, required: false },
+        email: { type: String, required: false }, // Можно добавить index: true, unique: true (если нужно)
+        phone: { type: String, required: false, default: "" },
         platform: { type: String, required: false },
 
         currentQuestion: {
@@ -63,16 +68,16 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
             questionPosition: { type: Number, default: 1 },
         },
 
-        rating: { type: Number, required: true, default: 1 },
+        rating: { type: Number, required: true, default: 1, index: true }, // Добавил index
         dailyRating: { type: Number, required: true, default: 1 },
         level: { type: Schema.Types.ObjectId, ref: 'Level', required: true },
-        // actions: [{ type: Schema.Types.ObjectId, ref: 'TelegramUserAction' }],
         via_app: { type: Boolean, required: false, default: false },
         photo_url: { type: String, required: false, default: '' },
         role: {
             type: String,
             enum: ['admin', 'user', 'moderator'],
             default: 'user',
+            index: true, // Добавил index
         },
         vocabular: {
             selected_language_for_translate: {
@@ -96,25 +101,26 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
             paymentId: { type: Schema.Types.ObjectId, ref: 'Payment' },
             startDate: { type: Date, default: null },
             endDate: { type: Date, default: null },
-            isActive: { type: Boolean, default: false },
+            isActive: { type: Boolean, default: false, index: true }, // Добавил index
         },
         referral_code: {
             type: String,
             unique: true,
-            default: generateReferralCode,
+            default: generateReferralCode, // <--- Используем обновленную функцию
+            index: true, // Добавил index
         },
         referred_by: {
             type: Schema.Types.ObjectId,
             ref: 'telegram_user',
             default: null,
+            index: true, // Добавил index
         },
-        // referrals_telegram уже присутствует и хранит список ObjectId приглашённых пользователей
-        referrals_telegram: [
-            { type: Schema.Types.ObjectId, ref: 'telegram_user' },
-        ],
+        referrals: [{ type: Schema.Types.ObjectId, ref: 'telegram_user' }],
         botusername: { type: String },
         blocked: {
             type: Boolean,
+            default: false, // Добавил default
+            index: true, // Добавил index
         },
     },
     {
@@ -122,70 +128,110 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
     },
 );
 
-// src/models/TelegramUser.ts
+// --- Методы ---
+
 TelegramUserSchema.methods.updateLevel = async function (
-  this: TelegramUserDocument
+    this: TelegramUserDocument,
 ): Promise<void> {
-  const user = this;
+    try {
+            const user = this;
 
-  // Find the corresponding level based on the rating
-  const level: ILevel | null = await LevelModel.findOne({
-    minRating: { $lte: user.rating },
-    $or: [{ maxRating: { $gte: user.rating } }, { maxRating: null }],
-  }).sort({ minRating: -1 });
+    // Find the corresponding level based on the rating
+    const level: ILevel | null = await LevelModel.findOne({
+        minRating: { $lte: user.rating },
+        $or: [{ maxRating: { $gte: user.rating } }, { maxRating: null }],
+    }).sort({ minRating: -1 });
 
-  if (level) {
-    // Ensure user.level is an ObjectId
-    if (!(user.level instanceof Types.ObjectId)) {
-      throw new Error('User level is not an ObjectId');
+    if (level) {
+        // Check if level is an ObjectId and if it's different from the new level's ID
+        // Эта проверка сработает корректно, если user.level не был заселен (populated)
+        if (
+            !(user.level instanceof Types.ObjectId) ||
+            !user.level.equals(level._id)
+        ) {
+            // Если user.level был заселен (является объектом ILevel), нужно сравнить ID
+            if (
+                user.level instanceof Types.ObjectId ||
+                (user.level as ILevel)._id?.equals(level._id)
+            ) {
+                // Уровень не изменился
+            } else {
+                user.level = level._id;
+                // console.log(`User ${user.id} level updated to ${level.name}`);
+                await user.save();
+            }
+        }
     }
-
-    // Compare current level with the found level
-    if (!user.level.equals(level._id)) {
-      user.level = level._id;
-      // Additional actions upon level change
-      // e.g., sendLevelUpNotification(user, level);
-      await user.save(); // Now TypeScript recognizes 'save()' method
+    } catch (error: any) {
+        throw new LevelUpdateError(
+            `Failed to update level for user ${this.id}`,
+            error,
+        );
     }
-  }
+ };
+
+TelegramUserSchema.methods.hasActiveSubscription = function (
+    this: TelegramUserDocument,
+): boolean {
+    const subscription = this.subscription;
+    return !!(
+        // Используем !! для явного приведения к boolean
+        (
+            subscription && // Убедимся, что объект subscription существует
+            subscription.isActive &&
+            subscription.endDate &&
+            new Date() <= subscription.endDate
+        )
+    );
 };
 
-TelegramUserSchema.methods.hasActiveSubscription = function (): boolean {
-  const subscription = this.subscription;
-  return subscription.isActive && subscription.endDate && new Date() <= subscription.endDate;
+// Делаем метод асинхронным, так как он вызывает save()
+TelegramUserSchema.methods.activateSubscription = async function (
+    this: TelegramUserDocument, // Явно указываем тип this
+    type: 'monthly' | 'quarterly' | 'annual',
+    paymentId: Types.ObjectId,
+): Promise<void> {
+    // Возвращаем Promise<void>
+    const durationMap = {
+        monthly: 30,
+        quarterly: 90, // Обычно квартал ~91 день, но 90 проще
+        annual: 365,
+    };
+
+    const now = new Date();
+    // Рассчитываем endDate. Убедимся, что endDate не null
+    const endDate = new Date(
+        now.getTime() + durationMap[type] * 24 * 60 * 60 * 1000,
+    );
+
+    this.subscription = {
+        type: type,
+        paymentId: paymentId,
+        startDate: now,
+        endDate: endDate,
+        isActive: true,
+    };
+
+    await this.save(); // Используем await для сохранения
 };
-TelegramUserSchema.methods.activateSubscription = function (
-  type: "monthly" | "quarterly" | "annual",
-  paymentId: Types.ObjectId
-): void {
-  const durationMap = {
-    monthly: 30,
-    quarterly: 90,
-    annual: 365,
-  };
 
-  const now = new Date();
-  const endDate = new Date(now.getTime() + durationMap[type] * 24 * 60 * 60 * 1000);
-
-  this.subscription = {
-    type,
-    paymentId,
-    startDate: now,
-    endDate,
-    isActive: true,
-  };
-
-  this.save();
-};
-
+// --- Модель ---
 const TelegramUserModel = model<TelegramUserDocument>(
-  'telegram_user',
-  TelegramUserSchema
+    'telegram_user', // Имя коллекции будет 'telegram_users'
+    TelegramUserSchema,
 );
 
+// --- Генератор реферального кода с использованием nanoid ---
+// Определяем алфавит (заглавные буквы + цифры) и длину кода
+const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const referralCodeLength = 6; // Та же длина, что была у substring(2, 8)
+
+// Создаем кастомный генератор nanoid
+const nanoidReferral = customAlphabet(alphabet, referralCodeLength);
+
 function generateReferralCode(): string {
-    // Пример генерации кода – можно улучшить алгоритм
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
+    // Генерируем код с помощью кастомного генератора
+    return nanoidReferral();
 }
 
 export default TelegramUserModel;

@@ -1,26 +1,41 @@
 // src/middleware/authorizeAdmin.ts
 
 import { Request, Response, NextFunction } from 'express';
+import { IUser } from '../models/User'; // Импортируем тип IUser из модели
+import logger from '../utils/logger'; // Рекомендуется для логирования попыток доступа
 
-// Предполагается, что у вас есть механизм аутентификации, который добавляет user к Request
-interface IUser {
-    _id: string;
-    role: string; // Например, 'admin', 'user' и т.д.
-}
+// Локальное определение IUser и declare global НЕ НУЖНЫ,
+// так как предполагается, что они определены централизованно.
 
-declare global {
-    namespace Express {
-        interface Request {
-            user?: IUser;
-        }
-    }
-}
+/**
+ * Middleware для проверки прав администратора.
+ * Требует успешного выполнения предшествующего middleware аутентификации,
+ * который устанавливает `req.user` (типа IUser).
+ * Предоставляет доступ только если `req.user.role === 'admin'`.
+ */
+const authorizeAdmin = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+): void => {
+    // Тип Request уже должен быть расширен через глобальные декларации
+    const user = req.user as IUser | undefined; // Получаем пользователя из запроса
 
-const authorizeAdmin = (req: Request, res: Response, next: NextFunction): void => {
-    if (req.user && req.user.role === 'admin') {
-        next(); // Пользователь является администратором, продолжаем выполнение
+    // Проверяем наличие пользователя и его роль
+    if (user && user.role === 'admin') {
+        // Пользователь аутентифицирован и является администратором
+        // logger.debug(`Admin access granted: User ${user._id} to ${req.method} ${req.originalUrl}`); // Опциональное логирование успеха
+        next(); // Разрешаем доступ к следующему обработчику
     } else {
-        res.status(403).json({ message: 'Доступ запрещён: требуется административные права.' });
+        // Пользователь либо не аутентифицирован, либо не администратор
+        const userId = user ? user._id : 'anonymous/unauthenticated';
+        logger.warn(
+            `Forbidden access attempt: User [${userId}] lacks admin role for ${req.method} ${req.originalUrl}`,
+        );
+        res.status(403).json({
+            message: 'Access Denied: Administrator privileges required.',
+        });
+        // Завершаем обработку запроса, отправляя ответ 403
     }
 };
 

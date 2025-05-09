@@ -1,713 +1,887 @@
-// telegramController.ts
+// src/controllers/telegramController.ts
+
 import { NextFunction, Request, Response } from 'express';
-import logger from '../utils/logger';
-import { DialogModel } from '../models/Dialog';
-import TelegramUserModel from '../models/TelegramUsers';
-import WordModel from '../models/Vocabulary/WordModel';
-import SearchedWordModel from '../models/Vocabulary/SearchedWordModel';
-import TelegramUserState from '../models/Telegram/UserState';
-import { Types } from 'mongoose';
-import LevelModel from '../models/Level';
-import TelegramUserActionModel from '../models/Telegram/UserAction';
+import { Types } from 'mongoose'; // Нужен для проверки ObjectId
 import dotenv from 'dotenv';
-dotenv.config(); // Загружаем переменные окружения из файла .env
-// Импортируйте модель LevelModel
-const telegramController = {
-    getAllUsers: async (
-        _req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
+
+// --- Импорты сервиса и зависимостей, НЕ ИСПОЛЬЗУЕМЫХ напрямую в контроллере ---
+import { telegramUserServiceInstance as telegramService } from '../compositionRoot'; // Импортируем готовый экземпляр СЕРВИСА
+import logger from '../utils/logger'; // Логгер нужен в контроллере для логов самого контроллера
+import { DialogModel } from '../models/Dialog'; // Модель, НЕ управляемая через TelegramUserService
+import TelegramUserState from '../models/Telegram/UserState'; // Модель, НЕ управляемая через TelegramUserService
+import TelegramUserActionModel from '../models/Telegram/UserAction'; // Модель, НЕ управляемая через TelegramUserService
+
+// --- Импорты для обработки ошибок ---
+import {
+    UserExistsError,
+    UserNotFoundError,
+    ValidationError,
+    DatabaseError,
+    ConfigurationError,
+    LevelUpdateError,
+} from '../errors/customErrors';
+import { RegisterUserDTO } from '../services/telegram/telegramUserService'; // Импорт DTO, если нужен для типизации в контроллере
+
+dotenv.config();
+
+// --- Хелпер для обработки ошибок сервиса в контексте HTTP ---
+// ВАЖНО: Эта функция ТЕПЕРЬ не возвращает результат res.json(), а просто вызывает его.
+const handleServiceError = (
+    error: unknown, // Используем unknown для большей безопасности типов
+    res: Response,
+    operation: string = 'operation', // Добавим название операции для логов
+): void => {
+    // Возвращаемый тип void
+    // Логируем ошибку с контекстом операции
+    logger.error(`Error during ${operation}:`, {
+        message: error instanceof Error ? error.message : String(error),
+        errorObject: error,
+    });
+
+    if (error instanceof UserNotFoundError) {
+        res.status(404).json({ message: error.message });
+        return; // Выходим после отправки ответа
+    }
+    if (error instanceof UserExistsError) {
+        res.status(409).json({ message: error.message }); // 409 Conflict
+        return; // Выходим
+    }
+    if (error instanceof ValidationError) {
+        res.status(400).json({ message: error.message });
+        return; // Выходим
+    }
+    if (error instanceof ConfigurationError) {
+        res.status(500).json({ message: error.message });
+        return; // Выходим
+    }
+    if (error instanceof LevelUpdateError) {
+        res.status(500).json({
+            message: `Level update failed: ${error.message}`,
+        });
+        return; // Выходим
+    }
+    if (error instanceof DatabaseError) {
+        res.status(500).json({ message: `Database error: ${error.message}` });
+        return; // Выходим
+    }
+
+    // Обработка других стандартных ошибок JavaScript
+    if (error instanceof Error) {
+        res.status(500).json({
+            message: `An unexpected error occurred: ${error.message}`,
+        });
+        return; // Выходим
+    }
+
+    // Если это вообще не объект Error
+    res.status(500).json({ message: 'An unknown server error occurred' });
+    // Неявный выход
+};
+
+/**
+ * Класс контроллера для обработки HTTP запросов, связанных с пользователями Telegram.
+ */
+class TelegramController {
+    // Используем готовый экземпляр сервиса, внедренный через compositionRoot
+    private userService = telegramService;
+
+    // --- МЕТОДЫ КОНТРОЛЛЕРА ---
+
+    /**
+     * Получает список всех пользователей (с пагинацией/фильтрацией в будущем).
+     */
+    getAllUsers = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'getAllUsers';
+        logger.info(`[${operationName}] Request received`);
         try {
-            const users = await TelegramUserModel.find();
-            if (users) {
-                res.status(200).json({
-                    message: 'Пользователи получены',
-                    count: users.length,
-                    users,
-                });
-                return;
-            } else {
-                res.status(200).json({
-                    message: 'Пользователей нет',
-                    users: [],
-                });
-                return;
-            }
-        } catch (error) {
-            logger.error(error);
-            next(error);
-        }
-    },
-    create: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const { messages } = req.body;
+            const options = {
+                limit: Number(req.query.limit) || 20,
+                offset: Number(req.query.offset) || 0,
+                filter: {}, // Добавить парсинг фильтров
+                sortBy: (req.query.sortBy as string) || 'createdAt',
+                sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc',
+            };
 
-            console.log(messages);
+            const result = await this.userService.listUsers(options);
 
-            await new DialogModel(messages)
-                .save()
-                .then((result) => console.log(result));
-
-            res.status(200).json({ messages });
-            return;
-        } catch (error) {
-            logger.error('error');
-            next(error);
-        }
-    },
-    paymentCb: async (
-        _req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            res.status(200);
-            return;
-        } catch (error) {
-            logger.error('error');
-            next(error);
-        }
-    },
-    blockUser: async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { id } = req.body;
-
-            if (!id) {
-                res.status(404).json({ message: 'ID должен быть указан' });
-                return;
-            }
-
-            await TelegramUserModel.findOneAndUpdate(
-                { id },
-                {
-                    $set: {
-                        blocked: true,
-                    },
-                },
-            );
-            res.status(200).json({ message: 'User blocked successfully' });
-            return;
-        } catch (error) {
-            logger.error(`Не удалось обновить поле blocked пользователю`);
-            next(error);
-        }
-    },
-    new_word_translate_request: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const { word, language, user_id } = req.body;
-            const user = await TelegramUserModel.findOne({ id: user_id });
-
-            if (!user) {
-                return;
-            }
-
-            // Преобразование слова в нижний регистр для поиска
-            const normalizedWord = word.toLowerCase();
-            let selectedLanguage =
-                language === 'russian' ? 'русский' : 'бурятский';
-
-            let translations: Types.ObjectId[] = [];
-
-            const is_exists_on_searchdata = await SearchedWordModel.findOne({
-                normalized_text: normalizedWord,
+            // НЕТ return перед res.status
+            res.status(200).json({
+                message:
+                    result.total > 0 ? 'Users retrieved' : 'No users found',
+                count: result.total,
+                users: result.users,
             });
-
-            if (is_exists_on_searchdata) {
-                // Если слово существует, обновить поле users и добавить запись в search_data
-                await SearchedWordModel.findOneAndUpdate(
-                    { normalized_text: normalizedWord },
-                    {
-                        $addToSet: { users: user._id },
-                        $push: {
-                            search_data: { content: word, user_id: user._id },
-                        },
-                    },
-                );
-            } else {
-                // Если слово не существует, создать новую запись в SearchedWordModel
-                await SearchedWordModel.create({
-                    text: word,
-                    normalized_text: normalizedWord,
-                    language: selectedLanguage,
-                    users: [user._id],
-                    search_data: [{ content: word, user_id: user._id }],
-                });
-            }
-
-            // Найти слово в WordModel и получить переводы
-            const words_on_my_database = await WordModel.find({
-                normalized_text: normalizedWord,
-                language: selectedLanguage,
-            }).populate(
-                'translations',
-                '_id text language author contributors dialect',
-            );
-
-            // Если переводы найдены, добавить их в массив translations
-            if (words_on_my_database.length > 0) {
-                words_on_my_database.forEach((element) => {
-                    element.translations.forEach((subelement) => {
-                        translations.push(subelement);
-                    });
-                });
-            }
-
-            let selectedLanguageForBurlang =
-                language === 'russian' ? 'russian-word' : 'buryat-word';
-            const burlang_fetch = await fetch(
-                `https://burlang.ru/api/v1/${selectedLanguageForBurlang}/translate?q=${normalizedWord}`,
-            );
-            const burlang_response = await burlang_fetch.json();
-
-            if (burlang_fetch.status == 200) {
-                console.log(burlang_response);
-                res.status(200).json({
-                    translations,
-                    burlang_api: burlang_response,
-                });
-                return;
-            } else {
-                res.status(200).json({ translations });
-                return;
-            }
         } catch (error) {
-            logger.error(`Ошибка при переводе слова: \n${error}`);
-            res.status(500).json({ message: 'Ошибка сервера' });
-            next(error);
+            handleServiceError(error, res, operationName);
         }
-    },
+    };
 
-    user_is_exists: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
+    /**
+     * Проверяет существование пользователя и возвращает его данные.
+     */
+    userExists = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'userExists';
+        const { id } = req.params;
+        const userIdNum = Number(id);
+        logger.info(`[${operationName}] Request for user ID: ${id}`);
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${id}`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход из функции
+        }
+
         try {
-            const { id } = req.params;
-            const user = await TelegramUserModel.findOne({ id: Number(id) })
-                .select(
-                    '_id id username email createdAt first_name rating theme photo_url role subscription phone',
-                )
-                .populate('level');
+            const user = await this.userService.findUserById(
+                userIdNum,
+                undefined,
+                true,
+            );
 
             if (!user) {
+                logger.info(`[${operationName}] User ID ${id} not found.`);
+                // НЕТ return перед res.status
                 res.status(200).json({
                     is_exists: false,
-                    message: 'Пользователь не существует',
+                    message: 'User does not exist',
                 });
-                return;
+            } else {
+                logger.info(`[${operationName}] User ID ${id} found.`);
+                // НЕТ return перед res.status
+                res.status(200).json({
+                    is_exists: true,
+                    message: 'User exists',
+                    user: user,
+                });
             }
-            // let phoneIsExists: boolean = false
-            // if (user.phone) {
-            //   phoneIsExists = true
-            // }
-
-            res.status(200).json({
-                is_exists: true,
-                message: 'Пользователь существует',
-                user: {
-                    _id: user._id,
-                    id: user.id,
-                    username: user.username,
-                    createdAt: user.createdAt,
-                    first_name: user.first_name,
-                    rating: user.rating,
-                    theme: user.theme,
-                    photo_url: user.photo_url,
-                    level: user.level,
-                    role: user.role,
-                    subscription: user.subscription,
-                    phone: user.phone,
-                },
-            });
-            logger.info(`Получение данных ID ${id}`);
-            return;
         } catch (error) {
-            logger.error('Error in user_is_exists:', error);
-            res.status(500).json({ error: 'Internal server error' });
-            next(error);
+            handleServiceError(error, res, operationName);
         }
-    },
+    };
 
-    register_telegram_user: async (
+    /**
+     * Регистрирует нового пользователя Telegram.
+     */
+    registerTelegramUser = async (
         req: Request,
         res: Response,
-        next: NextFunction,
     ): Promise<void> => {
+        const operationName = 'registerTelegramUser';
+        logger.info(`[${operationName}] Request received`);
         try {
             const {
                 id,
                 username,
                 first_name,
-                last_name,
                 email,
                 photo_url,
-                platform,
                 referral,
-                botusername
+                botusername,
             } = req.body;
-            logger.info(`${referral}`);
-            // Проверка на существование пользователя
-            const existingUser = await TelegramUserModel.findOne({ id });
-            if (existingUser) {
-                res.status(409).json({
-                    message: 'Пользователь уже зарегистрирован!',
+
+            if (!id || typeof id !== 'number') {
+                logger.warn(`[${operationName}] Missing or invalid user ID.`);
+                // НЕТ return перед res.status
+                res.status(400).json({
+                    message: 'User ID (number) is required.',
+                });
+                return; // Выход
+            }
+
+            if (!botusername || typeof botusername !== 'string') {
+                logger.warn(
+                    `[${operationName}] Missing or invalid botusername`,
+                );
+                res.status(400).json({
+                    message: `Bot Username is required.`,
                 });
                 return;
             }
 
-            // Получение начального уровня
-            const initialLevel = await LevelModel.findOne().sort({
-                minRating: 1,
-            });
-            if (!initialLevel) {
-                logger.error('Начальный уровень не найден.');
-                res.status(500).json({ error: 'Начальный уровень не найден.' });
-                return;
+            if (!first_name) {
+                logger.warn(
+                    `[${operationName}] Missing first_name for ID ${id}.`,
+                );
+                // НЕТ return перед res.status
+                res.status(400).json({ message: 'first_name is required.' });
+                return; // Выход
             }
 
-            // Сохранение нового пользователя с установленным уровнем
-            const newUser = new TelegramUserModel({
+            const userData: RegisterUserDTO = {
                 id,
-                username,
+                username: username || null,
                 first_name,
-                last_name,
-                photo_url,
-                platform,
-                email: email || '', // Обработка возможного отсутствия email
-                level: initialLevel._id, // Установка начального уровня
-                botusername
-            });
+                email: email || null,
+                photo_url: photo_url || null,
+                botusername,
+            };
 
-            // Если передан referral-код, найти реферера и обновить данные
-            if (referral) {
-                const referrer = await TelegramUserModel.findOne({
-                    referral_code: referral,
-                });
-                if (referrer) {
-                    newUser.referred_by = referrer._id;
-                    // Добавляем нового пользователя в список рефералов у реферера
-                    referrer.referrals_telegram.push(newUser._id);
-                    // Пример начисления бонуса (например, +10 к рейтингу)
-                    referrer.rating += 10;
-                    await referrer.save();
-                }
+            logger.info(
+                `[${operationName}] Attempting registration for ID ${id}`,
+            );
+            const newUser = await this.userService.registerUser(
+                userData,
+                referral,
+            );
+
+            logger.info(
+                `[${operationName}] User ID ${id} registered successfully with MongoID ${newUser._id}`,
+            );
+            // НЕТ return перед res.status
+            res.status(201).json({
+                message: 'User registered successfully!',
+                userId: newUser.id,
+                userMongoId: newUser._id,
+            });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Обновляет профиль пользователя (основные поля).
+     */
+    updateUserProfile = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'updateUserProfile';
+        const { userId } = req.params;
+        const userIdNum = Number(userId);
+        const updateData = req.body;
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${userId}`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход
+        }
+        if (!updateData || Object.keys(updateData).length === 0) {
+            logger.warn(
+                `[${operationName}] Missing update data for ID ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'Update data is required.' });
+            return; // Выход
+        }
+
+        try {
+            const updatedUser = await this.userService.updateUserProfile(
+                userIdNum,
+                updateData,
+            );
+            logger.info(
+                `[${operationName}] User profile ${userId} updated successfully.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json(updatedUser);
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Обновляет тему оформления пользователя.
+     */
+    updateUserTheme = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'updateUserTheme';
+        const userId = Number(req.body.userId);
+        const { theme } = req.body;
+        logger.info(
+            `[${operationName}] Request for user ID: ${userId} to theme '${theme}'`,
+        );
+
+        if (isNaN(userId)) {
+            logger.warn(`[${operationName}] Invalid ID format.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.updateUserTheme(userId, theme);
+            logger.info(
+                `[${operationName}] Theme updated successfully for user ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({ message: 'Theme updated successfully' });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Обновляет URL фотографии пользователя.
+     */
+    updateUserPhotoUrl = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'updateUserPhotoUrl';
+        const userId = Number(req.body.userId);
+        const { photo_url } = req.body; // Получаем photo_url из тела запроса
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userId)) {
+            logger.warn(`[${operationName}] Invalid ID format.`);
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return;
+        }
+        // Можно добавить проверку, что photo_url передан, если он обязателен
+        // if (photo_url === undefined) {
+        //     logger.warn(`[${operationName}] Missing photo_url for user ID ${userId}.`);
+        //     res.status(400).json({ message: 'photo_url is required.' });
+        //     return;
+        // }
+
+        try {
+            // --- ИСПОЛЬЗУЕМ updateUserProfile ---
+            await this.userService.updateUserProfile(
+                userId,
+                { photo_url: photo_url === undefined ? null : photo_url }, // Передаем объект только с полем photo_url
+                // Устанавливаем null, если photo_url не пришел, чтобы можно было очистить фото
+                // или используйте photo_url || null, если null допустим в body
+            );
+            // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
+
+            logger.info(
+                `[${operationName}] Photo updated successfully for user ${userId}.`,
+            );
+            res.status(200).json({ message: 'Photo updated successfully' });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Обновляет номер телефона пользователя.
+     */
+    saveUserPhone = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'saveUserPhone';
+        const userId = Number(req.params.userId || req.body.userId);
+        const { phoneNumber } = req.body;
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userId)) {
+            logger.warn(`[${operationName}] Invalid ID format.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return; // Выход
+        }
+        if (!phoneNumber || typeof phoneNumber !== 'string') {
+            logger.warn(
+                `[${operationName}] Invalid or missing phoneNumber for user ID ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({
+                message: 'phoneNumber (string) is required.',
+            });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.updateUserPhone(userId, phoneNumber);
+            logger.info(
+                `[${operationName}] Phone number saved successfully for user ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({
+                message: 'Phone number saved successfully',
+            });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Обновляет текущую позицию пользователя в уроке.
+     */
+    updateQuestionPosition = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        const operationName = 'updateQuestionPosition';
+        const { id, lessonId, position } = req.body;
+        const userIdNum = Number(id);
+        logger.info(
+            `[${operationName}] Request for user ID: ${id}, lesson: ${lessonId}, position: ${position}`,
+        );
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid user ID format: ${id}.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return; // Выход
+        }
+        if (!lessonId || !Types.ObjectId.isValid(lessonId)) {
+            logger.warn(
+                `[${operationName}] Invalid lessonId format: ${lessonId} for user ${id}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({
+                message: 'lessonId (valid ObjectId) is required.',
+            });
+            return; // Выход
+        }
+        const positionNum = Number(position);
+        if (
+            isNaN(positionNum) ||
+            positionNum <= 0 ||
+            !Number.isInteger(positionNum)
+        ) {
+            logger.warn(
+                `[${operationName}] Invalid position: ${position} for user ${id}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({
+                message: 'position (positive integer) is required.',
+            });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.updateCurrentQuestion(
+                userIdNum,
+                lessonId,
+                positionNum,
+            );
+            logger.info(
+                `[${operationName}] Question position updated for user ${id}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({
+                message: 'Question position updated successfully',
+            });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Устанавливает язык для словаря пользователя.
+     */
+    selectLanguageForVocabular = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        const operationName = 'selectLanguageForVocabular';
+        const { id, language } = req.body;
+        const userIdNum = Number(id);
+        logger.info(
+            `[${operationName}] Request for user ID: ${id}, language: ${language}`,
+        );
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${id}.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return; // Выход
+        }
+        if (language !== 'russian' && language !== 'buryat') {
+            logger.warn(
+                `[${operationName}] Invalid language: ${language} for user ${id}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({
+                message: "language must be 'russian' or 'buryat'.",
+            });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.setVocabularyLanguage(userIdNum, language);
+            logger.info(
+                `[${operationName}] Vocabulary language set for user ${id}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({ message: 'Language selected successfully' });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Блокирует пользователя.
+     */
+    blockUser = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'blockUser';
+        const userId = Number(req.params.userId || req.body.id);
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userId)) {
+            logger.warn(`[${operationName}] Invalid ID format.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.blockUser(userId);
+            logger.warn(
+                `[${operationName}] User ${userId} blocked successfully.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({ message: 'User blocked successfully' });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Получает реферальную информацию пользователя.
+     */
+    getUserReferralInfo = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
+        const operationName = 'getUserReferralInfo';
+        const { id } = req.params;
+        const userIdNum = Number(id);
+        logger.info(`[${operationName}] Request for user ID: ${id}`);
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${id}`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход
+        }
+
+        try {
+            const user = await this.userService.findUserById(
+                userIdNum,
+                '_id id referral_code username',
+            );
+            if (!user) {
+                logger.warn(`[${operationName}] User not found: ${id}`);
+                // НЕТ return перед res.status
+                res.status(404).json({ message: 'User not found' });
+                return; // Выход
             }
 
-            await newUser.save();
-
-            res.status(201).json({
-                message: 'Пользователь успешно зарегистрирован!',
-                user: newUser.id,
+            const referralsResult = await this.userService.listUsers({
+                filter: { referred_by: user._id },
+                fields: 'subscription',
+                limit: 10000,
             });
-            logger.info(`Пользователь успешно зарегистрирован: ${newUser}`);
-        } catch (error) {
-            logger.error(
-                `Ошибка при регистрации телеграмм пользователя: ${error}`,
-            );
-            next(error); // Передаем ошибку в следующий middleware
-        }
-    },
 
-    select_language_for_vocabular: async (
+            const referrals = referralsResult.users;
+            const subscribedReferralsCount = referrals.filter(
+                (r) => r.subscription?.isActive === true,
+            ).length;
+
+            const botUsername = process.env.BOT_USERNAME || 'your_bot_username';
+            logger.info(
+                `[${operationName}] Referral info retrieved for user ${id}`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({
+                referralCode: user.referral_code,
+                referralLink: `https://t.me/${botUsername}?start=ref_${user.referral_code}`,
+                referralsCount: referrals.length,
+                subscribedReferralsCount: subscribedReferralsCount,
+            });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Привязывает пользователя к рефереру (новый эндпоинт).
+     */
+    linkReferral = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'linkReferral';
+        const userId = Number(req.params.userId);
+        const { referralCode } = req.body;
+        logger.info(
+            `[${operationName}] Request for user ID: ${userId} with code: ${referralCode}`,
+        );
+
+        if (isNaN(userId)) {
+            logger.warn(
+                `[${operationName}] Invalid user ID format: ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход
+        }
+        if (!referralCode || typeof referralCode !== 'string') {
+            logger.warn(
+                `[${operationName}] Missing or invalid referralCode for user ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({
+                message: 'Referral code (string) is required.',
+            });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.linkReferral(userId, referralCode);
+            logger.info(
+                `[${operationName}] User ${userId} linked successfully via code ${referralCode}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({
+                message: `User ${userId} successfully linked via code ${referralCode}.`,
+            });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
+     * Получает таблицу лидеров.
+     */
+    getLeaderboard = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'getLeaderboard';
+        logger.info(`[${operationName}] Request received`);
+        try {
+            const limit = Number(req.query.limit) || 10;
+            const sortBy = (req.query.sortBy as string) || 'rating';
+
+            const fieldsToSelect =
+                'username id first_name photo_url level subscription rating';
+
+            const leaderboardResult = await this.userService.listUsers({
+                sortBy: sortBy,
+                sortOrder: 'desc',
+                limit: limit,
+                fields: fieldsToSelect,
+                filter: { blocked: { $ne: true } },
+            });
+
+            logger.info(
+                `[${operationName}] ${leaderboardResult.users.length} leaders fetched`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json(leaderboardResult.users);
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    // ==============================================
+    // МЕТОДЫ, НЕ СВЯЗАННЫЕ С TelegramUserService
+    // ==============================================
+
+    /**
+     * Создает запись диалога.
+     */
+    createDialog = async (
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
+        const operationName = 'createDialog';
         try {
-            const { language, id } = req.body;
-            await TelegramUserModel.findOneAndUpdate(
-                { id },
-                {
-                    $set: {
-                        'vocabular.select_language_for_vocabular': language,
-                    },
-                },
-            );
-            res.status(200).json({ message: 'Язык выбран' });
-            return;
+            const { messages } = req.body;
+            if (!messages || !Array.isArray(messages)) {
+                logger.warn(`[${operationName}] Invalid messages format.`);
+                // НЕТ return перед res.status
+                res.status(400).json({
+                    message: 'Invalid messages format. Array expected.',
+                });
+                return; // Выход
+            }
+            await new DialogModel({ messages }).save();
+            logger.info(`[${operationName}] Dialog entry created.`);
+            // НЕТ return перед res.status
+            res.status(201).json({ messages });
         } catch (error) {
-            logger.error(
-                `Ошибка при сохранении выбора языка для словаря, ${error}`,
-            );
-            res.status(500).json({ error: 'Ошибка сервера' });
-            next(error);
+            logger.error(`[${operationName}] Error saving dialog:`, { error });
+            next(error); // Передаем дальше, т.к. handleServiceError может не знать об ошибках DialogModel
         }
-    },
+    };
 
-    save: async (
-        _req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            console.log(123);
-            const dialogs = await DialogModel.find();
-            console.log(dialogs);
+    /**
+     * Сохраняет состояние пользователя.
+     */
+    saveUserState = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'saveUserState';
+        const { userId, scene, stateData } = req.body;
+        logger.debug(`[${operationName}] Request for user ID: ${userId}`);
 
-            res.status(200);
-            return;
-        } catch (error) {
-            logger.error('error');
-            next(error);
+        if (!userId || typeof userId !== 'number') {
+            logger.warn(`[${operationName}] Invalid or missing userId.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'userId (number) is required.' });
+            return; // Выход
         }
-    },
 
-    save_user_state: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
         try {
-            console.log('сохранение стейта');
-            const { userId, scene, stateData } = req.body;
             await TelegramUserState.findOneAndUpdate(
                 { userId },
                 { scene, stateData },
-                { upsert: true },
+                { upsert: true, new: true },
             );
+            logger.debug(`[${operationName}] State saved for user ${userId}.`);
+            // НЕТ return перед res.status
             res.status(200).json({ message: 'State saved successfully' });
-            return;
         } catch (error) {
-            logger.error(`Error saving user state: ${error}`);
-            res.status(500).json({ error: 'Internal server error' });
-            next(error);
+            // Здесь можно использовать handleServiceError, но он не знает специфичных ошибок TelegramUserState
+            // Поэтому пока оставляем общую обработку
+            logger.error(
+                `[${operationName}] Error saving state for user ${userId}:`,
+                { error },
+            );
+            // НЕТ return перед res.status
+            res.status(500).json({ message: 'Failed to save user state' });
         }
-    },
+    };
 
-    save_user_action: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
+    /**
+     * Получает состояние пользователя.
+     */
+    getUserState = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'getUserState';
+        const { id } = req.params;
+        const userIdNum = Number(id);
+        logger.debug(`[${operationName}] Request for user ID: ${id}`);
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${id}.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход
+        }
+
         try {
-            // logger.info(`Сохранение действие пользователя`);
-            const { userId, updateType, data } = req.body;
-            
+            const userState = await TelegramUserState.findOne({
+                userId: userIdNum,
+            });
+            if (!userState) {
+                logger.debug(
+                    `[${operationName}] State not found for user ${id}.`,
+                );
+                // НЕТ return перед res.status
+                res.status(404).json({ message: 'User state not found' });
+                return; // Выход
+            }
+            logger.debug(`[${operationName}] State retrieved for user ${id}.`);
+            // НЕТ return перед res.status
+            res.status(200).json(userState);
+        } catch (error) {
+            logger.error(
+                `[${operationName}] Error fetching state for user ${id}:`,
+                { error },
+            );
+            // НЕТ return перед res.status
+            res.status(500).json({ message: 'Failed to get user state' });
+        }
+    };
+
+    /**
+     * Сохраняет действие пользователя.
+     */
+    saveUserAction = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'saveUserAction';
+        const { userId, updateType, data } = req.body;
+        logger.debug(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (!userId || typeof userId !== 'number') {
+            logger.warn(`[${operationName}] Invalid or missing userId.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'userId (number) is required.' });
+            return; // Выход
+        }
+        if (!updateType) {
+            logger.warn(
+                `[${operationName}] Missing updateType for user ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'updateType is required.' });
+            return; // Выход
+        }
+
+        try {
             await new TelegramUserActionModel({
                 userId,
                 updateType,
                 data,
             }).save();
-
-            // await TelegramUserModel.findOneAndUpdate(
-            //     { id: userId },
-            //     {
-            //         $push: {
-            //             actions: action._id,
-            //         },
-            //     },
-            // );
-
-            res.status(200).json({ message: 'State saved successfully' });
-            return;
+            logger.debug(`[${operationName}] Action saved for user ${userId}.`);
+            // НЕТ return перед res.status
+            res.status(200).json({ message: 'Action saved successfully' });
         } catch (error) {
-            logger.error(`Error saving user state: ${error}`);
-            res.status(500).json({ error: 'Internal server error' });
-            next(error);
-        }
-    },
-
-    save_user_phone: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            logger.info(`Phone number saving`);
-            const { userId, phoneNumber } = req.body;
-            await TelegramUserModel.findOneAndUpdate(
-                { id: userId },
-                { phone: phoneNumber },
-                { upsert: true },
+            logger.error(
+                `[${operationName}] Error saving action for user ${userId}:`,
+                { error },
             );
-            res.status(200).json({
-                message: '✅ Номер телефона успешно сохранен',
+            // НЕТ return перед res.status
+            res.status(500).json({ message: 'Failed to save user action' });
+        }
+    };
+
+    /**
+     * Placeholder для колбэка платежа.
+     */
+    paymentCb = async (_req: Request, res: Response): Promise<void> => {
+        logger.info('Payment callback received (placeholder)');
+        // НЕТ return перед res.sendStatus
+        res.sendStatus(200);
+    };
+
+    /**
+     * Placeholder для получения всех диалогов.
+     */
+    getAllDialogs = async (_req: Request, res: Response): Promise<void> => {
+        const operationName = 'getAllDialogs';
+        logger.debug(`[${operationName}] Request received`);
+        try {
+            const dialogs = await DialogModel.find();
+            logger.debug(
+                `[${operationName}] ${dialogs.length} dialogs fetched.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json(dialogs);
+        } catch (error) {
+            logger.error(`[${operationName}] Error fetching dialogs:`, {
+                error,
             });
-            return;
-        } catch (error) {
-            logger.error(`Error saving phone number: ${error}`);
-            res.status(500).json({ error: 'Internal server error' });
-            next(error);
+            // НЕТ return перед res.status
+            res.status(500).json({ message: 'Failed to get dialogs' });
         }
-    },
+    };
+    /**
+     * Получает тему оформления пользователя.
+     */
+    getUserTheme = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'getUserTheme';
+        const { id } = req.params; // Получаем ID из параметров URL
+        const userIdNum = Number(id);
+        logger.info(`[${operationName}] Request for user ID: ${id}`);
 
-    get_user_state: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const { id } = req.params;
-            console.log(id);
-            const userState = await TelegramUserState.findOne({ userId: id });
-            if (!userState) {
-                res.status(404).json({ message: 'User state not found' });
-                return;
-            }
-            res.status(200).json(userState);
-            return;
-        } catch (error) {
-            logger.error(`Error fetching user state: ${error}`);
-            res.status(500).json({ error: 'Internal server error' });
-            next(error);
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${id}`);
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход
         }
-    },
-    // Получение текущей темы пользователя
-    getUserTheme: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
+
         try {
-            const { id } = req.params;
-            logger.info(`Запрос на получении темы пользователя ${id}`);
-            const user = await TelegramUserModel.findOne({ id });
-
-            if (!user) {
-                res.status(404).json({ message: 'Пользователь не найден' });
-                return;
-            }
-
-            res.status(200).json({ theme: user.theme });
-            return;
-        } catch (error) {
-            logger.error('Ошибка при получении темы пользователя:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
-            next(error);
-        }
-    },
-
-    // Обновление темы пользователя
-    updateUserTheme: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const { id, theme } = req.body;
-
-            logger.info(
-                `Запрос на сохранение пользовательской темы WebApp telegram bot`,
-            );
-
-            const user = await TelegramUserModel.findOneAndUpdate(
-                { id },
-                { theme },
-                { new: true },
+            // Запрашиваем у сервиса ТОЛЬКО поле 'theme'
+            const user = await this.userService.findUserById(
+                userIdNum,
+                'theme',
             );
 
             if (!user) {
-                res.status(404).json({ message: 'Пользователь не найден' });
-                return;
+                logger.warn(`[${operationName}] User not found: ${id}`);
+                // findUserById вернет null, UserNotFoundError здесь не будет
+                res.status(404).json({ message: 'User not found' });
+                return; // Выход
             }
 
-            res.status(200).json({ message: 'Тема успешно обновлена' });
-            return;
+            logger.info(`[${operationName}] Theme retrieved for user ${id}.`);
+            res.status(200).json({ theme: user.theme }); // Возвращаем только тему
         } catch (error) {
-            logger.error('Ошибка при обновлении темы пользователя:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
-            next(error);
+            // Обрабатываем возможные ошибки БД при поиске
+            handleServiceError(error, res, operationName);
         }
-    },
+    };
+    // УДАЛЯЕМ trackReferral, так как его функциональность покрывается linkReferral
+    // или требует доработки сервиса
+    /*
+    trackReferral = async (req: Request, res: Response): Promise<void> => {
+        // ... старый код ...
+    };
+    */
+}
 
-    // Обновление фотографии пользователя
-    updateUserPhotoUrl: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const { id, photo_url } = req.body;
-            console.log(photo_url);
-            const user = await TelegramUserModel.findOneAndUpdate(
-                { id },
-                { photo_url },
-                { new: true },
-            );
-
-            if (!user) {
-                res.status(404).json({ message: 'Пользователь не найден' });
-                return;
-            }
-
-            res.status(200).json({ message: 'Фотография обновлена' });
-            return;
-        } catch (error) {
-            logger.error('Ошибка при обновлении фотографии:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
-            next(error);
-        }
-    },
-
-    updateQuestionPosition: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const { id, photo_url } = req.body;
-            console.log(photo_url);
-            const user = await TelegramUserModel.findOneAndUpdate(
-                { id },
-                { photo_url },
-                { new: true },
-            );
-
-            if (!user) {
-                res.status(404).json({ message: 'Пользователь не найден' });
-                return;
-            }
-
-            res.status(200).json({ message: 'Фотография обновлена' });
-            return;
-        } catch (error) {
-            logger.error('Ошибка при обновлении фотографии:', error);
-            res.status(500).json({ error: 'Ошибка сервера' });
-            next(error);
-        }
-    },
-    // Новая функция: получение информации о рефералах пользователя
-    getUserReferralInfo: async (
-        req: Request,
-        res: Response,
-        _next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const { id } = req.params;
-            const user = await TelegramUserModel.findOne({ id: Number(id) });
-            if (!user) {
-                res.status(404).json({ message: 'Пользователь не найден' });
-                return;
-            }
-
-            logger.info(
-                `Получение информации по рефереру ${user.username ? user.username : user.id}`,
-            );
-
-            // Находим всех пользователей, у которых поле referred_by равно _id текущего пользователя
-            const referrals = await TelegramUserModel.find({
-                referred_by: user._id,
-            });
-
-            user.rating += 10;
-            await user.save();
-
-            logger.info(
-                `Добавлено 1 очко за запрос информации по рефереру ${user.username ? user.username : user.id}`,
-            );
-
-            // Фильтруем тех, у кого активна подписка
-            const subscribedReferrals = referrals.filter(
-                (r) => r.subscription && r.subscription.isActive,
-            );
-            res.status(200).json({
-                referralCode: user.referral_code,
-                referralLink: `https://t.me/${<string>process.env.bot_username}?start=ref_${user.referral_code}`,
-                referralsCount: referrals.length,
-                subscribedReferralsCount: subscribedReferrals.length,
-                earnedBonus: subscribedReferrals.length * 174.5, // например, 100 руб. за каждую подписку
-            });
-
-            return;
-        } catch (error) {
-            console.error('Error getting referral info:', error);
-            res.status(500).json({ message: 'Ошибка сервера' });
-            return;
-        }
-    },
-    // Новая функция: отслеживание реферала при регистрации
-    trackReferral: async (
-        req: Request,
-        res: Response,
-        _next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const { userId, referralCode } = req.body;
-            if (!userId || !referralCode) {
-                res.status(400).json({
-                    message: 'Не указан userId или referralCode',
-                });
-                return;
-            }
-            // Ищем реферера по referral_code
-            const referrer = await TelegramUserModel.findOne({
-                referral_code: referralCode,
-            });
-            if (!referrer) {
-                res.status(404).json({ message: 'Код реферала не найден' });
-                return;
-            }
-            // Проверяем, что пользователь не указывает себя в качестве реферера
-            if (referrer.id === Number(userId)) {
-                res.status(400).json({
-                    message: 'Нельзя быть своим рефералом',
-                });
-                return;
-            }
-            // Находим пользователя, который указывает код реферала
-            const user = await TelegramUserModel.findOne({
-                id: Number(userId),
-            });
-            if (!user) {
-                res.status(404).json({ message: 'Пользователь не найден' });
-                return;
-            }
-            // Если у пользователя ещё не задано поле referred_by, обновляем его
-            if (!user.referred_by) {
-                user.referred_by = referrer._id;
-                await user.save();
-                // Добавляем пользователя в список приглашённых у реферера, если его там ещё нет
-                if (!referrer.referrals_telegram.includes(user._id)) {
-                    referrer.referrals_telegram.push(user._id);
-                    await referrer.save();
-                }
-                res.status(200).json({ message: 'Реферал успешно засчитан' });
-                return;
-            } else {
-                res.status(400).json({
-                    message: 'У пользователя уже есть реферер',
-                });
-                return;
-            }
-        } catch (error) {
-            console.error('Error tracking referral:', error);
-            res.status(500).json({ message: 'Ошибка сервера' });
-            return;
-        }
-    },
-    // Новая функция: получение лидерборда
-    getLeaderboard: async (
-        _req: Request,
-        res: Response,
-        _next: NextFunction,
-    ): Promise<void> => {
-        try {
-            // Предполагается, что в модели есть поле dailyRating для рейтинга за сутки.
-            const leaderboard = await TelegramUserModel.find({})
-                .select(
-                    'username id first_name dailyRating photo level subscription rating',
-                )
-                .sort({ dailyRating: -1, createdAt: 1 })
-                .limit(10); // Возвращаем топ-10
-            logger.info(`${leaderboard.length} лидеров получено`)
-            res.json(leaderboard);
-            return
-        } catch (error) {
-            console.error('Error get leaderboard:', error);
-            res.status(500).json({ message: 'Ошибка сервера' });
-            return;
-        }
-    },
-};
-
-export default telegramController;
+// Экспортируем единственный экземпляр контроллера
+export const telegramController = new TelegramController();

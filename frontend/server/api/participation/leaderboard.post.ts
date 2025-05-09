@@ -12,7 +12,7 @@ export interface leaderboardUser {
 export interface leaderboardItem {
     _id: string;
     promotion: string;
-    user: leaderboardUser;
+    user: leaderboardUser | null;
     points: number;
     tasksCompleted: string[]; //????
     createdAt: string;
@@ -20,7 +20,7 @@ export interface leaderboardItem {
 }
 
 export interface getLeaderboardResponse {
-    userRank: number,
+    userRank: number | null,
     leaderboard: leaderboardItem[]
 }
 
