@@ -23,6 +23,16 @@
   --background-rating-item: #{$background-rating-item-light};
   --background-leaderpage-color: #{$background-leaderpage-color-light};
   --background-tooltip-color: #{$background-tooltip-color-light};
+
+  --background-vocabulary-color: #{$background-leaderpage-color-light};
+  --background-dictionary-container-color: #{$background-dictionary-container-color-light};
+  --background-item-color: #{$background-item-color-light};
+  --text-secondary-color: #{$text-secondary-color-light};
+
+  --inner-component-color: #{$inner-component-color-light};
+  --inner-component-color-hover: #{$inner-component-color-light-hover};
+
+  --box-shadow: #{$box-shadow-light};
 }
 
 body {
@@ -56,5 +66,16 @@ body[data-theme="dark"] {
   --background-rating-item: #{$background-rating-item-dark};
 
   --background-leaderpage-color: #{$background-leaderpage-color-dark};
-    --background-tooltip-color: #{$background-tooltip-color-dark};
+  --background-tooltip-color: #{$background-tooltip-color-dark};
+
+  --background-vocabulary-color: #{$background-vocabular-background-color-dark};
+  --background-dictionary-container-color: #{$background-dictionary-container-color-dark};
+
+  --background-item-color: #{$background-item-color-dark};
+  --text-secondary-color: #{$text-secondary-color-dark};
+
+  --inner-component-color: #{$inner-component-color-dark};
+  --inner-component-color-hover: #{$inner-component-color-dark-hover};
+
+  --box-shadow: #{$box-shadow-dark};
 }

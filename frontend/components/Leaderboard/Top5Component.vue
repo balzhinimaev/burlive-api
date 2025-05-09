@@ -29,14 +29,17 @@
                         <div class="user-column">
                             <div class="user-avatar">
                                 <div class="user-avatar-placeholder">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
+                                    <svg v-if="!user.photo_url || typeof (userLeaderboard.user) === null" width="16"
+                                        height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path
                                             d="M8 8C9.65685 8 11 6.65685 11 5C11 3.34315 9.65685 2 8 2C6.34315 2 5 3.34315 5 5C5 6.65685 6.34315 8 8 8Z"
                                             fill="#BBBBBB" />
                                         <path d="M8 9C5.33333 9 2 10.3333 2 13V14H14V13C14 10.3333 10.6667 9 8 9Z"
                                             fill="#BBBBBB" />
                                     </svg>
+                                    <div v-if="userLeaderboard.user">
+                                        <NuxtImg :src="userLeaderboard.user.photo_url" alt="" width="28" height="28"/>
+                                    </div>
                                 </div>
                             </div>
                             <div class="user-details">
@@ -205,6 +208,14 @@ watch(shouldShowMainButton, (newVal) => {
         });
     }
 });
+onBeforeMount(async () => {
+    if (window.Telegram?.WebApp.initDataUnsafe?.user?.id) {
+        await userStore.fetchLeaderboard(
+            props.promotionId,
+            window.Telegram?.WebApp.initDataUnsafe?.user.id
+        )
+    }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -328,9 +339,10 @@ watch(shouldShowMainButton, (newVal) => {
     flex-direction: column;
     background: var(--background-component-color);
     border-radius: 14px;
-    box-shadow: 0px 3px 6px rgba(16, 16, 16, 0.06);
+    box-shadow: var(--box-shadow);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border: 1px solid rgba(0, 0, 0, 0.03);
 

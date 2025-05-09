@@ -88,6 +88,7 @@ const progressPercentage = computed(() => {
     margin-top: 16px;
     display: flex;
     border-radius: 10px;
+    box-shadow: var(--box-shadow);
 
     .user-avatar {
         height: 48px;

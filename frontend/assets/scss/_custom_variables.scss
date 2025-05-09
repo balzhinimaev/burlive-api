@@ -2,7 +2,8 @@
 $white: #fff;
 $light: #fff;
 // $light: #ddd;
-$dark: #1f1f1f;
+$dark: #1D1D1D;
+$secondary-dark: #1A1A1A;
 
 $dark-description-color: #727272;
 $dark-text-color: #d1d1d1;
@@ -25,7 +26,7 @@ $border-radius: 10px;
 $custom-light-background: $light;
 $custom-light-secondary-background: #f6f6f6;
 
-$custom-dark-background: #101010;
+$custom-dark-background: $secondary-dark;
 $custom-dark-secondary-background: #0000002b;
 
 $custom-text-color-light: $dark;
@@ -74,7 +75,26 @@ $background-rating-item-dark: linear-gradient(269.75deg, rgba(29, 29, 29, 0.2) 0
 
 
 $background-leaderpage-color-light: #f1f1f1;
-$background-leaderpage-color-dark: #121113;
+$background-leaderpage-color-dark: rgba(12, 12, 12, 0.2);
 
 $background-tooltip-color-dark: #121113;
 $background-tooltip-color-light: #fff;
+
+$background-vocabular-background-color-dark: #00000059;
+
+$background-dictionary-container-color-light: #fff;
+$background-dictionary-container-color-dark: #12121261;
+
+$background-item-color-light: #fff;
+$background-item-color-dark: #2d2d2d;
+
+$text-secondary-color-light: #333;
+$text-secondary-color-dark: #fff;
+
+$inner-component-color-light: #f6f6f6;
+$inner-component-color-light-hover: #f8f8f8;
+$inner-component-color-dark: #111;
+$inner-component-color-dark-hover: #181818;
+
+$box-shadow-light: 0px 4px 4px rgb(229 229 229 / 25%);
+$box-shadow-dark: 0px 4px 4px rgba(0, 0, 0, 0.25);

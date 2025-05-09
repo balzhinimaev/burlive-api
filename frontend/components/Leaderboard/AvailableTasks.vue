@@ -535,10 +535,10 @@ onMounted(() => {
             box-shadow: 0px 8px 16px rgba(16, 16, 16, 0.1);
         }
 
-        .task-action {
-            background-color: var(--accent-color, #4285F4);
-            color: #fff;
-        }
+        // .task-action {
+            // background-color: var(--background-component-color);
+            // color: var(--text-primary-color);
+        // }
     }
 }
 
@@ -546,7 +546,8 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     padding: 16px;
-    background: var(--background-item-color, #fff);
+    background-color: var(--background-component-color);
+    // background: var(--background-item-color, #fff);
     border-radius: 15px;
     box-shadow: 0px 4px 8px rgba(16, 16, 16, 0.06);
     position: relative;
