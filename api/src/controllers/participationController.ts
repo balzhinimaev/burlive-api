@@ -148,7 +148,7 @@ class ParticipationController {
                 promotion: promotionId,
             })
                 .sort({ points: -1 })
-                .populate('user', 'id username first_name rating dailyRating');
+                .populate('user', 'id username first_name rating dailyRating photo_url');
 
             let userRank: number | null = null;
             if (currentUserId) {

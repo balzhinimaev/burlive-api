@@ -67,10 +67,42 @@ export interface FindTranslationInput {
     telegramUserId: number;
 }
 
+
+// Тип для данных об искомом слове, которые мы будем включать в историю
+interface SearchedWordDetails {
+    _id: Types.ObjectId;
+    text: string;
+    normalized_text: string;
+    language: 'russian' | 'buryat'; // Указываем язык этого слова
+}
+// Тип для данных о найденном переводе (только основное)
+export interface FoundTranslationDetails { // <-- ДОБАВЛЕН ЭКСПОРТИРУЕМЫЙ ТИП
+    _id: Types.ObjectId;
+    text: string;
+    // При необходимости можно добавить другие поля, например, язык
+}
+
+// Обновляем тип для элемента истории поиска
+export interface SearchHistoryItem {
+    _id: Types.ObjectId; // ID самой записи истории
+    searchedWord: SearchedWordDetails | null; // Детали искомого слова
+    targetLanguage: 'russian' | 'buryat'; // Язык, на который искали перевод
+    foundTranslation: FoundTranslationDetails | null; // Найденный перевод (или null) <-- ИЗМЕНЕНО
+    createdAt: Date; // Время поиска
+}
+// Тип для одного элемента в результатах истории поиска
+// Тип для входных данных handler'а
+export interface GetSearchHistoryInput {
+    telegramUserId: number;
+    page?: number;
+    limit?: number;
+}
+
+// Можно также переэкспортировать конкретные типы, если они нужны где-то еще напрямую
 // Можно также переэкспортировать конкретные типы, если они нужны где-то еще напрямую
 export {
     IAcceptedWordRussian,
     IAcceptedWordBuryat,
     ISuggestedWordRussian,
-    ISuggestedWordBuryat,
+    ISuggestedWordBuryat, SearchedWordDetails,
 };

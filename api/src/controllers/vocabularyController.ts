@@ -1,113 +1,205 @@
 // src/controllers/vocabularyController.ts
 import { NextFunction, Request, Response } from 'express';
-import { isValidObjectId } from 'mongoose';
 import logger from '../utils/logger';
-import WordModel from '../models/Vocabulary/WordModel';
-import SuggestedWordModel, {
-    ISuggestedWordModel,
-} from '../models/Vocabulary/SuggestedWordModel';
-import updateRating from '../utils/updateRatingTelegram';
-import DeclinedWordModel from '../models/Vocabulary/DeclinedWordModel';
-import TelegramUserModel, { TelegramUser } from '../models/TelegramUsers';
-import SearchedWordModel, {
-    IWordModel,
-} from '../models/Vocabulary/SearchedWordModel';
 
-// Интерфейсы для типов запросов
-interface SuggestWordTranslateBody {
-    word_id: string;
-    translate_language: string;
-    translate: string;
-    dialect?: string;
-    normalized_text: string;
-    telegram_user_id: string;
-}
+// Импортируем только необходимые типы и сервис
+import {
+    AcceptedWordType,
+    FindTranslationInput,
+    GetSearchHistoryInput,
+    SearchHistoryItem,
+    SuggestTranslationInput,
+    SuggestTranslationResult,
+    // Добавьте импорты для типов возвращаемых getAllWords, getAllWordsPaginated, getConfirmedWord, если они определены
+} from '../types/vocabulary.types';
+import { vocabularyServiceInstance as vocabularyService } from '../compositionRoot';
+import { DeclineSuggestionInput } from '../services/vocabulary/interfaces/declineSuggestion.interface';
+// NotFoundError и DatabaseError могут быть нужны в центральном обработчике ошибок
+import { NotFoundError /*, DatabaseError */ } from '../errors/customErrors';
+import { GetConfirmedWordsPaginatedInput } from '../services/vocabulary/interfaces/getConfirmedWordsPaginated.interface';
+import { PaginatedResult } from '../types/common.types';
+import { SearchPartialInput } from '../services/vocabulary/interfaces/searchPartialWords.interface';
 
-// interface SuggestWordsBody {
-//   text: string;
-//   language: string;
-//   id: string;
-//   dialect?: string;
-// }
-
-interface TranslateBody {
+// --- Интерфейсы для тел запросов ---
+interface TranslateWordBody {
     userInput: string;
-    target_language: string;
-    telegram_user_id: number;
+    targetLanguage: 'russian' | 'buryat';
+    sourceLanguage: 'russian' | 'buryat';
+    telegramUserId: number; // Стандартизировано
 }
 
+interface DeclineSuggestionBody {
+    suggestedWordId: string;
+    language: 'russian' | 'buryat';
+    telegramUserId: number; // Стандартизировано (в контроллере переименовываем в moderatorTelegramId)
+    reason?: string;
+}
+
+interface SuggestTranslationBody {
+    wordId: string;
+    targetLanguage: 'russian' | 'buryat';
+    translationText: string;
+    dialect?: string;
+    telegramUserId: number; // Стандартизировано
+}
+
+interface SuggestWordsBody {
+    text: string;
+    language: 'russian' | 'buryat';
+    telegramUserId: number; // Стандартизировано
+    dialect?: string;
+}
+
+interface AcceptSuggestionBody {
+    suggestedWordId: string;
+    language: 'russian' | 'buryat';
+    telegramUserId: number; // Стандартизировано (в контроллере переименовываем в moderatorTelegramId)
+}
+
+// --- Контроллер ---
 const vocabularyController = {
     /**
-     * Получение всех слов
+     * Получение всех слов.
+     * Делегирует выполнение VocabularyService.getAllWords.
+     * TODO: Реализовать VocabularyService.getAllWords.
      */
-    getAllWords: async (
-        _req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        try {
-            const words = await WordModel.find()
-                .sort({ _id: 1 })
-                .populate('author', '_id firstName username email')
-                .populate('translations', '_id text')
-                .populate(
-                    'translations_u',
-                    '_id text language dialect createdAt pre_translations normalized_text author contributors',
-                );
-
-            logger.info('Все слова получены!');
-            res.status(200).json({ message: 'Словарь найден', words });
-        } catch (error) {
-            logger.error(`Ошибка при получении слов: ${error}`);
-            next(error); // Передаём ошибку в следующий middleware
-        }
-    },
+    // getAllWords: async (
+    //     _req: Request,
+    //     res: Response,
+    //     next: NextFunction,
+    // ): Promise<void> => {
+    //     try {
+    //         logger.info('Controller: Requesting all words');
+    //         // Вызов гипотетического метода сервиса
+    //         const words = await vocabularyService.getAllWords(); // <-- ЗАМЕНИТЬ НА РЕАЛЬНЫЙ МЕТОД СЕРВИСА
+    //         logger.info(`Controller: Successfully retrieved all words.`);
+    //         res.status(200).json({ message: 'Словарь найден', words });
+    //     } catch (error) {
+    //         logger.error(`Error in getAllWords controller: ${error}`);
+    //         next(error);
+    //     }
+    // },
 
     /**
-     * Получение всех слов с пагинацией и сортировкой по количеству переводов
+     * НОВЫЙ МЕТОД: Получение подтверждённых слов с пагинацией.
+     * Делегирует выполнение VocabularyService.getConfirmedWordsPaginated.
+     * Ожидает параметры 'language', 'page', 'limit' в req.query.
      */
-    getAllWordsPaginated: async (
-        req: Request,
+    getConfirmedWordsPaginated: async (
+        // Типизируем параметры query: <Params, ResBody, ReqBody, ReqQuery>
+        req: Request<
+            {},
+            {},
+            {},
+            { language?: string; page?: string; limit?: string }
+        >,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
         try {
-            const page = parseInt(req.query.page as string, 10) || 1;
-            const limit = parseInt(req.query.limit as string, 10) || 10;
-            const skip = (page - 1) * limit;
+            // Доверяем валидатору Express, что параметры корректны и существуют
+            // (или используем значения по умолчанию, если валидатор не строгий)
+            const language = req.query.language as 'russian' | 'buryat'; // Валидатор должен гарантировать тип
+            const page = parseInt(req.query.page || '1', 10); // Значение по умолчанию 1
+            const limit = parseInt(req.query.limit || '10', 10); // Значение по умолчанию 10
 
-            // Считаем общее количество слов в базе данных
-            const totalWords = await WordModel.countDocuments();
+            logger.info(
+                `Controller: Requesting confirmed paginated words. Lang=${language}, Page=${page}, Limit=${limit}`,
+            );
 
-            // Получаем слова с разбивкой по страницам и сортировкой по количеству переводов
-            const words = await WordModel.find()
-                .sort({ translations: 1 }) // Сортировка по количеству переводов
-                .skip(skip)
-                .limit(limit)
-                .populate('author', '_id firstName username email')
-                .populate('translations', '_id text')
-                .populate(
-                    'translations_u',
-                    '_id text language dialect createdAt pre_translations normalized_text author contributors',
+            // Создаем DTO для сервиса
+            const serviceInput: GetConfirmedWordsPaginatedInput = {
+                language,
+                page,
+                limit,
+            };
+
+            // Вызываем метод сервиса
+            const paginatedResult: PaginatedResult<AcceptedWordType> =
+                await vocabularyService.getConfirmedWordsPaginated(
+                    serviceInput,
                 );
 
-            // Формируем ответ с данными
+            logger.info(
+                `Controller: Successfully retrieved confirmed paginated words. Current page: ${paginatedResult.currentPage}, Total items: ${paginatedResult.totalItems}`,
+            );
+
+            // Отправляем успешный ответ
             res.status(200).json({
-                message: 'Словарь найден',
-                words,
-                totalWords, // Общее количество слов
-                currentPage: page, // Текущая страница
-                totalPages: Math.ceil(totalWords / limit), // Общее количество страниц
+                message: `Confirmed ${language} words retrieved successfully.`,
+                ...paginatedResult, // Отправляем весь объект пагинации
             });
-        } catch (error) {
-            logger.error(`Ошибка при получении слов: ${error}`);
-            res.status(500).json({ message: 'Ошибка при получении слов' });
+        } catch (error: unknown) {
+            // Логируем ошибку и передаем в центральный обработчик
+            const message =
+                error instanceof Error ? error.message : 'Unknown error';
+            logger.error(
+                `Error in getConfirmedWordsPaginated controller: ${message}`,
+                error,
+            );
             next(error);
         }
     },
 
     /**
-     * Получение предложенных слов на утверждение с пагинацией
+     * Получение одного подтверждённого слова (по ID или случайного).
+     * Делегирует выполнение VocabularyService.getConfirmedWord.
+     */
+    getConfirmedWord: async (
+        req: Request, // Типизация параметров запроса: <Params, ResBody, ReqBody, ReqQuery>
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        // Получаем wordId из query параметров
+        // req.query будет типа ParsedQs, кастуем к string | undefined
+        const wordId = req.query.wordId as string | undefined;
+
+        try {
+            logger.info(
+                `Controller: Requesting confirmed word. ${wordId ? `ID: ${wordId}` : 'Random'}`,
+            );
+
+            // Вызываем метод сервиса, передавая wordId (который может быть undefined)
+            const word: AcceptedWordType | null =
+                await vocabularyService.getConfirmedWord(wordId);
+
+            // Проверяем, вернул ли сервис результат
+            if (!word) {
+                // Если сервис вернул null, значит слово не найдено (ни по ID, ни случайное)
+                // Логируем это
+                logger.warn(
+                    `Controller: Confirmed word ${wordId ? `with ID ${wordId}` : '(random)'} not found by service.`,
+                );
+                // Бросаем ошибку NotFoundError, которую поймает центральный обработчик
+                throw new NotFoundError(
+                    `Подтвержденное слово ${wordId ? `с ID ${wordId}` : ''} не найдено.`,
+                );
+            }
+
+            // Если слово найдено, логируем успех и отправляем ответ
+            logger.info(
+                `Controller: Successfully retrieved confirmed word ${wordId ? `with ID ${wordId}` : `(random ID: ${word._id})`}.`,
+            );
+            res.status(200).json({
+                message: 'Подтверждённое слово найдено.',
+                word, // Отправляем найденное слово
+            });
+        } catch (error: unknown) {
+            // Логируем ошибку перед передачей в центральный обработчик
+            const message =
+                error instanceof Error ? error.message : 'Unknown error';
+            logger.error(
+                `Error in getConfirmedWord controller for wordId [${wordId || 'random'}]: ${message}`,
+                error,
+            );
+
+            // Передаем ошибку (может быть ValidationError, NotFoundError, DatabaseError или другая)
+            // дальше в центральный обработчик ошибок Express
+            next(error);
+        }
+    },
+    /**
+     * Получение предложенных слов на утверждение с пагинацией.
      */
     getWordsOnApproval: async (
         req: Request,
@@ -115,710 +207,397 @@ const vocabularyController = {
         next: NextFunction,
     ): Promise<void> => {
         try {
+            // Доверяем валидации page, limit, language из роутера
             const page = parseInt(req.query.page as string, 10) || 1;
             const limit = parseInt(req.query.limit as string, 10) || 10;
-            const skip = (page - 1) * limit;
+            const language = req.query.language as 'russian' | 'buryat'; // Типизация после валидации
 
-            const count = await SuggestedWordModel.countDocuments();
-            const words = await SuggestedWordModel.find()
-                .sort({ _id: 1 })
-                .skip(skip)
-                .limit(limit)
-                .populate('author', '_id firstName username email')
-                .populate('pre_translations', '_id text');
+            // --- Ручная валидация удалена ---
 
             logger.info(
-                `Все предложенные слова получены! total count: ${count}`,
+                `Controller: Requesting words for approval. Lang=${language}, Page=${page}, Limit=${limit}`,
             );
+
+            const paginatedResult = await vocabularyService.getWordsForApproval(
+                page,
+                limit,
+                language,
+            );
+
+            logger.info(
+                `Controller: Successfully retrieved ${paginatedResult.items.length} words for approval (Total: ${paginatedResult.totalItems}) for ${language}.`,
+            );
+
             res.status(200).json({
-                message: 'Словарь найден',
-                words,
-                total_count: count,
+                message: `Suggested ${language} words retrieved successfully.`,
+                ...paginatedResult,
             });
-        } catch (error) {
-            logger.error(`Ошибка при получении предложенных слов: ${error}`);
-            res.status(500).json({
-                message: 'Ошибка при получении предложенных слов',
-            });
+        } catch (error: unknown) {
+            logger.error(`Controller Error in getWordsOnApproval: ${error}`);
             next(error);
         }
     },
 
     /**
-     * Предложение перевода слова
+     * Предложение перевода для существующего слова.
      */
     suggestWordTranslate: async (
-        req: Request<{}, {}, SuggestWordTranslateBody>,
+        req: Request<{}, {}, SuggestTranslationBody>,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
+        // Доверяем данным после валидации в роутере
         const {
-            word_id,
-            translate_language,
-            translate,
+            wordId,
+            targetLanguage,
+            translationText,
             dialect,
-            normalized_text,
-            telegram_user_id,
+            telegramUserId, // Используем стандартизированное имя
         } = req.body;
 
         try {
-            // Проверка обязательных параметров
-            if (
-                !word_id ||
-                !translate_language ||
-                !translate ||
-                !telegram_user_id ||
-                !normalized_text
-            ) {
-                logger.error('Отсутствует один из обязательных параметров');
-                res.status(400).json({
-                    message:
-                        'Ошибка: отсутствует один из обязательных параметров',
-                });
-                return;
-            }
+            // --- Ручная валидация удалена ---
 
-            // Проверка валидности ObjectId
-            if (
-                !isValidObjectId(word_id) ||
-                typeof telegram_user_id !== 'number'
-            ) {
-                res.status(400).json({
-                    message: 'Неверный формат word_id или telegram_user_id',
-                });
-                return;
-            }
+            const sourceLanguage =
+                targetLanguage === 'russian' ? 'buryat' : 'russian';
 
-            const telegram_author = await TelegramUserModel.findOne({
-                id: telegram_user_id,
-            });
+            const serviceInput: SuggestTranslationInput = {
+                wordId,
+                sourceLanguage,
+                translationText,
+                telegramUserId,
+                dialect: dialect, // Просто передаем (будет string | undefined)
+            };
 
-            // Поиск исходного слова в базе данных
-            const existingWord = await WordModel.findById(word_id);
-            if (!telegram_author) {
-                res.status(404).json({ message: 'Пользователь не найден!' });
-                return;
-            }
-            
-            if (!existingWord) {
-                res.status(404).json({ message: 'Исходное слово не найдено' });
-                return;
-            }
+            logger.info(
+                `Controller: Requesting suggestTranslation for wordId ${wordId} by user ${telegramUserId}`,
+            );
 
-            // Проверка на существование перевода (предложенного слова)
-            const existingSuggestedWord = await SuggestedWordModel.findOne({
-                normalized_text,
-            });
+            const result: SuggestTranslationResult =
+                await vocabularyService.suggestTranslation(serviceInput);
 
-            if (existingSuggestedWord) {
-                if (existingSuggestedWord.language !== translate_language) {
-                    logger.warn(
-                        'Нужно проверить языковую соответствие предложенного перевода',
-                    );
-                    // Дополнительная логика, если языки не совпадают
-                    // Например, можно вернуть ошибку или обновить язык
-                }
-
-                logger.info(`Предложенное слово уже существует в коллекции`);
-
-                // Обновляем исходное слово
-                await WordModel.findByIdAndUpdate(word_id, {
-                    $addToSet: {
-                        translations_u: existingSuggestedWord._id,
-                        contributors: telegram_author?._id,
-                    },
-                });
-
-                // Обновляем предложенное слово
-                await SuggestedWordModel.findByIdAndUpdate(
-                    existingSuggestedWord._id,
-                    {
-                        $addToSet: {
-                            pre_translations: existingWord._id,
-                            contributors: telegram_author?._id,
-                        },
-                    },
-                );
-
-                logger.info(`Данные успешно обновлены`);
-            } else {
-                console.log(translate_language);
-                // Создаём новое предложенное слово
-                const newSuggestedWord = new SuggestedWordModel({
-                    text: translate,
-                    language:
-                        translate_language == 'russian' ||
-                        translate_language == 'русский'
-                            ? 'buryat'
-                            : translate_language,
-                    author: telegram_author?._id,
-                    dialect,
-                    normalized_text: translate.toLowerCase().trim(),
-                });
-
-                // Сохраняем новое предложенное слово
-                const savedSuggestedWord = await newSuggestedWord.save();
-
-                if (!savedSuggestedWord) {
-                    logger.error('Ошибка при сохранении предложенного слова');
-                    res.status(500).json({
-                        message: 'Ошибка при сохранении слова',
-                    });
-                    return;
-                }
-
-                updateRating(telegram_author._id, 15);
-
-                logger.info(
-                    `Предложенное слово успешно сохранено с ID: ${savedSuggestedWord._id}`,
-                );
-
-                // Обновляем исходное слово
-                await WordModel.findByIdAndUpdate(word_id, {
-                    $addToSet: { translations_u: savedSuggestedWord._id },
-                });
-
-                // Связываем новое предложенное слово с исходным словом
-                await SuggestedWordModel.findByIdAndUpdate(
-                    savedSuggestedWord._id,
-                    {
-                        $addToSet: { pre_translations: existingWord._id },
-                    },
-                );
-            }
+            logger.info(
+                `Controller: SuggestTranslation successful. Status: ${result.status}`,
+            );
 
             res.status(200).json({
-                message: `Перевод успешно предложен и добавлен в словарь, пользователем ${telegram_author?._id}`,
+                message: `Предложение перевода обработано успешно (статус: ${result.status}).`,
+                status: result.status,
+                word: result.word,
             });
-        } catch (error) {
-            logger.error(`Ошибка при предложении перевода: ${error}`);
+        } catch (error: unknown) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Unknown error during suggestWordTranslate';
+            logger.error(
+                `Error in suggestWordTranslate controller for wordId ${wordId}: ${message}`,
+                { body: req.body, error },
+            );
             next(error);
         }
     },
 
     /**
-     * Предложение нескольких слов
+     * Предложение нескольких слов.
      */
     suggestWords: async (
-        req: Request,
+        req: Request<{}, {}, SuggestWordsBody>,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
-        const { text, language, telegram_user_id, dialect } = req.body;
+        // Доверяем данным после валидации в роутере
+        const { text, language, telegramUserId, dialect } = req.body; // Используем telegramUserId
 
         try {
-            if (!text || !language) {
-                logger.error(
-                    'Ошибка при предложении слов, отсутствует один из параметров',
-                );
-                res.status(400).json({
-                    message: 'Отсутствует один из параметров',
-                });
-                return;
-            }
-
-            if (!req.user || !req.user._id) {
-                res.status(401).json({ message: 'Вы не авторизованы!' });
-                return;
-            }
-
-            if (!telegram_user_id) {
-                logger.error(`Отсутствует telegramID`);
-                res.status(400).json({ message: 'Ошибка запроса' });
-                return;
-            }
-
-            // Найти пользователя и получить только его _id
-            const user = await TelegramUserModel.findOne({
-                id: telegram_user_id,
-            }).select('_id');
-
-            if (!user) {
-                res.status(404).json({ message: 'Пользователь не найден' });
-                return;
-            }
-
-            const userId = user._id; // Извлечение _id как ObjectId
-
-            const results: Array<{
-                message: string;
-                word?: ISuggestedWordModel;
-            }> = [];
-            const wordsArray = text.split(',').map((word: string) => ({
-                normalized: word.trim().toLowerCase(),
-                original: word.trim(),
-            }));
-
-            for (const { normalized, original } of wordsArray) {
-                let existingWord = await SuggestedWordModel.findOne({
-                    normalized_text: normalized,
-                });
-
-                if (existingWord) {
-                    if (!existingWord.contributors.includes(userId)) {
-                        existingWord.contributors.push(userId);
-                        await existingWord.save();
-                        await updateRating(userId, 30); // Передаем бонус, если необходимо
-                    }
-                    results.push({
-                        message:
-                            'Слово уже существует, автор добавлен в список контрибьюторов',
-                        word: existingWord,
-                    });
-                } else {
-                    const newSuggestedWord = new SuggestedWordModel({
-                        text: original,
-                        normalized_text: normalized, // Добавление нормализованного текста
-                        language,
-                        author: userId,
-                        contributors: [userId],
-                    });
-
-                    if (language === 'buryat' && typeof dialect === 'string') {
-                        newSuggestedWord.dialect = dialect;
-                        logger.info(`Диалект присвоен к слову`);
-                    }
-
-                    await newSuggestedWord.save();
-                    results.push({
-                        message: 'Слово успешно предложено',
-                        word: newSuggestedWord,
-                    });
-                    await updateRating(userId, 30);
-                }
-            }
-
+            logger.info(
+                `Controller: Requesting suggestWords by user ${telegramUserId}`,
+            );
+            const results = await vocabularyService.suggestWords({
+                text,
+                language,
+                telegramUserId, // Передаем стандартизированное имя
+                dialect,
+            });
+            logger.info(
+                `Controller: suggestWords processed for user ${telegramUserId}. Results count: ${results.length}`,
+            );
             res.status(200).json(results);
         } catch (error) {
-            logger.error(`Ошибка при предложении слов: ${error}`);
-            res.status(500).json({ message: 'Ошибка при предложении слов' });
+            logger.error(`Error in suggestWords controller: ${error}`);
             next(error);
         }
     },
 
     /**
-     * Принятие предложенного слова
+     * Принятие предложенного слова.
      */
     acceptSuggestedWord: async (
-        req: Request,
+        req: Request<{}, {}, AcceptSuggestionBody>,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
-        const suggestedWord = req.suggestedWord as ISuggestedWordModel;
-        if (typeof req.telegram_user_id !== 'number') {
-            res.status(400).json({
-                message: 'Телеграм пользователь не указан или не найден',
-            });
-            return;
-        }
-        const telegram_user_id = req.telegram_user_id as number;
+        // Доверяем данным после валидации в роутере
+        const {
+            suggestedWordId,
+            telegramUserId: moderatorTelegramId, // Используем стандартизированное имя и переименовываем для ясности
+            language,
+        } = req.body;
+
+        // --- Ручная валидация удалена (parseInt, isNaN) ---
 
         try {
-            if (!suggestedWord) {
-                res.status(400).json({ message: 'suggestedWord не указан' });
-                return;
-            }
-
-            if (!telegram_user_id) {
-                res.status(400).json({ message: 'telegram_user_id не указан' });
-                return;
-            }
-
-            // Поиск пользователя по telegram_user_id
-            const user = await TelegramUserModel.findOne({
-                id: telegram_user_id,
-            });
-            if (!user) {
-                res.status(404).json({ message: 'Пользователь не найден' });
-                return;
-            }
-
-            // Создание нового подтвержденного слова
-            const word = new WordModel({
-                text: suggestedWord.text,
-                normalized_text: suggestedWord.normalized_text,
-                language: suggestedWord.language,
-                dialect: suggestedWord.dialect,
-                translations: suggestedWord.pre_translations,
-                author: suggestedWord.author,
-                contributors: suggestedWord.contributors,
-            });
-
-            await word.save();
-
-            // Обновление исходных слов с новым переводом
-            await WordModel.findByIdAndUpdate(suggestedWord.pre_translations, {
-                $addToSet: { translations: word._id },
-            });
-
-            // Удаление предложенного слова
-            await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
-
             logger.info(
-                `Предложенное слово принято и добавлено в словарь: ${word._id}`,
-            );
-            res.status(200).json({
-                message: 'Слово успешно принято и добавлено в словарь',
-                word,
-            });
-        } catch (error) {
-            logger.error(`Ошибка при принятии предложенного слова: ${error}`);
-            res.status(500).json({
-                message: 'Ошибка при принятии предложенного слова',
-            });
-            next(error);
-        }
-    },
-
-    /**
-     * Отклонение предложенного слова
-     */
-    declineSuggestedWord: async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        const suggestedWord = req.suggestedWord as ISuggestedWordModel;
-
-        try {
-            if (!suggestedWord) {
-                res.status(400).json({ message: 'SuggestedWord не указан' });
-                return;
-            }
-
-            // Найти слово в SuggestedWordModel
-            const wordToDecline = await SuggestedWordModel.findById(
-                suggestedWord._id,
+                `Controller: Accepting suggestion ${suggestedWordId} (${language}) by moderator ${moderatorTelegramId}`,
             );
 
-            if (!wordToDecline) {
-                res.status(404).json({ message: 'Слово не найдено' });
-                return;
-            }
-
-            // Создать новый документ в DeclinedWordModel с теми же данными
-            const declinedWord = new DeclinedWordModel({
-                text: wordToDecline.text,
-                normalized_text: wordToDecline.normalized_text,
-                language: wordToDecline.language,
-                dialect: wordToDecline.dialect,
-                translations: wordToDecline.pre_translations, // соответствие переводам
-                author: wordToDecline.author,
-                contributors: wordToDecline.contributors,
-            });
-
-            // Сохранить отклонённое слово
-            await declinedWord.save();
-
-            // Удалить слово из SuggestedWordModel
-            await SuggestedWordModel.findByIdAndDelete(suggestedWord._id);
+            const acceptedWord: AcceptedWordType =
+                await vocabularyService.acceptSuggestion({
+                    suggestedWordId,
+                    moderatorTelegramId, // Передаем переименованную переменную
+                    language,
+                });
 
             logger.info(
-                `Слово отклонено и перенесено в архив отклонённых слов: ${suggestedWord._id}`,
+                `Controller: Suggestion ${suggestedWordId} accepted successfully.`,
             );
             res.status(200).json({
                 message:
-                    'Слово успешно отклонено и перенесено в архив отклонённых слов.',
+                    'Слово успешно принято и добавлено/обновлено в словаре',
+                word: acceptedWord,
             });
-        } catch (error) {
-            logger.error(`Ошибка при отклонении предложенного слова: ${error}`);
-            res.status(500).json({
-                message: 'Ошибка при отклонении предложенного слова',
-            });
+        } catch (error: unknown) {
+            logger.error(
+                `Error in acceptSuggestedWord controller for ${suggestedWordId}: ${error}`,
+            );
+            // --- Убрана специфическая обработка ошибок, передаем дальше ---
             next(error);
         }
     },
 
     /**
-     * Получение одного подтверждённого слова или случайного
+     * Отклонение предложенного слова.
      */
-    getConfirmedWord: async (
+    declineSuggestedWord: async (
+        req: Request<{}, {}, DeclineSuggestionBody>,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        // Доверяем данным после валидации в роутере
+        const {
+            suggestedWordId,
+            language,
+            telegramUserId: moderatorTelegramId, // Используем стандартизированное имя и переименовываем
+            reason,
+        } = req.body;
+
+        try {
+            logger.info(
+                `Controller: Declining suggestion ${suggestedWordId} (${language}) by moderator ${moderatorTelegramId}`,
+            );
+            const declineInput: DeclineSuggestionInput = {
+                suggestedWordId,
+                language,
+                moderatorTelegramId, // Передаем переименованную переменную
+                reason,
+            };
+
+            await vocabularyService.declineSuggestion(declineInput);
+
+            logger.info(
+                `Controller: Successfully declined suggestion ${suggestedWordId}.`,
+            );
+            res.status(200).json({
+                message: 'Suggestion declined successfully.',
+            });
+        } catch (error: unknown) {
+            logger.error(
+                `Error in declineSuggestedWord controller for ${suggestedWordId}: ${error}`,
+            );
+            next(error);
+        }
+    },
+
+    /**
+     * Перевод слова.
+     */
+    translateWord: async (
+        req: Request<{}, {}, TranslateWordBody>,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        // Доверяем данным после валидации в роутере
+        const { userInput, targetLanguage, sourceLanguage, telegramUserId } =
+            req.body; // Используем telegramUserId
+
+        // --- Ручная валидация удалена ---
+
+        try {
+            logger.info(
+                `Controller: Requesting translation for "${userInput}" (Target: ${targetLanguage}, Source: ${sourceLanguage}, User: ${telegramUserId})`,
+            );
+
+            const findInput: FindTranslationInput = {
+                userInput,
+                targetLanguage,
+                sourceLanguage,
+                telegramUserId, // Передаем стандартизированное имя
+            };
+
+            const translationResult =
+                await vocabularyService.findTranslation(findInput);
+
+            // --- Логика updateSearchHistory удалена ---
+
+            logger.info(
+                `Controller: Translation successful for "${userInput}". OwnDB: ${!!translationResult.burlivedb}, Burlang: ${translationResult.burlangdb ? 'Found/Error' : 'Not Found'}`,
+            );
+            res.status(200).json(translationResult);
+        } catch (error: unknown) {
+            logger.error(
+                `Error in translateWord controller for "${userInput}": ${error}`,
+            );
+            next(error);
+        }
+    },
+
+    /**
+     * Получение истории поиска пользователя с пагинацией.
+     */
+    getSearchHistory: async (
+        // Типизируем параметры: <Params, ResBody, ReqBody, ReqQuery>
+        req: Request<
+            { telegramUserId: string },
+            {},
+            {},
+            { page?: string; limit?: string }
+        >,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        try {
+            // Доверяем валидатору Express, что параметры корректны
+            const telegramUserId = parseInt(req.params.telegramUserId, 10); // ID из URL
+            const page = req.query.page
+                ? parseInt(req.query.page, 10)
+                : undefined; // Опционально
+            const limit = req.query.limit
+                ? parseInt(req.query.limit, 10)
+                : undefined; // Опционально
+
+            // Проверка, что telegramUserId - число (хотя валидатор это уже делает)
+            if (isNaN(telegramUserId)) {
+                // Обычно до сюда не дойдет из-за валидатора, но на всякий случай
+                return next(new Error('Invalid telegramUserId parameter'));
+            }
+
+            logger.info(
+                `Controller: Requesting search history for user ${telegramUserId}. Page=${page ?? 'default'}, Limit=${limit ?? 'default'}`,
+            );
+
+            // Создаем DTO для сервиса
+            const serviceInput: GetSearchHistoryInput = {
+                telegramUserId,
+                page, // Передаем как есть (может быть undefined)
+                limit, // Передаем как есть (может быть undefined)
+            };
+
+            // Вызываем метод сервиса
+            const paginatedResult: PaginatedResult<SearchHistoryItem> =
+                await vocabularyService.getSearchHistory(serviceInput);
+
+            logger.info(
+                `Controller: Successfully retrieved search history for user ${telegramUserId}. Current page: ${paginatedResult.currentPage}, Total items: ${paginatedResult.totalItems}`,
+            );
+
+            // Отправляем успешный ответ
+            res.status(200).json({
+                message: `Search history for user ${telegramUserId} retrieved successfully.`,
+                ...paginatedResult, // Отправляем весь объект пагинации
+            });
+        } catch (error: unknown) {
+            // Логируем ошибку и передаем в центральный обработчик
+            const userIdParam = req.params.telegramUserId;
+            logger.error(
+                `Error in getSearchHistory controller for user ${userIdParam}`,
+                error,
+            );
+            next(error);
+        }
+    },
+
+    /**
+     * Поиск слов по частичному совпадению (префиксу).
+     * Извлекает параметры из запроса и делегирует выполнение VocabularyService.
+     * Принимает стандартный Request и полагается на express-validator middleware.
+     */
+    searchPartialWords: async (
+        // Используем стандартные типы Request, Response, NextFunction
         req: Request,
         res: Response,
         next: NextFunction,
     ): Promise<void> => {
         try {
-            const { wordId } = req.query;
-            logger.info(`Получение подтвержденного слова`);
-            let word;
-            if (wordId && typeof wordId === 'string') {
-                if (!isValidObjectId(wordId)) {
-                    res.status(400).json({ message: 'Неверный формат wordId' });
-                    return;
-                }
-                word = await WordModel.findById(wordId)
-                    .populate('author', '_id firstName username email')
-                    .populate(
-                        'translations',
-                        '_id text language dialect createdAt pre_translations normalized_text author contributors',
-                    )
-                    .populate(
-                        'translations_u',
-                        '_id text language dialect createdAt pre_translations normalized_text author contributors',
-                    );
-            } else {
-                // Получение случайного слова
-                const count = await WordModel.countDocuments();
-                const random = Math.floor(Math.random() * count);
-                word = await WordModel.findOne()
-                    .skip(random)
-                    .populate('author', '_id firstName username email')
-                    .populate(
-                        'translations',
-                        '_id text language dialect createdAt pre_translations normalized_text author contributors',
-                    )
-                    .populate(
-                        'translations_u',
-                        '_id text language dialect createdAt pre_translations normalized_text author contributors',
-                    );
-            }
+            // Мы здесь, значит валидация express-validator прошла успешно.
+            // Свойства q и language гарантированно существуют и имеют нужный тип.
+            // Свойство limit, если было передано и валидно, было преобразовано в число через .toInt().
 
-            if (!word) {
-                res.status(404).json({ message: 'Слово не найдено' });
-                return;
-            }
+            const query = req.query.q as string; // Можно использовать 'as', т.к. валидатор проверил
+            const language = req.query.language as 'russian' | 'buryat'; // Аналогично
 
-            res.status(200).json({
-                message: 'Подтверждённое слово найдено',
-                word,
-            });
-        } catch (error) {
-            logger.error(`Ошибка при получении слова: ${error}`);
-            res.status(500).json({ message: 'Ошибка при получении слова' });
-            next(error);
-        }
-    },
-
-    /**
-     * Перевод слова
-     */
-    translateWord: async (
-        req: Request<{}, {}, TranslateBody>,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> => {
-        const { userInput, target_language, telegram_user_id } = req.body;
-
-        try {
-
-            logger.info(`Целевой язык: ${target_language}\nTelegram ID пользователя: ${telegram_user_id}`)
-
-            // Нормализация входного слова
-            const normalized_userInput = userInput.toLocaleLowerCase().trim();
-
-            // Проверка валидности telegram_user_id
-            if (!telegram_user_id) {
-                res.status(400).json({
-                    message: 'Неверный формат telegram_user_id',
-                });
-                return;
-            }
-
-            // Поиск слова в вашей базе данных (опционально)
-            const existingWord = await WordModel.findOne({
-                normalized_text: normalized_userInput,
-            })
-                .populate('translations')
-                .populate('translations_u');
-
-            let burlivedb: any = [];
-
-            if (existingWord) {
-                logger.info(`Найденное слово в базе данных:\n ${existingWord}`);
-
-                if (existingWord.translations.length) {
-                    burlivedb = existingWord.translations;
-                }
-
-                logger.info(
-                    `Найденные предложенные переводы в базе данных: ${existingWord?.translations_u}`,
+            // Определяем limit, учитывая .toInt() от валидатора
+            let limit = 10; // Значение по умолчанию
+            if (
+                typeof req.query.limit === 'number' &&
+                !isNaN(req.query.limit)
+            ) {
+                // Валидатор успешно применил .toInt() и проверил диапазон
+                limit = req.query.limit;
+            } else if (req.query.limit !== undefined) {
+                // Если limit был, но не стал числом после валидатора - что-то странное, логируем
+                logger.warn(
+                    `Controller: searchPartialWords - limit parameter was present but not a valid number after validation: ${req.query.limit}. Using default ${limit}.`,
                 );
             }
+            // Если req.query.limit === undefined, используется значение по умолчанию (10)
 
-            // console.log(
-            //     `Тут надо добавить функцион добавления искомого слова в бд на проверку для дальнейшего перевода`,
-            // );
-            
-            logger.info(`${normalized_userInput}`);
-            const user: TelegramUser | null = await TelegramUserModel.findOne({
-                id: telegram_user_id,
-            });
-            if (!user) {
-                logger.error("Попытка перевести слово без telegram_user_id")    
-                res.status(404).json({ message: "Пользователь не найден" })
-                return
-                throw Error;
-            }
+            logger.info(
+                `Controller: Requesting partial search. Query="${query}", Lang=${language}, Limit=${limit}`,
+            );
 
-            const searchResultExists: IWordModel | null = await SearchedWordModel.findOne({
-                normalized_text: normalized_userInput
-            })
-            if (searchResultExists === null) {
-                await new SearchedWordModel({
-                    normalized_text: normalized_userInput,
-                    text: userInput,
-                    language: target_language,
-                    users: [user?._id]
-                }).save()
-                logger.info(`Создана история поиска`)
-            } else {
-                await SearchedWordModel.findByIdAndUpdate(searchResultExists._id, {
-                    $addToSet: { users: user._id }
-                })
-                logger.info(`Пользователь добавлен в поле users`)
-            }
-            logger.info(`Пользователь проверяет на существование искомого слова в таблице searched-word`)
-            // logger.info(searchResultExists)
-            // const searchWord = await new SearchedWordModel({
-            //     normalized_text: normalized_userInput,
-            //     text: userInput,
-            //     language: target_language,
-            //     users: [user?._id]
-            // })
+            // Создаем DTO для сервиса
+            const serviceInput: SearchPartialInput = {
+                query,
+                language,
+                limit,
+            };
 
-            // const existsWord: IWordModel | null =
-            //     await SearchedWordModel.findOne({
-            //         normalized_text: normalized_userInput,
-            //     });
-            // if (existsWord) {
-            //     await SearchedWordModel.findByIdAndUpdate(existsWord._id, {
-            //         $addToSet: { users: user._id },
-            //     });
-            //     logger.info(`Пользователь добавлен в искомое слово`);
-            // } else {
-            //     new SearchedWordModel({
-            //         text: userInput,
-            //         normalized_text: normalized_userInput,
-            //         language: target_language,
-            //         users: [user._id],
-            //     }).save();
-            // }
-            // await new SearchedWordModel({
-            //   text: userInput,
-            //   normalized_text: normalized_userInput,
-            //   language: target_language,
-            //   users: []
-            // })
-            // Определение источника языка слова с помощью внешних API
-            // let source_language = target_language;
+            // Вызываем метод сервиса
+            const words: AcceptedWordType[] =
+                await vocabularyService.searchPartialWords(serviceInput);
 
-            // Функция для поиска слова в указанном API
-            // const searchWord = async (language: 'russian' | 'buryat'): Promise<boolean> => {
-            //   const searchUrl = `https://burlang.ru/api/v1/${source_language}-word/search?q=${encodeURIComponent(normalized_userInput)}`;
-            //   try {
-            //     const response = await fetch(searchUrl);
-            //     if (!response.ok) {
-            //       logger.error(`Ошибка при поиске слова в ${language} API: ${response.statusText}`);
-            //       return false;
-            //     }
-            //     const data = await response.json();
-            //     // Предполагаем, что API возвращает массив результатов
-            //     // return Array.isArray(data) && data.length > 0;
-            //     console.log(data)
-            //     return true
-            //   } catch (error: any) {
-            //     logger.error(`Ошибка при выполнении запроса к ${language} API: ${error.message}`);
-            //     return false;
-            //   }
-            // };
+            logger.info(
+                `Controller: Successfully retrieved ${words.length} words for partial search query "${query}" (${language}).`,
+            );
 
-            // Проверяем, является ли слово русским
-            // const isRussian = await searchWord('russian');
-            // if (isRussian) {
-            //   source_language = 'russian';
-            // } else {
-            //   // Проверяем, является ли слово бурятским
-            //   const isBuryat = await searchWord('buryat');
-            //   if (isBuryat) {
-            //     source_language = 'buryat';
-            //   }
-            // }
-
-            // if (!source_language) {
-            //   res.status(404).json({ message: "Слово не найдено в русских или бурятских словарях." });
-            //   return;
-            // }
-
-            // Определяем URL для перевода на основе источника языка
-            let translateUrl = '';
-            if (target_language === 'russian') {
-                translateUrl = `https://burlang.ru/api/v1/russian-word/translate?q=${encodeURIComponent(normalized_userInput)}`;
-            } else if (target_language === 'buryat') {
-                translateUrl = `https://burlang.ru/api/v1/buryat-word/translate?q=${encodeURIComponent(normalized_userInput)}`;
-            }
-
-            logger.info(`url перевода ${translateUrl}`);
-
-            // Выполняем запрос к API перевода
-            const translateResponse = await fetch(translateUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            let burlang_translate_result: string = ``;
-            interface translateResponse {
-                translations: {
-                    value: string;
-                }[];
-            }
-            if (!translateResponse.ok) {
-                // logger.error(`Ошибка при переводе слова: ${translateResponse.statusText}`);
-                // res.status(500).json({ message: "Ошибка при переводе слова." });
-                // return;
-                burlang_translate_result = `Переводов не найдено`;
-            } else {
-                const translateData =
-                    (await translateResponse.json()) as translateResponse;
-                console.log(translateData);
-                for (let i = 0; i < translateData.translations.length; i++) {
-                    let translate = translateData.translations[i].value;
-                    if (translateData.translations.length === i + 1) {
-                        burlang_translate_result += `${translate}`;
-                    } else {
-                        burlang_translate_result =
-                            burlang_translate_result + `${translate}, `;
-                    }
-                }
-            }
-
-            // Предполагаем, что API возвращает объект с полем translatedText
-            // const translatedText = translateData.translatedText;
-
-            // if (!translatedText) {
-            // logger.error("Переведённый текст не найден в ответе API.");
-            // res.status(500).json({ message: "Ошибка при получении перевода." });
-            // return;
-            // }
-
-            // (Опционально) Сохранение перевода в вашей базе данных
-            // Например, если вы хотите сохранять переводы
-            /*
-      const newTranslation = new TranslationModel({
-        original_word: existingWord._id,
-        translated_word: translatedText,
-        source_language,
-        target_language
-      });
-      await newTranslation.save();
-      */
-
-            // (Опционально) Обновление рейтинга пользователя
-            // await updateRating(new ObjectId(telegram_user_id), 10); // Например, добавить 10 баллов
-            await updateRating(user._id, 2)
+            // Отправляем успешный ответ
             res.status(200).json({
-                message: burlang_translate_result,
-                burlivedb,
-                // translatedText,
+                message: `Partial search results for "${query}" (${language}) retrieved successfully.`,
+                words: words,
             });
-        } catch (error: any) {
-            logger.error(error)
-            logger.error(`Ошибка при переводе слова: ${error.message}`);
-            res.status(500).json({ message: 'Ошибка при переводе слова' });
+        } catch (error: unknown) {
+            // Обработка ошибок (логирование и передача дальше)
+            const message =
+                error instanceof Error ? error.message : 'Unknown error';
+            logger.error(`Error in searchPartialWords controller: ${message}`, {
+                query: req.query,
+                error,
+            });
             next(error);
         }
     },
 };
 
 export default vocabularyController;
+
+// --- Вспомогательная функция updateSearchHistory УДАЛЕНА ---

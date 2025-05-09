@@ -8,7 +8,6 @@ export const getTestByLesson = async (
     res: Response,
     next: NextFunction,
 ): Promise<void> => {
-    console.log('get test')
     try {
         const { lessonId } = req.params;
         const test = await Test.findOne({ lessonId }).populate('questions');

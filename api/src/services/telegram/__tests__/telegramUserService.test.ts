@@ -13,7 +13,6 @@ import {
     ValidationError,
     UserNotFoundError,
     DatabaseError,
-    LevelUpdateError,
 } from '../../../errors/customErrors';
 
 // --- Мокирование Зависимостей ---
@@ -197,6 +196,7 @@ describe('TelegramUserService', () => {
             id: userId,
             username: 'testuser',
             first_name: 'Test',
+            botusername: "burlive"
         };
 
         it('should register a new user successfully without referral code', async () => {
@@ -1374,43 +1374,34 @@ describe('TelegramUserService', () => {
         });
     });
 
-    describe('updateUserPhoto', () => {
-        it('should call updateUserProfile with correct photo data', async () => {
-            const photoUrl = 'http://example.com/photo.jpg';
-            const updatedUser = createMockUserDocument({
-                id: userId,
-                photo_url: photoUrl,
-            });
-            (
-                mockTelegramUserModel.findOneAndUpdate as jest.Mock
-            ).mockResolvedValueOnce(updatedUser);
-            const spyUpdateProfile = jest.spyOn(service, 'updateUserProfile');
-
-            const result = await service.updateUserPhoto(userId, photoUrl);
-
-            expect(result).toEqual(updatedUser);
-            expect(spyUpdateProfile).toHaveBeenCalledWith(userId, {
-                photo_url: photoUrl,
-            });
-            expect(mockTelegramUserModel.findOneAndUpdate).toHaveBeenCalledWith(
-                { id: userId },
-                { $set: { photo_url: photoUrl } },
-                expect.anything(),
-            );
+    describe('updateUserProfile (for photo)', () => {
+    it('should call findOneAndUpdate with correct photo data when updating profile', async () => {
+        const photoUrl = 'http://example.com/photo.jpg';
+        // updateUserProfile возвращает обновленный документ
+        const updatedUser = createMockUserDocument({
+            id: userId,
+            photo_url: photoUrl, // Устанавливаем фото в "возвращаемом" документе
+            // ... другие поля из createMockUserDocument
         });
 
-        it('should throw ValidationError for invalid photo URL type', async () => {
-            const invalidPhotoUrl = 12345 as any;
-            await expect(
-                service.updateUserPhoto(userId, invalidPhotoUrl),
-            ).rejects.toThrow(ValidationError);
-            await expect(
-                service.updateUserPhoto(userId, invalidPhotoUrl),
-            ).rejects.toThrow('Неверный формат URL фотографии.');
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).not.toHaveBeenCalled();
-        });
+        // Мокируем findOneAndUpdate, который вызывается внутри updateUserProfile
+        (mockTelegramUserModel.findOneAndUpdate as jest.Mock).mockResolvedValueOnce(updatedUser);
+
+        // --- ACT: Вызываем updateUserProfile с данными для фото ---
+        const result = await service.updateUserProfile(userId, { photo_url: photoUrl });
+
+        // --- ASSERT ---
+        // 1. Проверяем, что вернулся ожидаемый пользователь
+        expect(result).toEqual(updatedUser);
+
+        // 2. Проверяем, что findOneAndUpdate был вызван с правильными аргументами
+        expect(mockTelegramUserModel.findOneAndUpdate).toHaveBeenCalledTimes(1);
+        expect(mockTelegramUserModel.findOneAndUpdate).toHaveBeenCalledWith(
+            { id: userId },                             // Критерий поиска
+            { $set: { photo_url: photoUrl } },         // Данные для обновления ($set)
+            { new: true, runValidators: true }       // Опции
+        );
+    });
     });
 
     describe('updateUserPhone', () => {
@@ -1767,273 +1758,6 @@ describe('TelegramUserService', () => {
             expect(mockLogger.error).toHaveBeenCalledWith(
                 `Error blocking user ${userId}: ${dbError.message}`, // Check the message logged
                 { error: dbError }, // Check the error object logged
-            );
-        });
-    });
-
-    // --- Тесты для addRating ---
-    describe('addRating', () => {
-        const amount = 10;
-        const initialRating = 50;
-        const userBefore = createMockUserDocument({
-            id: userId,
-            rating: initialRating,
-            level: levelId, // Убедимся, что уровень есть
-        });
-        const userAfterRatingUpdate = createMockUserDocument({
-            ...userBefore.toObject(), // Копируем данные
-            rating: initialRating + amount,
-        });
-        // Мок для результата populate().exec() - возвращает документ с методом updateLevel
-        const userReturnedByUpdateExec = createMockUserDocument({
-            ...userAfterRatingUpdate.toObject(), // Данные после инкремента рейтинга
-        });
-        // Явно мокаем updateLevel на этом конкретном экземпляре
-        userReturnedByUpdateExec.updateLevel.mockResolvedValue(undefined);
-
-        // Мок для первого findOne(...).select().lean() в addRating
-        const mockUserExistsLeanResult = { _id: userBefore._id }; // lean возвращает POJO
-        const mockUserExistsQuery = {
-            select: jest.fn().mockReturnThis(),
-            lean: jest.fn().mockResolvedValue(mockUserExistsLeanResult),
-        };
-
-        // Мок для findOneAndUpdate(...).populate().exec()
-        const mockUpdateQuery = {
-            populate: jest.fn().mockReturnThis(),
-            exec: jest.fn().mockResolvedValue(userReturnedByUpdateExec), // exec возвращает мок документа
-        };
-
-        beforeEach(() => {
-            // Настраиваем моки для каждого теста addRating заново
-            // findOne по умолчанию вернет квери для проверки существования
-            (mockTelegramUserModel.findOne as jest.Mock).mockReturnValue(
-                mockUserExistsQuery,
-            );
-            // findOneAndUpdate по умолчанию вернет квери для обновления
-            (
-                mockTelegramUserModel.findOneAndUpdate as jest.Mock
-            ).mockReturnValue(mockUpdateQuery);
-        });
-
-        it('should add rating and call updateLevel successfully', async () => {
-            // Arrange (моки уже настроены в beforeEach)
-
-            // Act
-            const result = await service.addRating(userId, amount);
-
-            // Assert
-            // 1. Проверка findOne lean
-            expect(mockTelegramUserModel.findOne).toHaveBeenCalledWith({
-                id: userId,
-            });
-            expect(mockUserExistsQuery.select).toHaveBeenCalledWith('_id');
-            expect(mockUserExistsQuery.lean).toHaveBeenCalledTimes(1);
-
-            // 2. Проверка findOneAndUpdate + populate + exec
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1);
-            // --- ИСПРАВЛЕНО: Проверяем аргументы findOneAndUpdate ---
-            expect(mockTelegramUserModel.findOneAndUpdate).toHaveBeenCalledWith(
-                { id: userId }, // filter
-                { $inc: { rating: amount } }, // update
-                { new: true, runValidators: true }, // options
-            );
-            expect(mockUpdateQuery.populate).toHaveBeenCalledWith('level');
-            expect(mockUpdateQuery.exec).toHaveBeenCalledTimes(1);
-
-            // 3. Проверка вызова updateLevel на РЕЗУЛЬТАТЕ exec
-            expect(userReturnedByUpdateExec.updateLevel).toHaveBeenCalledTimes(
-                1,
-            );
-
-            // 4. Проверка результата и логов
-            expect(result).toBe(userReturnedByUpdateExec); // Должен вернуться документ из exec
-            expect(result.rating).toBe(initialRating + amount);
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                `Adding ${amount} rating points to user ${userId}.`,
-            );
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                `User ${userId} rating updated to ${result.rating}.`, // Используем актуальный рейтинг
-            );
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                `Checked/Updated level for user ${userId} after rating change.`,
-            );
-        });
-
-        it('should throw ValidationError if amount is not a number', async () => {
-            const invalidAmount = 'ten' as any;
-            await expect(
-                service.addRating(userId, invalidAmount),
-            ).rejects.toThrow(ValidationError);
-            await expect(
-                service.addRating(userId, invalidAmount),
-            ).rejects.toThrow('Количество очков рейтинга должно быть числом.');
-            expect(mockTelegramUserModel.findOne).not.toHaveBeenCalled(); // Проверка до запросов в БД
-        });
-
-        it('should throw UserNotFoundError if user not found by initial findOne lean', async () => {
-            // Arrange: Переопределяем lean() для этого теста
-            mockUserExistsQuery.lean.mockResolvedValueOnce(null); // Mock lean for the single upcoming call
-            const expectedErrorMessage = `Пользователь с ID ${userId} не найден для обновления рейтинга.`;
-
-            // Act: Call the service method ONCE
-            const action = service.addRating(userId, amount);
-
-            // Assert: Check the rejection type and message from the single promise
-            await expect(action).rejects.toThrow(UserNotFoundError);
-            await expect(action).rejects.toThrow(expectedErrorMessage);
-
-            // Assert: Check mock calls (ensure they were called correctly up to the point of failure)
-            expect(mockTelegramUserModel.findOne).toHaveBeenCalledTimes(1); // findOne был вызван
-            expect(mockUserExistsQuery.lean).toHaveBeenCalledTimes(1); // lean был вызван
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).not.toHaveBeenCalled(); // Не дошли до обновления
-
-            // Assert: Check logs
-            expect(mockLogger.warn).toHaveBeenCalledTimes(1); // Ensure warn was called once
-            expect(mockLogger.warn).toHaveBeenCalledWith(
-                `User ${userId} not found during rating update attempt (pre-check).`,
-            );
-            expect(mockLogger.error).toHaveBeenCalledTimes(1); // Ensure error was called once
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                `Error updating rating for user ${userId}: ${expectedErrorMessage}`, // Check the error message in the log
-                { error: expect.any(UserNotFoundError) }, // Check the error object passed to the logger
-            );
-            // Optional: Ensure info log for adding points wasn't called
-            expect(mockLogger.info).not.toHaveBeenCalledWith(
-                expect.stringContaining('Adding rating points'),
-            );
-        });
-
-        it('should throw UserNotFoundError if user not found by findOneAndUpdate exec', async () => {
-            // Arrange: Переопределяем exec() для этого теста
-            mockUpdateQuery.exec.mockResolvedValueOnce(null);
-            const expectedErrorMessage = `Пользователь с ID ${userId} не найден после попытки обновления рейтинга.`;
-
-            // Act: Call the service method ONCE and store the promise
-            const action = service.addRating(userId, amount);
-
-            // Assert: Check the rejection type and message from the single call
-            await expect(action).rejects.toThrow(UserNotFoundError);
-            await expect(action).rejects.toThrow(expectedErrorMessage);
-
-            // Проверки вызовов Mongoose
-            expect(mockTelegramUserModel.findOne).toHaveBeenCalledTimes(1); // findOne lean был
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1); // findOneAndUpdate был
-            expect(mockUpdateQuery.exec).toHaveBeenCalledTimes(1); // exec был
-            expect(userReturnedByUpdateExec.updateLevel).not.toHaveBeenCalled(); // updateLevel не вызывался
-
-            // Проверки логов
-            // Убедимся, что было ровно два вызова
-            expect(mockLogger.error).toHaveBeenCalledTimes(2);
-
-            // Проверяем ПЕРВЫЙ вызов лога ошибки (из if !updatedUser)
-            expect(mockLogger.error).toHaveBeenNthCalledWith(
-                1, // Первый вызов
-                `User ${userId} disappeared between checks during rating update.`,
-            );
-
-            // Проверяем ВТОРОЙ вызов лога ошибки (из catch)
-            expect(mockLogger.error).toHaveBeenNthCalledWith(
-                2, // Второй вызов
-                `Error updating rating for user ${userId}: ${expectedErrorMessage}`, // Сообщение из UserNotFoundError, которое было поймано
-                { error: expect.any(UserNotFoundError) }, // Проверяем, что объект ошибки был передан
-            );
-        });
-
-        it('should throw LevelUpdateError if updateLevel fails', async () => {
-            // Arrange: Переопределяем мок updateLevel на возвращенном документе
-            const updateLevelError = new LevelUpdateError(
-                'Level update logic failed',
-            );
-            userReturnedByUpdateExec.updateLevel.mockRejectedValueOnce(
-                updateLevelError,
-            );
-
-            // Act & Assert
-            const action = service.addRating(userId, amount);
-            await expect(action).rejects.toThrow(LevelUpdateError);
-            await expect(action).rejects.toThrow(updateLevelError.message);
-
-            // Проверки вызовов
-            expect(mockTelegramUserModel.findOne).toHaveBeenCalledTimes(1);
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1);
-            expect(mockUpdateQuery.exec).toHaveBeenCalledTimes(1);
-            expect(userReturnedByUpdateExec.updateLevel).toHaveBeenCalledTimes(
-                1,
-            ); // Попытка была
-
-            // Проверка лога (только общий лог ошибки)
-            expect(mockLogger.error).toHaveBeenCalledTimes(1); // --- ИСПРАВЛЕНО: Только ОДИН лог ---
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                `Error updating rating for user ${userId}: ${updateLevelError.message}`,
-                { error: updateLevelError }, // --- ИСПРАВЛЕНО: Проверяем структуру ---
-            );
-            // --- ИСПРАВЛЕНО: Удалена проверка несуществующего лога ---
-            // expect(mockLogger.error).toHaveBeenCalledWith(
-            //    `Error originating from updateLevel...`);
-        });
-
-        it('should throw custom ValidationError on Mongoose validation error during findOneAndUpdate', async () => {
-            // Arrange
-            const mongooseValidationError = new Error(
-                'Mongoose validation failed on $inc',
-            ) as any;
-            mongooseValidationError.name = 'ValidationError';
-            // findOneAndUpdate(...).populate().exec() падает с ошибкой валидации
-            mockUpdateQuery.exec.mockRejectedValueOnce(mongooseValidationError);
-
-            // Act & Assert
-            const action = service.addRating(userId, amount);
-            await expect(action).rejects.toThrow(ValidationError);
-            await expect(action).rejects.toThrow(
-                `Ошибка валидации при обновлении рейтинга: ${mongooseValidationError.message}`,
-            );
-            expect(mockTelegramUserModel.findOne).toHaveBeenCalledTimes(1); // lean был
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1); // Попытка update была
-            expect(mockUpdateQuery.exec).toHaveBeenCalledTimes(1); // Попытка exec была
-            expect(userReturnedByUpdateExec.updateLevel).not.toHaveBeenCalled(); // До updateLevel не дошло
-            expect(mockLogger.error).toHaveBeenCalledTimes(1);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                `Error updating rating for user ${userId}: ${mongooseValidationError.message}`,
-                { error: mongooseValidationError }, // --- ИСПРАВЛЕНО: Проверяем структуру ---
-            );
-        });
-
-        it('should throw DatabaseError on findOneAndUpdate exec db error', async () => {
-            // Arrange
-            const dbError = new Error('DB update exec failed');
-            mockUpdateQuery.exec.mockRejectedValueOnce(dbError); // exec падает
-
-            // Act & Assert
-            const action = service.addRating(userId, amount);
-            await expect(action).rejects.toThrow(DatabaseError);
-            await expect(action).rejects.toThrow(
-                `Не удалось обновить рейтинг пользователя: ${dbError.message}`,
-            );
-
-            // Проверки вызовов
-            expect(mockTelegramUserModel.findOne).toHaveBeenCalledTimes(1);
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1);
-            expect(mockUpdateQuery.exec).toHaveBeenCalledTimes(1); // Попытка exec была
-            expect(userReturnedByUpdateExec.updateLevel).not.toHaveBeenCalled();
-
-            // Проверка лога
-            expect(mockLogger.error).toHaveBeenCalledTimes(1);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                `Error updating rating for user ${userId}: ${dbError.message}`,
-                { error: dbError }, // --- ИСПРАВЛЕНО: Проверяем структуру ---
             );
         });
     });

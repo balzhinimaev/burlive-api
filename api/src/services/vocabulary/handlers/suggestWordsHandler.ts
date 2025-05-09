@@ -1,98 +1,35 @@
 // src/services/vocabulary/handlers/suggestWordsHandler.ts
 import { Types, Model } from 'mongoose';
-import { SuggestionInput } from '../../../types/vocabulary.types';
+import {
+    SuggestionInput,
+    SuggestWordResultItem,
+} from '../../../types/vocabulary.types';
 
 import { RATING_POINTS } from '../../../config/constants';
 import { NotFoundError, DatabaseError } from '../../../errors/customErrors';
+
 // Импортируем модель и ТИП документа TelegramUser
 import { TelegramUserDocument } from '../../../models/TelegramUsers';
-// Импортируем ИНТЕРФЕЙСЫ для моделей словаря
-import { IAcceptedWordRussian } from '../../../models/Vocabulary/AcceptedWordRussian';
-import { IAcceptedWordBuryat } from '../../../models/Vocabulary/AcceptedWordBuryat';
-import { ISuggestedWordRussian } from '../../../models/Vocabulary/SuggestedWordModelRussian';
-import { ISuggestedWordBuryat } from '../../../models/Vocabulary/SuggestedWordModelBuryat';
 
 // Импортируем утилиты
 import { isError } from '../../../utils/typeGuards';
 import logger from '../../../utils/logger';
+
 // Импортируем ИНТЕРФЕЙСЫ для обработчиков и ТИПЫ результата
 import {
     ISuggestWordsHandler,
-    SuggestWordResultItem, // Импортируем объединенный lean-тип (должен быть определен в интерфейсе)
-} from './interfaces'; // <-- Убедитесь, что путь верный
+    LeanAcceptedBuryat,
+    LeanAcceptedRussian,
+    LeanSuggestedBuryat,
+    LeanSuggestedRussian,
+    IAcceptedWordRussian,
+    IAcceptedWordBuryat,
+    ISuggestedWordRussian,
+    ISuggestedWordBuryat,
+} from '../interfaces/suggestWords.interface';
+
 import { IAddRatingHandler } from '../../interfaces/userRating.interface';
 import { IDialect } from '../../../models/Dialect';
-
-// --- ЛОКАЛЬНЫЕ Lean Type Definitions (для type casting внутри хендлера) ---
-/**
- * Представляют собой "облегченные" (lean) версии Mongoose-документов,
- * содержащие только необходимые поля в виде простых JS-объектов.
- * Используются для оптимизации (меньше данных из БД) и упрощения работы
- * с результатами запросов `.lean()`.
- */
-// Они должны соответствовать структуре LeanWordResultType из интерфейса
-type LeanAcceptedRussian = Omit<
-    IAcceptedWordRussian,
-    'translations' | 'translations_u' | 'author' | 'contributors' | 'themes'
-> & {
-    _id: Types.ObjectId;
-    translations?: Types.ObjectId[];
-    translations_u?: Types.ObjectId[];
-    author?: Types.ObjectId;
-    contributors?: Types.ObjectId[];
-    themes?: Types.ObjectId[];
-    __v?: number;
-    createdAt?: Date;
-    updatedAt?: Date;
-};
-type LeanAcceptedBuryat = Omit<
-    IAcceptedWordBuryat,
-    | 'translations'
-    | 'translations_u'
-    | 'author'
-    | 'contributors'
-    | 'themes'
-    | 'dialect'
-> & {
-    _id: Types.ObjectId;
-    translations?: Types.ObjectId[];
-    translations_u?: Types.ObjectId[];
-    author?: Types.ObjectId;
-    contributors?: Types.ObjectId[];
-    themes?: Types.ObjectId[];
-    dialect?: Types.ObjectId | null;
-    __v?: number;
-    createdAt?: Date;
-    updatedAt?: Date;
-};
-type LeanSuggestedRussian = Omit<
-    ISuggestedWordRussian,
-    'pre_translations' | 'author' | 'contributors' | 'themes'
-> & {
-    _id: Types.ObjectId;
-    pre_translations?: Types.ObjectId[];
-    author?: Types.ObjectId;
-    contributors?: Types.ObjectId[];
-    themes?: Types.ObjectId[];
-    __v?: number;
-    createdAt?: Date;
-    updatedAt?: Date;
-};
-type LeanSuggestedBuryat = Omit<
-    ISuggestedWordBuryat,
-    'pre_translations' | 'author' | 'contributors' | 'themes' | 'dialect'
-> & {
-    _id: Types.ObjectId;
-    pre_translations?: Types.ObjectId[];
-    author?: Types.ObjectId;
-    contributors?: Types.ObjectId[];
-    themes?: Types.ObjectId[];
-    dialect?: Types.ObjectId | null;
-    __v?: number;
-    createdAt?: Date;
-    updatedAt?: Date;
-};
-// --- Конец Lean Type Definitions ---
 
 /**
  * Обработчик (Handler) для бизнес-логики предложения новых слов пользователями.
@@ -663,6 +600,7 @@ export class SuggestWordsHandler implements ISuggestWordsHandler {
             `Creating new Russian suggestion: "${originalWord}" by ${authorId}.`,
         );
         try {
+            // 1. Подготовка данных
             const newSuggestionData: Partial<ISuggestedWordRussian> = {
                 text: originalWord,
                 normalized_text: normalized,
@@ -674,13 +612,20 @@ export class SuggestWordsHandler implements ISuggestWordsHandler {
                 themes: [],
             };
             // Создаем новый документ Mongoose
+            // 2. Создание экземпляра (вызов конструктора)
+            // В тесте: MockSuggestedRussianConstructor(newSuggestionData)
+            // Ожидаем, что вернется объект, настроенный через .mockReturnValueOnce()
             const newSuggestionDoc = new this.suggestedWordRussian(
                 newSuggestionData,
             );
-            // Сохраняем документ в БД
-            const savedDoc = await newSuggestionDoc.save(); // save() возвращает полный Mongoose документ
+            // 3. Сохранение (вызов метода .save() на экземпляре)
+            // В тесте: newSuggestionDoc.save() -> вызов глобального mockSave
+            // Ожидаем, что зарезолвится значением, настроенным через mockSave.mockResolvedValueOnce()
+            const savedDoc = await newSuggestionDoc.save();
 
-            // Пытаемся начислить рейтинг ПОСЛЕ успешного сохранения
+            // 4. Начисление рейтинга (вызов внешнего обработчика)
+            // В тесте: mockAddRatingHandler.execute(...)
+            // Ожидаем, что зарезолвится успешно (настроено в beforeEach)
             try {
                 await this.addRatingHandler.execute({
                     userObjectId: authorId,
@@ -698,10 +643,14 @@ export class SuggestWordsHandler implements ISuggestWordsHandler {
                 // Можно добавить информацию об ошибке рейтинга в message, если нужно
             }
 
+            // 5. Преобразование в Lean-объект (вызов .toObject() на результате сохранения)
+            // В тесте: savedDoc.toObject() -> вызов глобального mockToObject
+            // Ожидаем, что вернет простой объект (настроено глобально)
             // Преобразуем Mongoose документ в lean-объект для возврата
             const resultWord: LeanSuggestedRussian =
                 savedDoc.toObject<LeanSuggestedRussian>();
 
+            // 6. Возврат успешного результата
             return {
                 message: `Слово "${originalWord}" успешно предложено.`,
                 word: resultWord,

@@ -11,7 +11,7 @@ import {
     ValidationError,
     // AppError, // Оставляем на случай использования в других местах
     DatabaseError,
-    LevelUpdateError,
+    // LevelUpdateError,
 } from '../../errors/customErrors'; // Убедитесь, что путь верный
 
 export type RegisterUserDTO = Pick<TelegramUser, 'id'> &
@@ -336,19 +336,6 @@ export class TelegramUserService {
     }
 
     /**
-     * Обновляет фото пользователя.
-     */
-    async updateUserPhoto(
-        id: number,
-        photoUrl: string,
-    ): Promise<TelegramUserDocument> {
-        if (typeof photoUrl !== 'string') {
-            throw new ValidationError('Неверный формат URL фотографии.');
-        }
-        return this.updateUserProfile(id, { photo_url: photoUrl });
-    }
-
-    /**
      * Обновляет телефон пользователя.
      */
     async updateUserPhone(
@@ -456,107 +443,6 @@ export class TelegramUserService {
             // Исправлено: убран второй аргумент
             throw new DatabaseError(
                 `Не удалось заблокировать пользователя: ${error.message}`,
-            );
-        }
-    }
-
-    /**
-     * Добавляет (или вычитает) очки рейтинга пользователю и обновляет его уровень.
-     * @param id - Telegram ID пользователя.
-     * @param amount - Количество очков для добавления (может быть отрицательным).
-     * @returns Обновленный документ пользователя.
-     * @throws ValidationError если amount не число.
-     * @throws UserNotFoundError если пользователь не найден на любом из этапов.
-     * @throws LevelUpdateError если произошла ошибка при обновлении уровня пользователя.
-     * @throws DatabaseError при других ошибках базы данных.
-     */
-    async addRating(id: number, amount: number): Promise<TelegramUserDocument> {
-        this.logger.info(`Adding ${amount} rating points to user ${id}.`);
-
-        // 1. Валидация входных данных
-        if (typeof amount !== 'number') {
-            // Выбрасываем ValidationError сразу, если amount не число
-            throw new ValidationError(
-                'Количество очков рейтинга должно быть числом.',
-            );
-        }
-
-        try {
-            // 2. Проверка существования пользователя (БЕЗ .exec())
-            // Этот шаг важен, чтобы не пытаться обновить несуществующего пользователя
-            const userExists = await this.telegramUserModel
-                .findOne({ id: id })
-                .select('_id')
-                .lean(); // lean() для легковесной проверки
-            if (!userExists) {
-                this.logger.warn(
-                    `User ${id} not found during rating update attempt (pre-check).`,
-                );
-                throw new UserNotFoundError(
-                    `Пользователь с ID ${id} не найден для обновления рейтинга.`,
-                );
-            }
-
-            // 3. Обновление рейтинга и получение обновленного пользователя с уровнем
-            // НЕ используем await перед findOneAndUpdate, используем await перед exec()
-            const updatedUser = await this.telegramUserModel
-                .findOneAndUpdate(
-                    { id: id }, // Находим по ID
-                    { $inc: { rating: amount } }, // Атомарно увеличиваем рейтинг
-                    { new: true, runValidators: true }, // Возвращаем новый документ, запускаем валидаторы
-                )
-                .populate('level') // Загружаем связанный документ уровня
-                .exec(); // Выполняем запрос findOneAndUpdate + populate
-
-            // 4. Проверка, что пользователь все еще существует после обновления
-            // (маловероятно, но возможно, если его удалили между findOne и findOneAndUpdate)
-            if (!updatedUser) {
-                this.logger.error(
-                    `User ${id} disappeared between checks during rating update.`,
-                );
-                // Считаем это UserNotFoundError, так как пользователя для дальнейшей работы нет
-                throw new UserNotFoundError(
-                    `Пользователь с ID ${id} не найден после попытки обновления рейтинга.`,
-                );
-            }
-
-            this.logger.info(
-                `User ${id} rating updated to ${updatedUser.rating}.`,
-            );
-
-            // 5. Вызов метода модели для обновления уровня
-            // Этот метод должен выбрасывать LevelUpdateError при неудаче
-            await updatedUser.updateLevel();
-            this.logger.debug(
-                `Checked/Updated level for user ${id} after rating change.`,
-            );
-
-            // 6. Возвращаем успешно обновленного пользователя
-            return updatedUser;
-        } catch (error: any) {
-            // 7. Обработка всех ошибок, возникших в try блоке
-            this.logger.error(
-                `Error updating rating for user ${id}: ${error.message}`,
-                { error },
-            );
-
-            // Перехватываем и пробрасываем известные/ожидаемые ошибки
-            if (
-                error instanceof UserNotFoundError || // Ошибка "Не найден" на любом этапе
-                error instanceof ValidationError || // Ошибка валидации amount в начале
-                error instanceof LevelUpdateError // Ошибка из await updatedUser.updateLevel()
-            ) {
-                throw error;
-            }
-            // Перехватываем ошибки валидации Mongoose (если вдруг $inc их вызовет)
-            if (error.name === 'ValidationError') {
-                throw new ValidationError(
-                    `Ошибка валидации при обновлении рейтинга: ${error.message}`,
-                );
-            }
-            // Все остальные непредвиденные ошибки считаем ошибками базы данных
-            throw new DatabaseError(
-                `Не удалось обновить рейтинг пользователя: ${error.message}`,
             );
         }
     }

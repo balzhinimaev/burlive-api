@@ -7,15 +7,10 @@
  */
 export class AppError extends Error {
     public readonly statusCode: number;
-    // Убираем 'public readonly name: string;', так как оно уже есть у Error
-    // public readonly name: string;
 
-    // Убираем параметр 'name' из конструктора
     constructor(message: string, statusCode: number = 500) {
         super(message);
         this.statusCode = statusCode;
-        // Убираем 'this.name = name;'
-        // this.name = name;
 
         // Восстанавливаем цепочку прототипов для корректной работы instanceof
         Object.setPrototypeOf(this, new.target.prototype);
@@ -26,7 +21,6 @@ export class AppError extends Error {
 
 // --- Ошибки Валидации (400 Bad Request) ---
 export class ValidationError extends AppError {
-    // Просто вызываем super с нужными параметрами
     constructor(message: string = 'Ошибка валидации входных данных') {
         super(message, 400);
     }
@@ -58,7 +52,6 @@ export class NotFoundError extends AppError {
 export class UserNotFoundError extends NotFoundError {
     constructor(message: string = 'Пользователь не найден') {
         super(message); // Статус код 404 унаследуется
-        // Убираем 'this.name = 'UserNotFoundError';'
     }
 }
 
@@ -74,7 +67,6 @@ export class UserExistsError extends ConflictError {
         message: string = 'Пользователь с такими данными уже существует',
     ) {
         super(message); // Статус код 409 унаследуется
-        // Убираем 'this.name = 'UserExistsError';'
     }
 }
 
@@ -107,21 +99,16 @@ export class DatabaseError extends AppError {
      */
     constructor(
         message: string = 'Произошла ошибка при обращении к базе данных',
-        cause?: Error, // Добавляем опциональный параметр cause
+        cause?: Error,
     ) {
-        super(message, 500); // Вызываем конструктор AppError со статусом 500
-        this.cause = cause; // Сохраняем исходную ошибку
-
-        // Установка прототипа выполняется в базовом классе AppError через new.target.prototype,
-        // поэтому явный вызов Object.setPrototypeOf здесь обычно не требуется,
-        // если только не нужна специфическая логика для этого конкретного класса.
-        // Object.setPrototypeOf(this, DatabaseError.prototype);
+        super(message, 500);
+        this.cause = cause;
+        // Object.setPrototypeOf не нужен здесь, т.к. вызывается в AppError
     }
 }
 
 // Ошибка внешнего сервиса (502 Bad Gateway / 503 Service Unavailable)
 export class ExternalServiceError extends AppError {
-    // Убираем параметр name из super
     constructor(
         message: string = 'Ошибка при обращении к внешнему сервису',
         statusCode: 502 | 503 = 502,
@@ -130,14 +117,16 @@ export class ExternalServiceError extends AppError {
     }
 }
 
-// Можно добавить и другие типы ошибок по мере необходимости...
-
-// Определяем LevelUpdateError где-то (можно в customErrors.ts)
+// Ошибка обновления уровня пользователя (или другая специфичная ошибка)
 export class LevelUpdateError extends AppError {
-    public readonly cause?: Error; // Поле cause уже было здесь
+    public readonly cause?: Error;
+
     constructor(message: string, cause?: Error) {
-        super(message, 500); // Или другой статус
+        super(message, 500); // Используем статус 500 или другой подходящий
         this.cause = cause;
-        Object.setPrototypeOf(this, LevelUpdateError.prototype); // Здесь может быть нужен, если есть своя логика
+        // Убираем явный вызов Object.setPrototypeOf для консистентности
+        // Object.setPrototypeOf(this, LevelUpdateError.prototype);
     }
 }
+
+// Можно добавить и другие типы ошибок по мере необходимости...

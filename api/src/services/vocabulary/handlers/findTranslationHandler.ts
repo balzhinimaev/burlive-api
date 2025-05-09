@@ -1,5 +1,5 @@
 // src/services/vocabulary/handlers/findTranslationHandler.ts
-import mongoose, { Document, Model } from 'mongoose'; // Добавили Model
+import mongoose, { Document } from 'mongoose'; // Добавили Model
 import {
     IFindTranslationHandler,
     FindTranslationInput,
@@ -22,7 +22,7 @@ import AcceptedWordRussianModel from '../../../models/Vocabulary/AcceptedWordRus
 import AcceptedWordBuryatModel from '../../../models/Vocabulary/AcceptedWordBuryat';
 import SearchedWordRussianModel from '../../../models/Vocabulary/SearchedWordRussianModel';
 import SearchedWordBuryatModel from '../../../models/Vocabulary/SearchedWordBuryatModel';
-import SearchedWordHistoryModel from '../../../models/Vocabulary/SearchedWordHistoryModel';
+import SearchedWordHistoryModel, { IWordHistoryModel } from '../../../models/Vocabulary/SearchedWordHistoryModel';
 import { NotFoundError } from '../../../errors/customErrors';
 
 export class FindTranslationHandler implements IFindTranslationHandler {
@@ -72,21 +72,22 @@ export class FindTranslationHandler implements IFindTranslationHandler {
 
         try {
             // Используем Promise.all для параллельного выполнения
-            const [_, burlangResult, ownDbResult] = await Promise.all([
-                this._updateSearchHistory(
-                    normalizedInput,
-                    userInput,
-                    targetLanguage,
-                    sourceLanguage,
-                    user, // Передаем найденного пользователя
-                ),
+            const [burlangResult, ownDbResult] = await Promise.all([
                 this._findInBurlang(normalizedInput, targetLanguage),
                 this._findInOwnDB(normalizedInput, sourceLanguage),
             ]);
 
-            this.log.info(
-                `FindTranslationHandler successful for "${userInput}". OwnDB: ${!!ownDbResult}, Burlang: ${burlangResult ? 'Found' : 'Not Found/Error'}`,
-            );
+            await this._updateSearchHistory(
+                normalizedInput,
+                userInput,
+                targetLanguage,
+                sourceLanguage,
+                user, // Передаем найденного пользователя
+                ownDbResult,
+            ),
+                this.log.info(
+                    `FindTranslationHandler successful for "${userInput}". OwnDB: ${!!ownDbResult}, Burlang: ${burlangResult ? 'Found' : 'Not Found/Error'}`,
+                );
             return { burlangdb: burlangResult, burlivedb: ownDbResult };
         } catch (error: unknown) {
             // Логируем ошибку на уровне обработчика
@@ -121,63 +122,74 @@ export class FindTranslationHandler implements IFindTranslationHandler {
         originalText: string,
         targetLang: 'russian' | 'buryat',
         sourceLang: 'russian' | 'buryat',
-        user: Document<unknown, {}, TelegramUser> & TelegramUser,
+        user: Document<unknown, {}, TelegramUser> & TelegramUser, // Тип пользователя остается
+        ownDbResult: AcceptedWordType | null, // Принимаем найденный перевод
     ): Promise<void> {
         try {
-            let SearchedModel: Model<any>; // Используем базовый Model тип Mongoose
-            let searchDoc: Document | null = null;
-            const updatePayload = {
-                $setOnInsert: {
-                    text: originalText,
-                    source_language: sourceLang,
-                    target_language: targetLang,
-                },
-                $addToSet: { users: user._id },
-            };
-            const options = {
-                upsert: true,
-                new: true,
-                setDefaultsOnInsert: true,
-            }; // Добавил setDefaultsOnInsert
-
-            // Используем внедренные модели
+            let SearchedModel: any;
+            // Определяем модель искомого слова
             if (sourceLang === 'russian') {
                 SearchedModel = this.searchedWordRussianModel;
             } else {
                 SearchedModel = this.searchedWordBuryatModel;
             }
 
-            searchDoc = await SearchedModel.findOneAndUpdate(
+            // Шаг 1: Найти или создать документ искомого слова, добавить пользователя
+            const searchDoc = await SearchedModel.findOneAndUpdate(
                 { normalized_text: normalizedText },
-                updatePayload,
-                options,
-            );
+                {
+                    $setOnInsert: { text: originalText }, // Только текст при создании
+                    $addToSet: { users: user._id }, // Добавляем юзера
+                },
+                { upsert: true, new: true, setDefaultsOnInsert: true },
+            ); // Не используем lean() здесь, т.к. ниже не модифицируем
 
             if (searchDoc) {
-                // Используем внедренную модель
-                await new this.searchedWordHistoryModel({
-                    searched: searchDoc._id,
+                const searchedWordId = searchDoc._id;
+
+                // Шаг 2: Подготовить данные для записи в историю
+                const historyData: Partial<IWordHistoryModel> = {
+                    // Используем Partial т.к. некоторые поля опциональны
+                    searched: searchedWordId,
                     user: user._id,
+                    source_language: sourceLang,
                     target_language: targetLang,
-                }).save();
+                };
+
+                // // Если перевод был найден в нашей БД, добавляем информацию о нем
+                // if (ownDbResult) {
+                //     historyData.foundTranslation = ownDbResult._id;
+                //     // Определяем имя модели найденного перевода (оно соответствует целевому языку)
+                //     historyData.foundTranslationModelName =
+                //         targetLang === 'russian'
+                //             ? 'word-on-russian-language' // Если искали перевод на русский, то он в этой модели
+                //             : 'word-on-buryat-language'; // Если искали на бурятский, то он в этой модели
+                //     // Еще раз: убедитесь, что имена моделей здесь и в схеме истории совпадают!
+                // }
+
+                // Шаг 3: Сохранить запись в истории поиска
+                await new this.searchedWordHistoryModel(historyData).save();
+
                 this.log.info(
-                    `Search history updated for "${normalizedText}", user ${user._id}`,
+                    `Search history entry created for "${normalizedText}", user ${user._id}. Found translation: ${!!ownDbResult}`,
                 );
+
+                // Шаг 4: Обновление массива переводов в SearchedWord...Model БОЛЬШЕ НЕ НУЖНО
+                // Блок с updateOne и $addToSet удален.
             } else {
                 this.log.warn(
-                    `Search document was not created or found after findOneAndUpdate for "${normalizedText}"`,
+                    `Search document was unexpectedly null after findOneAndUpdate with upsert:true for "${normalizedText}"`,
                 );
             }
         } catch (error: unknown) {
             const message = isError(error)
                 ? error.message
                 : 'Unknown error updating search history.';
-            // Используем this.log
             this.log.error(
                 `_updateSearchHistory: Failed for "${normalizedText}": ${message}`,
                 error,
             );
-            // Не перебрасываем ошибку, чтобы основной поиск мог продолжиться
+            // Не перебрасываем ошибку
         }
     }
 
