@@ -33,6 +33,7 @@ export type UpdateUserDTO = Partial<
         | 'dailyRating'
         | 'currentQuestion'
         | 'blocked'
+        | 'vocabular'
     >
 >;
 
@@ -320,6 +321,54 @@ export class TelegramUserService {
         }
     }
 
+    async updateVocabularLanguage(
+        id: number,
+        updateData: string,
+    ): Promise<TelegramUserDocument> {
+
+        if (Object.keys(updateData).length === 0) {
+            const currentUser = await this.findUserById(id);
+            if (!currentUser)
+                throw new UserNotFoundError(
+                    `Пользователь с ID ${id} не найден.`,
+                );
+            return currentUser;
+        }
+
+        try {
+            // НЕ НУЖЕН .exec()
+            const updatedUser = await this.telegramUserModel.findOneAndUpdate(
+                { id: id },
+                { $set: {
+                    "vocabular.selected_language_for_translate": updateData
+                } },
+                { new: true, runValidators: true },
+            );
+            if (!updatedUser) {
+                // Логгер здесь не нужен, т.к. ошибка будет поймана и залоггирована ниже
+                throw new UserNotFoundError(
+                    `Пользователь с ID ${id} не найден для обновления.`,
+                );
+            }
+            return updatedUser;
+        } catch (error: any) {
+
+            if (error instanceof UserNotFoundError) {
+                throw error;
+            }
+            if (error.name === 'ValidationError') {
+                // Исправлено: убран второй аргумент
+                throw new ValidationError(
+                    `Ошибка валидации при обновлении профиля: ${error.message}`,
+                );
+            }
+            // Исправлено: убран второй аргумент
+            throw new DatabaseError(
+                `Не удалось обновить профиль пользователя: ${error.message}`,
+            );
+        }
+    }
+
     /**
      * Обновляет тему пользователя.
      */
@@ -346,6 +395,15 @@ export class TelegramUserService {
             throw new ValidationError('Неверный формат номера телефона.');
         }
         return this.updateUserProfile(id, { phone: phoneNumber });
+    }
+    async updateUserVocabularyLanguage(
+        id: number,
+        language: string,
+    ): Promise<TelegramUserDocument> {
+        if (typeof language !== 'string') {
+            throw new ValidationError('Неверный язык.');
+        }
+        return this.updateVocabularLanguage(id, language);
     }
 
     /**

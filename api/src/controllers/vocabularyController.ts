@@ -12,13 +12,17 @@ import {
     SuggestTranslationResult,
     // Добавьте импорты для типов возвращаемых getAllWords, getAllWordsPaginated, getConfirmedWord, если они определены
 } from '../types/vocabulary.types';
-import { vocabularyServiceInstance as vocabularyService } from '../compositionRoot';
+import {
+    vocabularyServiceInstance as vocabularyService,
+    classifierServiceInstance as classifierService,
+} from '../compositionRoot';
 import { DeclineSuggestionInput } from '../services/vocabulary/interfaces/declineSuggestion.interface';
 // NotFoundError и DatabaseError могут быть нужны в центральном обработчике ошибок
 import { NotFoundError /*, DatabaseError */ } from '../errors/customErrors';
 import { GetConfirmedWordsPaginatedInput } from '../services/vocabulary/interfaces/getConfirmedWordsPaginated.interface';
 import { PaginatedResult } from '../types/common.types';
 import { SearchPartialInput } from '../services/vocabulary/interfaces/searchPartialWords.interface';
+import { IPartOfSpeechClassifier } from '../models/Classifiers/PartOfSpeechClassifierModel';
 
 // --- Интерфейсы для тел запросов ---
 interface TranslateWordBody {
@@ -593,6 +597,46 @@ const vocabularyController = {
                 query: req.query,
                 error,
             });
+            next(error);
+        }
+    },
+
+    /**
+     * НОВЫЙ МЕТОД: Получение списка всех частей речи.
+     * Делегирует выполнение ClassifierService.getPartsOfSpeech.
+     */
+    getPartsOfSpeech: async (
+        _req: Request, // Запрос не используется
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        try {
+            logger.info(
+                'Controller: Requesting all parts of speech classifiers.',
+            );
+
+            // Вызываем метод нового сервиса классификаторов
+            const partsOfSpeech: IPartOfSpeechClassifier[] =
+                await classifierService.getPartsOfSpeech();
+
+            logger.info(
+                `Controller: Successfully retrieved ${partsOfSpeech.length} parts of speech classifiers.`,
+            );
+
+            // Отправляем успешный ответ
+            res.status(200).json({
+                message: 'Parts of speech retrieved successfully.',
+                // Можно отправить как есть или обернуть в 'data'
+                data: partsOfSpeech,
+            });
+        } catch (error: unknown) {
+            // Логируем ошибку и передаем в центральный обработчик
+            const message =
+                error instanceof Error ? error.message : 'Unknown error';
+            logger.error(
+                `Error in getPartsOfSpeech controller: ${message}`,
+                error,
+            );
             next(error);
         }
     },

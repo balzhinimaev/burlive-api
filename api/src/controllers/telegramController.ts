@@ -390,6 +390,46 @@ class TelegramController {
     };
 
     /**
+     * Устанавливает промежуточный язык.
+     */
+    setLanuage = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'setMiddlewareLanuage';
+        const userId = Number(req.params.userId || req.body.userId);
+        const { language } = req.body;
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userId)) {
+            logger.warn(`[${operationName}] Invalid ID format.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return; // Выход
+        }
+        if (!language && ((language !== 'russian') || (language !== 'buryat'))) {
+            logger.warn(
+                `[${operationName}] Invalid or missing language for user ID ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({
+                message: 'language (string) is required.',
+            });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.updateUserVocabularyLanguage(userId, language);
+            logger.info(
+                `[${operationName}] Vocabulary Language saved successfully for user ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({
+                message: 'Vocabulary Language saved successfully',
+            });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    /**
      * Обновляет текущую позицию пользователя в уроке.
      */
     updateQuestionPosition = async (

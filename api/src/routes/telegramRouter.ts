@@ -51,6 +51,10 @@ telegramRouter.post('/users/block', telegramController.blockUser); // Блоки
 // --- PUT/PATCH-запросы (для обновлений) ---
 // Использовать PUT или PATCH для обновлений более семантически верно
 telegramRouter.put('/users/:userId/phone', telegramController.saveUserPhone); // Обновление телефона (ID из URL)
+telegramRouter.put(
+    '/users/:userId/set-language',
+    telegramController.setLanuage,
+); // Обновление телефона (ID из URL)
 telegramRouter.patch(
     '/users/:userId/profile',
     telegramController.updateUserProfile,

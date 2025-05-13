@@ -1,5 +1,6 @@
 // src/models/Vocabulary/SuggestedWordModelRussian.ts
 import { Schema, Types, model } from 'mongoose';
+import { IPartOfSpeechClassifier } from '../Classifiers/PartOfSpeechClassifierModel';
 
 // Переименован и экспортирован
 export interface ISuggestedWordRussian {
@@ -15,6 +16,7 @@ export interface ISuggestedWordRussian {
     updatedAt: Date; // Добавлено из timestamps
     // Дополнительные поля, если нужны
     themes: Types.ObjectId[];
+    partOfSpeech?: Types.ObjectId | IPartOfSpeechClassifier | null;
 }
 
 const SuggestedWordSchema = new Schema<ISuggestedWordRussian>(
@@ -55,6 +57,12 @@ const SuggestedWordSchema = new Schema<ISuggestedWordRussian>(
             },
         ], // Указываем на принятые бурятские слова
         themes: [{ type: Schema.Types.ObjectId, ref: 'theme', default: [] }],
+        partOfSpeech: {
+            // Новое поле
+            type: Schema.Types.ObjectId,
+            ref: 'part-of-speech-classifier', // Ссылка на нашу новую модель
+            // required: false,
+        },
         // Дополнительные поля, если нужны
     },
     {

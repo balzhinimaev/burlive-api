@@ -24,6 +24,7 @@ export interface TelegramUser extends User {
     dailyRating: number;
     vocabular: {
         selected_language_for_translate: 'russian' | 'buryat';
+        proccesed_word_id: Types.ObjectId;
     };
     currentQuestion: {
         lessonId: Types.ObjectId;
@@ -86,6 +87,9 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
                 required: true,
                 default: 'russian',
             },
+            proccesed_word_id: {
+                type: Schema.Types.ObjectId
+            }
         },
         theme: {
             type: String,

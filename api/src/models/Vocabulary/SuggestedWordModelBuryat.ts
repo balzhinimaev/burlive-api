@@ -1,5 +1,6 @@
 // src/models/Vocabulary/SuggestedWordModelBuryat.ts
 import { Schema, Types, model } from 'mongoose';
+import { IPartOfSpeechClassifier } from '../Classifiers/PartOfSpeechClassifierModel';
 
 // Переименован и экспортирован
 export interface ISuggestedWordBuryat {
@@ -14,10 +15,12 @@ export interface ISuggestedWordBuryat {
     pre_translations: Types.ObjectId[];
     createdAt: Date; // Оставляем createdAt из вашего исходного кода
     themes: Types.ObjectId[];
+    partOfSpeech?: Types.ObjectId | IPartOfSpeechClassifier | null;
+    // ^ Может быть ObjectId при сохранении/загрузке или IPartOfSpeechClassifier после populate
     // Дополнительные поля, если нужны
 }
 
-const SuggestedWordSchema = new Schema<ISuggestedWordBuryat>({
+const SuggestedWordSchemaBuryat = new Schema<ISuggestedWordBuryat>({
     text: { type: String, required: true },
     normalized_text: {
         type: String,
@@ -41,7 +44,8 @@ const SuggestedWordSchema = new Schema<ISuggestedWordBuryat>({
         index: true, // Индекс по статусу
     },
     dialect: {
-        type: Schema.Types.ObjectId, // Оставляем String, как в исходном коде. Если это ссылка, измените на Schema.Types.ObjectId и добавьте ref: 'dialects'
+        type: Schema.Types.ObjectId,
+        ref: 'Dialect',
         required: false, // Диалект не обязателен
     },
     // language: {
@@ -60,7 +64,13 @@ const SuggestedWordSchema = new Schema<ISuggestedWordBuryat>({
     themes: [{ type: Schema.Types.ObjectId, ref: 'theme', default: [] }],
     createdAt: {
         type: Date,
-        default: Date.now, // Оставляем как в вашем исходном коде (альтернатива - timestamps: true)
+        default: Date.now,
+    },
+    partOfSpeech: {
+        // Новое поле
+        type: Schema.Types.ObjectId,
+        ref: 'part-of-speech-classifier', // Ссылка на нашу новую модель
+        // required: false,
     },
     // Дополнительные поля, если нужны
 });
@@ -68,6 +78,6 @@ const SuggestedWordSchema = new Schema<ISuggestedWordBuryat>({
 // Создаем и экспортируем модель
 const SuggestedWordModelBuryat = model<ISuggestedWordBuryat>(
     'suggested-words-on-buryat-language', // Имя коллекции
-    SuggestedWordSchema,
+    SuggestedWordSchemaBuryat,
 );
 export default SuggestedWordModelBuryat;

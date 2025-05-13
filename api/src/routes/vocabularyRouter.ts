@@ -381,5 +381,18 @@ vocabularyRouter.get(
     vocabularyController.getSearchHistory, // Контроллер для этого роута
 );
 
+/**
+ * НОВЫЙ РОУТ
+ * @route   GET /backendapi/vocabulary/parts-of-speech
+ * @desc    Получение списка всех доступных частей речи (классификаторов)
+ * @access  Public (или Private, если требуется аутентификация)
+ */
+vocabularyRouter.get(
+    '/parts-of-speech',
+    authenticateToken,
+    // [] - Валидация здесь не нужна, т.к. нет параметров
+    // validate, // Тоже не нужен, т.к. нет валидации
+    vocabularyController.getPartsOfSpeech, // Новый метод контроллера
+);
 
 export default vocabularyRouter;

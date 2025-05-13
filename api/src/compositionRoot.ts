@@ -18,10 +18,10 @@ import { TelegramUserService } from './services/telegram/telegramUserService';
 // import { LeaderboardService } from './services/telegram/leaderboardService';
 // import { UserStateService } from './services/telegram/userStateService';
 // import { UserActionService } from './services/telegram/userActionService';
-
+import PartOfSpeechClassifierModel from './models/Classifiers/PartOfSpeechClassifierModel';
 import { GetWordsForApprovalHandler } from './services/vocabulary/handlers/GetWordsForApprovalHandler';
 import { SearchPartialWordsHandler } from './services/vocabulary/handlers/searchPartialWordsHandler';
-
+import { ClassifierService } from './services/classifiers/ClassifierService';
 // Утилиты и Константы
 // import updateRating from './utils/updateRatingTelegram'; // Убедись, что импорт правильный (default)
 import logger from './utils/logger';
@@ -117,6 +117,12 @@ const findTranslationHandlerInstance = new FindTranslationHandler(
     // fetch, // Если бы внедряли fetch
 );
 
+// НОВЫЙ ЭКЗЕМПЛЯР СЕРВИСА КЛАССИФИКАТОРОВ
+const classifierServiceInstance = new ClassifierService(
+    PartOfSpeechClassifierModel, // Передаем модель
+    loggerInstance, // Передаем логгер
+);
+
 const getConfirmedWordHandlerInstance = new GetConfirmedWordHandler();
 const getConfirmedWordsPaginatedHandler = new GetConfirmedWordsPaginatedHandler();
 
@@ -158,6 +164,7 @@ export {
     suggestWordsHandlerInstance,
     telegramUserServiceInstance,
     addRatingHandlerInstance,
+    classifierServiceInstance,
     // referralServiceInstance,
     // subscriptionServiceInstance,
     // leaderboardServiceInstance,
