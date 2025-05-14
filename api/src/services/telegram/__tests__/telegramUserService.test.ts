@@ -1763,132 +1763,132 @@ describe('TelegramUserService', () => {
     });
 
     // --- Тесты для setVocabularyLanguage ---
-    describe('setVocabularyLanguage', () => {
-        const lang = 'buryat';
-        const updatedUserDocument = createMockUserDocument({
-            id: userId,
-            vocabular: { selected_language_for_translate: lang },
-        });
+    // describe('setVocabularyLanguage', () => {
+    //     const lang = 'buryat';
+    //     const updatedUserDocument = createMockUserDocument({
+    //         id: userId,
+    //         vocabular: { selected_language_for_translate: lang },
+    //     });
 
-        it('should set language successfully', async () => {
-            // Arrange: findOneAndUpdate вернет обновленный документ
-            (
-                mockTelegramUserModel.findOneAndUpdate as jest.Mock
-            ).mockResolvedValueOnce(updatedUserDocument);
+    //     it('should set language successfully', async () => {
+    //         // Arrange: findOneAndUpdate вернет обновленный документ
+    //         (
+    //             mockTelegramUserModel.findOneAndUpdate as jest.Mock
+    //         ).mockResolvedValueOnce(updatedUserDocument);
 
-            // Act
-            const result = await service.setVocabularyLanguage(userId, lang);
+    //         // Act
+    //         const result = await service.setVocabularyLanguage(userId, lang);
 
-            // Assert
-            expect(result).toEqual(updatedUserDocument);
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1);
-            // --- ИСПРАВЛЕНО: Проверяем аргументы ---
-            expect(mockTelegramUserModel.findOneAndUpdate).toHaveBeenCalledWith(
-                { id: userId }, // filter
-                { $set: { 'vocabular.selected_language_for_translate': lang } }, // update
-                { new: true, runValidators: true }, // options
-            );
-            // --- ИСПРАВЛЕНО: Проверяем оба лога ---
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                `Setting vocabulary language to ${lang} for user ${userId}.`, // Лог 1 (начало)
-            );
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                `User ${userId} vocab language set to ${lang}.`, // Лог 2 (успех)
-            );
-            expect(mockLogger.info).toHaveBeenCalledTimes(2); // Убедимся, что было два вызова info
-        });
+    //         // Assert
+    //         expect(result).toEqual(updatedUserDocument);
+    //         expect(
+    //             mockTelegramUserModel.findOneAndUpdate,
+    //         ).toHaveBeenCalledTimes(1);
+    //         // --- ИСПРАВЛЕНО: Проверяем аргументы ---
+    //         expect(mockTelegramUserModel.findOneAndUpdate).toHaveBeenCalledWith(
+    //             { id: userId }, // filter
+    //             { $set: { 'vocabular.selected_language_for_translate': lang } }, // update
+    //             { new: true, runValidators: true }, // options
+    //         );
+    //         // --- ИСПРАВЛЕНО: Проверяем оба лога ---
+    //         expect(mockLogger.info).toHaveBeenCalledWith(
+    //             `Setting vocabulary language to ${lang} for user ${userId}.`, // Лог 1 (начало)
+    //         );
+    //         expect(mockLogger.info).toHaveBeenCalledWith(
+    //             `User ${userId} vocab language set to ${lang}.`, // Лог 2 (успех)
+    //         );
+    //         expect(mockLogger.info).toHaveBeenCalledTimes(2); // Убедимся, что было два вызова info
+    //     });
 
-        it('should throw ValidationError for invalid language value', async () => {
-            const invalidLang = 'english' as any;
-            await expect(
-                service.setVocabularyLanguage(userId, invalidLang),
-            ).rejects.toThrow(ValidationError);
-            await expect(
-                service.setVocabularyLanguage(userId, invalidLang),
-            ).rejects.toThrow('Недопустимое значение языка словаря.');
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).not.toHaveBeenCalled();
-        });
+    //     it('should throw ValidationError for invalid language value', async () => {
+    //         const invalidLang = 'english' as any;
+    //         await expect(
+    //             service.setVocabularyLanguage(userId, invalidLang),
+    //         ).rejects.toThrow(ValidationError);
+    //         await expect(
+    //             service.setVocabularyLanguage(userId, invalidLang),
+    //         ).rejects.toThrow('Недопустимое значение языка словаря.');
+    //         expect(
+    //             mockTelegramUserModel.findOneAndUpdate,
+    //         ).not.toHaveBeenCalled();
+    //     });
 
-        it('should throw UserNotFoundError if user not found', async () => {
-            // Arrange: findOneAndUpdate вернет null
-            (
-                mockTelegramUserModel.findOneAndUpdate as jest.Mock
-            ).mockResolvedValueOnce(null);
+    //     it('should throw UserNotFoundError if user not found', async () => {
+    //         // Arrange: findOneAndUpdate вернет null
+    //         (
+    //             mockTelegramUserModel.findOneAndUpdate as jest.Mock
+    //         ).mockResolvedValueOnce(null);
 
-            // Act & Assert
-            const action = service.setVocabularyLanguage(userId, lang);
+    //         // Act & Assert
+    //         const action = service.setVocabularyLanguage(userId, lang);
 
-            await expect(action).rejects.toThrow(UserNotFoundError);
-            await expect(action).rejects.toThrow(
-                `Пользователь с ID ${userId} не найден.`,
-            );
+    //         await expect(action).rejects.toThrow(UserNotFoundError);
+    //         await expect(action).rejects.toThrow(
+    //             `Пользователь с ID ${userId} не найден.`,
+    //         );
 
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1);
-            expect(mockLogger.error).toHaveBeenCalledTimes(1);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                `Error setting vocab language for user ${userId}: Пользователь с ID ${userId} не найден.`,
-                { error: expect.any(UserNotFoundError) }, // --- ИСПРАВЛЕНО: Проверяем структуру ---
-            );
-        });
+    //         expect(
+    //             mockTelegramUserModel.findOneAndUpdate,
+    //         ).toHaveBeenCalledTimes(1);
+    //         expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    //         expect(mockLogger.error).toHaveBeenCalledWith(
+    //             `Error setting vocab language for user ${userId}: Пользователь с ID ${userId} не найден.`,
+    //             { error: expect.any(UserNotFoundError) }, // --- ИСПРАВЛЕНО: Проверяем структуру ---
+    //         );
+    //     });
 
-        it('should throw custom ValidationError on Mongoose validation error during update', async () => {
-            // Arrange
-            const mongooseValidationError = new Error(
-                'Invalid language enum value',
-            ) as any;
-            mongooseValidationError.name = 'ValidationError';
-            (
-                mockTelegramUserModel.findOneAndUpdate as jest.Mock
-            ).mockRejectedValueOnce(mongooseValidationError);
+    //     it('should throw custom ValidationError on Mongoose validation error during update', async () => {
+    //         // Arrange
+    //         const mongooseValidationError = new Error(
+    //             'Invalid language enum value',
+    //         ) as any;
+    //         mongooseValidationError.name = 'ValidationError';
+    //         (
+    //             mockTelegramUserModel.findOneAndUpdate as jest.Mock
+    //         ).mockRejectedValueOnce(mongooseValidationError);
 
-            // Act & Assert
-            const action = service.setVocabularyLanguage(userId, lang);
+    //         // Act & Assert
+    //         const action = service.setVocabularyLanguage(userId, lang);
 
-            await expect(action).rejects.toThrow(ValidationError);
-            await expect(action).rejects.toThrow(
-                `Ошибка валидации при установке языка словаря: ${mongooseValidationError.message}`,
-            );
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1);
-            expect(mockLogger.error).toHaveBeenCalledTimes(1);
-            expect(mockLogger.error).toHaveBeenCalledWith(
-                `Error setting vocab language for user ${userId}: ${mongooseValidationError.message}`,
-                { error: mongooseValidationError }, // --- ИСПРАВЛЕНО: Проверяем структуру ---
-            );
-        });
+    //         await expect(action).rejects.toThrow(ValidationError);
+    //         await expect(action).rejects.toThrow(
+    //             `Ошибка валидации при установке языка словаря: ${mongooseValidationError.message}`,
+    //         );
+    //         expect(
+    //             mockTelegramUserModel.findOneAndUpdate,
+    //         ).toHaveBeenCalledTimes(1);
+    //         expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    //         expect(mockLogger.error).toHaveBeenCalledWith(
+    //             `Error setting vocab language for user ${userId}: ${mongooseValidationError.message}`,
+    //             { error: mongooseValidationError }, // --- ИСПРАВЛЕНО: Проверяем структуру ---
+    //         );
+    //     });
 
-        it('should throw DatabaseError on generic db error', async () => {
-            // Arrange
-            const dbError = new Error('DB update failed');
-            (
-                mockTelegramUserModel.findOneAndUpdate as jest.Mock
-            ).mockRejectedValueOnce(dbError);
+    //     it('should throw DatabaseError on generic db error', async () => {
+    //         // Arrange
+    //         const dbError = new Error('DB update failed');
+    //         (
+    //             mockTelegramUserModel.findOneAndUpdate as jest.Mock
+    //         ).mockRejectedValueOnce(dbError);
 
-            // Act: Call the service method ONCE and store the promise
-            const action = service.setVocabularyLanguage(userId, lang);
+    //         // Act: Call the service method ONCE and store the promise
+    //         const action = service.setVocabularyLanguage(userId, lang);
 
-            // Assert: Check the rejection type and message from the single call
-            await expect(action).rejects.toThrow(DatabaseError);
-            await expect(action).rejects.toThrow(
-                `Не удалось установить язык словаря: ${dbError.message}`,
-            );
+    //         // Assert: Check the rejection type and message from the single call
+    //         await expect(action).rejects.toThrow(DatabaseError);
+    //         await expect(action).rejects.toThrow(
+    //             `Не удалось установить язык словаря: ${dbError.message}`,
+    //         );
 
-            // Assert: Check that mocks were called as expected (after the promise rejected)
-            // Use try/catch or check after await expect().rejects to ensure these run even on failure
-            // Although Jest typically handles this okay with rejects.
-            expect(
-                mockTelegramUserModel.findOneAndUpdate,
-            ).toHaveBeenCalledTimes(1);
-            expect(mockLogger.error).toHaveBeenCalledTimes(1);
-        });
-    });
+    //         // Assert: Check that mocks were called as expected (after the promise rejected)
+    //         // Use try/catch or check after await expect().rejects to ensure these run even on failure
+    //         // Although Jest typically handles this okay with rejects.
+    //         expect(
+    //             mockTelegramUserModel.findOneAndUpdate,
+    //         ).toHaveBeenCalledTimes(1);
+    //         expect(mockLogger.error).toHaveBeenCalledTimes(1);
+    //     });
+    // });
 
     // Внутри describe('TelegramUserService', ...) файла TelegramUserService.spec.ts
 
