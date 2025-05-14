@@ -13,6 +13,7 @@ import {
     DatabaseError,
     // LevelUpdateError,
 } from '../../errors/customErrors'; // Убедитесь, что путь верный
+import { ObjectId } from 'mongodb';
 
 export type RegisterUserDTO = Pick<TelegramUser, 'id'> &
     Partial<Omit<TelegramUser, '_id' | 'createdAt' | 'updatedAt'>>;
@@ -182,7 +183,7 @@ export class TelegramUserService {
             | Record<
                   string,
                   number
-              > = '_id id username email createdAt first_name rating theme photo_url role subscription phone level',
+              > = '_id bot id username email createdAt first_name rating theme photo_url role subscription phone level vocabular',
         populateLevel: boolean = false,
     ): Promise<TelegramUserDocument | null> {
         this.logger.debug(`Finding user by ID: ${id}`);
@@ -325,7 +326,6 @@ export class TelegramUserService {
         id: number,
         updateData: string,
     ): Promise<TelegramUserDocument> {
-
         if (Object.keys(updateData).length === 0) {
             const currentUser = await this.findUserById(id);
             if (!currentUser)
@@ -339,9 +339,11 @@ export class TelegramUserService {
             // НЕ НУЖЕН .exec()
             const updatedUser = await this.telegramUserModel.findOneAndUpdate(
                 { id: id },
-                { $set: {
-                    "vocabular.selected_language_for_translate": updateData
-                } },
+                {
+                    $set: {
+                        'vocabular.selected_language_for_translate': updateData,
+                    },
+                },
                 { new: true, runValidators: true },
             );
             if (!updatedUser) {
@@ -352,7 +354,107 @@ export class TelegramUserService {
             }
             return updatedUser;
         } catch (error: any) {
+            if (error instanceof UserNotFoundError) {
+                throw error;
+            }
+            if (error.name === 'ValidationError') {
+                // Исправлено: убран второй аргумент
+                throw new ValidationError(
+                    `Ошибка валидации при обновлении профиля: ${error.message}`,
+                );
+            }
+            // Исправлено: убран второй аргумент
+            throw new DatabaseError(
+                `Не удалось обновить профиль пользователя: ${error.message}`,
+            );
+        }
+    }
 
+    async updateWordId(
+        id: number,
+        updateData: string,
+    ): Promise<TelegramUserDocument> {
+        if (Object.keys(updateData).length === 0) {
+            const currentUser = await this.findUserById(id);
+            if (!currentUser)
+                throw new UserNotFoundError(
+                    `Пользователь с ID ${id} не найден.`,
+                );
+            return currentUser;
+        }
+
+        try {
+            // НЕ НУЖЕН .exec()
+            const updatedUser = await this.telegramUserModel.findOneAndUpdate(
+                { id: id },
+                {
+                    $set: {
+                        'vocabular.proccesed_word_id': new ObjectId(updateData),
+                    },
+                },
+                { new: true },
+            );
+            if (!updatedUser) {
+                // Логгер здесь не нужен, т.к. ошибка будет поймана и залоггирована ниже
+                throw new UserNotFoundError(
+                    `Пользователь с ID ${id} не найден для обновления.`,
+                );
+            }
+            return updatedUser;
+        } catch (error: any) {
+            if (error instanceof UserNotFoundError) {
+                throw error;
+            }
+            if (error.name === 'ValidationError') {
+                // Исправлено: убран второй аргумент
+                throw new ValidationError(
+                    `Ошибка валидации при обновлении профиля: ${error.message}`,
+                );
+            }
+            // Исправлено: убран второй аргумент
+            throw new DatabaseError(
+                `Не удалось обновить профиль пользователя: ${error.message}`,
+            );
+        }
+    }
+
+    async updatePage(
+        id: number,
+        updateData: number,
+    ): Promise<TelegramUserDocument> {
+        // console.log(id, updateData)
+        // if (Object.keys(updateData).length === 0) {
+        //     const currentUser = await this.findUserById(id);
+        //     console.log(currentUser);
+        //     if (!currentUser)
+        //         throw new UserNotFoundError(
+        //             `Пользователь с ID ${id} не найден.`,
+        //         );
+        //     return currentUser;
+        // }
+
+        try {
+            console.log(id, updateData)
+            // НЕ НУЖЕН .exec()
+            const updatedUser = await this.telegramUserModel.findOneAndUpdate(
+                { id: id },
+                {
+                    $set: {
+                        'vocabular.page': updateData,
+                    },
+                },
+                { new: true },
+            );
+
+            console.log(updatedUser)
+            if (!updatedUser) {
+                // Логгер здесь не нужен, т.к. ошибка будет поймана и залоггирована ниже
+                throw new UserNotFoundError(
+                    `Пользователь с ID ${id} не найден для обновления.`,
+                );
+            }
+            return updatedUser;
+        } catch (error: any) {
             if (error instanceof UserNotFoundError) {
                 throw error;
             }
@@ -404,6 +506,26 @@ export class TelegramUserService {
             throw new ValidationError('Неверный язык.');
         }
         return this.updateVocabularLanguage(id, language);
+    }
+
+    async updateUserWordId(
+        id: number,
+        wordId: string,
+    ): Promise<TelegramUserDocument> {
+        if (typeof wordId !== 'string') {
+            throw new ValidationError('Неверный айди');
+        }
+        return this.updateWordId(id, wordId);
+    }
+    async updateUserBotPage(
+        id: number,
+        page: number,
+    ): Promise<TelegramUserDocument> {
+        if (typeof page !== 'number') {
+            throw new ValidationError('Неверный page');
+        }
+        console.log(id, page)
+        return this.updatePage(id, page);
     }
 
     /**

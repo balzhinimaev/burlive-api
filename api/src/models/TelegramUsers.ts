@@ -20,11 +20,12 @@ export interface TelegramUser extends User {
     via_app: boolean;
     photo_url: string | null;
     phone: string | null;
-    role: 'admin' | 'user' | 'moderator'
+    role: 'admin' | 'user' | 'moderator';
     dailyRating: number;
     vocabular: {
         selected_language_for_translate: 'russian' | 'buryat';
         proccesed_word_id: Types.ObjectId;
+        page: number
     };
     currentQuestion: {
         lessonId: Types.ObjectId;
@@ -61,14 +62,13 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
         custom_username: { type: String, required: false, default: '' },
         first_name: { type: String, required: false },
         email: { type: String, required: false }, // Можно добавить index: true, unique: true (если нужно)
-        phone: { type: String, required: false, default: "" },
+        phone: { type: String, required: false, default: '' },
         platform: { type: String, required: false },
 
         currentQuestion: {
             lessonId: { type: Schema.Types.ObjectId, ref: 'Lesson' },
             questionPosition: { type: Number, default: 1 },
         },
-
         rating: { type: Number, required: true, default: 1, index: true }, // Добавил index
         dailyRating: { type: Number, required: true, default: 1 },
         level: { type: Schema.Types.ObjectId, ref: 'Level', required: true },
@@ -88,8 +88,9 @@ const TelegramUserSchema: Schema<TelegramUserDocument> = new Schema(
                 default: 'russian',
             },
             proccesed_word_id: {
-                type: Schema.Types.ObjectId
-            }
+                type: Schema.Types.ObjectId,
+            },
+            page: { type: Number, default: 1 },
         },
         theme: {
             type: String,

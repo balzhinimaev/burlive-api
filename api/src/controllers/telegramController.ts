@@ -1,7 +1,7 @@
 // src/controllers/telegramController.ts
 
 import { NextFunction, Request, Response } from 'express';
-import { Types } from 'mongoose'; // Нужен для проверки ObjectId
+import { isValidObjectId, Types } from 'mongoose'; // Нужен для проверки ObjectId
 import dotenv from 'dotenv';
 
 // --- Импорты сервиса и зависимостей, НЕ ИСПОЛЬЗУЕМЫХ напрямую в контроллере ---
@@ -404,7 +404,7 @@ class TelegramController {
             res.status(400).json({ message: 'User ID (number) is required.' });
             return; // Выход
         }
-        if (!language && ((language !== 'russian') || (language !== 'buryat'))) {
+        if (!language && (language !== 'russian' || language !== 'buryat')) {
             logger.warn(
                 `[${operationName}] Invalid or missing language for user ID ${userId}.`,
             );
@@ -416,13 +416,93 @@ class TelegramController {
         }
 
         try {
-            await this.userService.updateUserVocabularyLanguage(userId, language);
+            await this.userService.updateUserVocabularyLanguage(
+                userId,
+                language,
+            );
             logger.info(
                 `[${operationName}] Vocabulary Language saved successfully for user ${userId}.`,
             );
             // НЕТ return перед res.status
             res.status(200).json({
                 message: 'Vocabulary Language saved successfully',
+            });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    proccessWordId = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'setProccessWordId';
+        const userId = Number(req.params.userId || req.body.userId);
+        const { wordId } = req.body;
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userId)) {
+            logger.warn(`[${operationName}] Invalid User ID format.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return; // Выход
+        }
+        if (!wordId && !isValidObjectId(wordId)) {
+            logger.warn(
+                `[${operationName}] Invalid or missing wordId for user ID ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({
+                message: 'wordId (string) is required.',
+            });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.updateUserWordId(
+                userId,
+                wordId,
+            );
+            logger.info(
+                `[${operationName}] WordId saved successfully for user ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({
+                message: 'Word ID saved successfully',
+            });
+        } catch (error) {
+            handleServiceError(error, res, operationName);
+        }
+    };
+    
+    currentPage = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'currentPageUpdate';
+        const userId = Number(req.params.userId || req.body.userId);
+        const { page } = req.body;
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userId)) {
+            logger.warn(`[${operationName}] Invalid User ID format.`);
+            // НЕТ return перед res.status
+            res.status(400).json({ message: 'User ID (number) is required.' });
+            return; // Выход
+        }
+        if (!page && !isNaN(page)) {
+            logger.warn(
+                `[${operationName}] Invalid or missing page for user ID ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(400).json({
+                message: 'page (number) is required.',
+            });
+            return; // Выход
+        }
+
+        try {
+            await this.userService.updateUserBotPage(userId, page);
+            logger.info(
+                `[${operationName}] Page saved successfully for user ${userId}.`,
+            );
+            // НЕТ return перед res.status
+            res.status(200).json({
+                message: 'Page saved successfully',
             });
         } catch (error) {
             handleServiceError(error, res, operationName);
@@ -909,6 +989,114 @@ class TelegramController {
 
             logger.info(`[${operationName}] Theme retrieved for user ${id}.`);
             res.status(200).json({ theme: user.theme }); // Возвращаем только тему
+        } catch (error) {
+            // Обрабатываем возможные ошибки БД при поиске
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    getProcessedWord = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'getProcessedWord';
+        const { userId } = req.params; // Получаем ID из параметров URL
+        const userIdNum = Number(userId);
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${userId}`);
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход
+        }
+
+        try {
+            // Запрашиваем у сервиса ТОЛЬКО поле 'theme'
+            const user = await this.userService.findUserById(
+                userIdNum,
+                'vocabular',
+            );
+
+            if (!user) {
+                logger.warn(`[${operationName}] User not found: ${userIdNum}`);
+                // findUserById вернет null, UserNotFoundError здесь не будет
+                res.status(404).json({ message: 'User not found' });
+                return; // Выход
+            }
+
+            logger.info(
+                `[${operationName}] processed_word_id retrieved for user ${userIdNum}.`,
+            );
+            res.status(200).json({ processed_word_id: user.vocabular.proccesed_word_id, language: user.vocabular.selected_language_for_translate }); // Возвращаем только тему
+        } catch (error) {
+            // Обрабатываем возможные ошибки БД при поиске
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    getPage = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'getCurrentPage';
+        const { userId } = req.params; // Получаем ID из параметров URL
+        const userIdNum = Number(userId);
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${userId}`);
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход
+        }
+
+        try {
+            // Запрашиваем у сервиса ТОЛЬКО поле 'theme'
+            const user = await this.userService.findUserById(
+                userIdNum,
+                'vocabular',
+            );
+
+            if (!user) {
+                logger.warn(`[${operationName}] User not found: ${userIdNum}`);
+                // findUserById вернет null, UserNotFoundError здесь не будет
+                res.status(404).json({ message: 'User not found' });
+                return; // Выход
+            }
+
+            logger.info(
+                `[${operationName}] current page retrieved for user ${userIdNum}.`,
+            );
+            res.status(200).json({ page: user.vocabular.page }); // Возвращаем только страницу
+        } catch (error) {
+            // Обрабатываем возможные ошибки БД при поиске
+            handleServiceError(error, res, operationName);
+        }
+    };
+
+    getLanguage = async (req: Request, res: Response): Promise<void> => {
+        const operationName = 'getLanguage';
+        const { userId } = req.params; // Получаем ID из параметров URL
+        const userIdNum = Number(userId);
+        logger.info(`[${operationName}] Request for user ID: ${userId}`);
+
+        if (isNaN(userIdNum)) {
+            logger.warn(`[${operationName}] Invalid ID format: ${userId}`);
+            res.status(400).json({ message: 'Invalid User ID format.' });
+            return; // Выход
+        }
+
+        try {
+            // Запрашиваем у сервиса ТОЛЬКО поле 'theme'
+            const user = await this.userService.findUserById(
+                userIdNum,
+                'vocabular',
+            );
+
+            if (!user) {
+                logger.warn(`[${operationName}] User not found: ${userIdNum}`);
+                // findUserById вернет null, UserNotFoundError здесь не будет
+                res.status(404).json({ message: 'User not found' });
+                return; // Выход
+            }
+
+            logger.info(
+                `[${operationName}] current language retrieved for user ${userIdNum}.`,
+            );
+            res.status(200).json({ language: user.vocabular.selected_language_for_translate }); // Возвращаем только страницу
         } catch (error) {
             // Обрабатываем возможные ошибки БД при поиске
             handleServiceError(error, res, operationName);

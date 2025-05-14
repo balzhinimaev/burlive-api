@@ -22,11 +22,17 @@ telegramRouter.get('/users/exists/:id', telegramController.userExists); // Пр�
 // telegramRouter.get('/users/:userId/profile', telegramController.userExists); // Алиас или замена для userExists, если нужно получить полный профиль
 telegramRouter.get('/users/:id/state', telegramController.getUserState); // Получить состояние пользователя
 telegramRouter.get('/users/:id/theme', telegramController.getUserTheme); // Получить тему пользователя (убрано 'user/' для единообразия)
+telegramRouter.get('/users/:userId/page', telegramController.getPage); // Получить тему пользователя (убрано 'user/' для единообразия)
+telegramRouter.get('/users/:userId/language', telegramController.getLanguage); // Получить тему пользователя (убрано 'user/' для единообразия)
 telegramRouter.get(
     '/users/:id/referral-info',
     telegramController.getUserReferralInfo,
 );
 telegramRouter.get('/leaderboard', telegramController.getLeaderboard); // Получить таблицу лидеров
+telegramRouter.get(
+    '/processed-word/:userId',
+    telegramController.getProcessedWord,
+); // Получить таблицу лидеров
 
 // --- POST-запросы ---
 telegramRouter.post('/users', telegramController.registerTelegramUser); // Регистрация нового пользователя (переименован для ясности)
@@ -55,6 +61,14 @@ telegramRouter.put(
     '/users/:userId/set-language',
     telegramController.setLanuage,
 ); // Обновление телефона (ID из URL)
+telegramRouter.put(
+    '/users/:userId/proccess-word-id',
+    telegramController.proccessWordId,
+); // Обновление телефона (ID из URL)
+telegramRouter.put(
+    '/users/:userId/current-page',
+    telegramController.currentPage,
+);
 telegramRouter.patch(
     '/users/:userId/profile',
     telegramController.updateUserProfile,
