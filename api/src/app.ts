@@ -93,7 +93,7 @@ const io = new SocketIOServer(server, {
 // 3. Rate Limiting (Applied globally)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 150, // Max requests per windowMs per IP
+    max: 10000, // Max requests per windowMs per IP
     message: 'Too many requests, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
