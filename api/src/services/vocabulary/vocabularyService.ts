@@ -13,7 +13,11 @@ import {
     SuggestTranslationResult,
     TranslationResult,
 } from '../../types/vocabulary.types';
-
+import {
+    GetSuggestedWordByIdInput,
+    SuggestedWordDetailsType,
+} from '../../types/vocabulary.types';
+import { IGetSuggestedWordByIdHandler } from './interfaces/getSuggestedWordById.interface';
 import { isError } from '../../utils/typeGuards';
 
 import { ISuggestWordsHandler, SuggestWordResultItem } from './handlers/interfaces';
@@ -52,6 +56,7 @@ class VocabularyService {
         private readonly getConfirmedWordsPaginatedHandler: IGetConfirmedWordsPaginatedHandler,
         private readonly getSearchHistoryHandler: IGetSearchHistoryHandler,
         private readonly searchPartialWordsHandler: ISearchPartialWordsHandler,
+        private readonly getSuggestedWordByIdHandler: IGetSuggestedWordByIdHandler,
         // ...
         // А также другие прямые зависимости, если они нужны самому сервису (маловероятно при таком подходе)
         private readonly log: typeof logger,
@@ -359,6 +364,30 @@ class VocabularyService {
 
             // Перебрасываем оригинальную ошибку для обработки выше (например, в контроллере API)
             throw error; // Важно перебросить ошибку, чтобы контроллер вернул корректный статус
+        }
+    }
+
+    /**
+     * Gets a specific suggested word by ID and language by delegating to GetSuggestedWordByIdHandler.
+     */
+    async getSuggestedWordById(
+        input: GetSuggestedWordByIdInput,
+    ): Promise<SuggestedWordDetailsType | null> {
+        this.log.info(
+            `VocabularyService: Delegating getSuggestedWordById for ID: ${input.id}, Lang: ${input.language}...`,
+        );
+        try {
+            // Делегируем вызов соответствующему обработчику
+            return await this.getSuggestedWordByIdHandler.execute(input);
+        } catch (error: unknown) {
+            const message = isError(error)
+                ? error.message
+                : 'Unknown error during getSuggestedWordById delegation.';
+            this.log.error(
+                `VocabularyService: Error during getSuggestedWordById for ID ${input.id}, Lang: ${input.language}: ${message}`,
+                error,
+            );
+            throw error; // Перебрасываем ошибку для обработки выше
         }
     }
 }

@@ -39,6 +39,7 @@ import SearchedWordHistoryModel from './models/Vocabulary/SearchedWordHistoryMod
 import { SuggestTranslationHandler } from './services/vocabulary/handlers/suggestTranslation.handler';
 import { GetConfirmedWordHandler } from './services/vocabulary/handlers/getConfirmedWord.handler';
 import { GetConfirmedWordsPaginatedHandler } from './services/vocabulary/handlers/getConfirmedWordsPaginatedHandler';
+import { GetSuggestedWordByIdHandler } from './services/vocabulary/handlers/getSuggestedWordByIdHandler';
 
 // --- Создание Экземпляров ---
 
@@ -136,6 +137,13 @@ const getSearchHistoryHandlerInstance = new GetSearchHistoryHandler(
     loggerInstance,
 );
 
+const getSuggestedWordByIdHandlerInstance = new GetSuggestedWordByIdHandler(
+    SuggestedWordRussianModel,
+    SuggestedWordBuryatModel,
+    loggerInstance,
+    mongooseInstance, // <-- Передаем mongoose для ObjectId.isValid
+);
+
 const searchPartialWordsHandler = new SearchPartialWordsHandler(
     AcceptedWordBuryatModel,
     AcceptedWordRussianModel,
@@ -154,6 +162,7 @@ const vocabularyServiceInstance = new VocabularyService(
     getConfirmedWordsPaginatedHandler,
     getSearchHistoryHandlerInstance,
     searchPartialWordsHandler,
+    getSuggestedWordByIdHandlerInstance,
     loggerInstance,
 );
 

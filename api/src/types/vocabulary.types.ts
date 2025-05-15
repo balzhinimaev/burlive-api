@@ -98,6 +98,12 @@ export interface GetSearchHistoryInput {
     limit?: number;
 }
 
+export type SuggestedWordDetailsType = ApprovalWordType;
+export interface GetSuggestedWordByIdInput {
+    id: string;
+    language: 'russian' | 'buryat'; // Язык нужен, чтобы знать, в какой коллекции искать
+}
+
 // Можно также переэкспортировать конкретные типы, если они нужны где-то еще напрямую
 // Можно также переэкспортировать конкретные типы, если они нужны где-то еще напрямую
 export {

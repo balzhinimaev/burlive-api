@@ -7,7 +7,9 @@ import {
     AcceptedWordType,
     FindTranslationInput,
     GetSearchHistoryInput,
+    GetSuggestedWordByIdInput,
     SearchHistoryItem,
+    SuggestedWordDetailsType,
     SuggestTranslationInput,
     SuggestTranslationResult,
     // Добавьте импорты для типов возвращаемых getAllWords, getAllWordsPaginated, getConfirmedWord, если они определены
@@ -83,6 +85,60 @@ const vocabularyController = {
     //         next(error);
     //     }
     // },
+
+    /**
+     * Получение одного предложенного слова по ID для рассмотрения.
+     */
+    getSuggestedWordById: async (
+        // Типизация: Params, ResBody, ReqBody, ReqQuery
+        req: Request<{ id: string }, {}, {}, { language?: string }>,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> => {
+        const { id } = req.params;
+        // Валидатор уже должен был проверить и преобразовать req.query.language
+        const language = req.query.language as 'russian' | 'buryat';
+
+        try {
+            logger.info(
+                `Controller: Requesting suggested word. ID: ${id}, Language: ${language}`,
+            );
+
+            const serviceInput: GetSuggestedWordByIdInput = {
+                id,
+                language,
+            };
+
+            const suggestedWord: SuggestedWordDetailsType | null =
+                await vocabularyService.getSuggestedWordById(serviceInput);
+
+            if (!suggestedWord) {
+                // Если сервис вернул null, значит слово не найдено
+                logger.warn(
+                    `Controller: Suggested word with ID ${id} for language ${language} not found by service.`,
+                );
+                throw new NotFoundError( // Предполагается, что NotFoundError есть
+                    `Предложенное слово с ID ${id} для языка ${language} не найдено.`,
+                );
+            }
+
+            logger.info(
+                `Controller: Successfully retrieved suggested word. ID: ${id}, Language: ${language}`,
+            );
+            res.status(200).json({
+                message: 'Предложенное слово найдено.',
+                word: suggestedWord,
+            });
+        } catch (error: unknown) {
+            const message =
+                error instanceof Error ? error.message : 'Unknown error';
+            logger.error(
+                `Error in getSuggestedWordById controller for ID ${id}, Lang ${language}: ${message}`,
+                error,
+            );
+            next(error);
+        }
+    },
 
     /**
      * НОВЫЙ МЕТОД: Получение подтверждённых слов с пагинацией.

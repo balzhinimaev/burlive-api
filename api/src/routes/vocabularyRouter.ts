@@ -395,4 +395,28 @@ vocabularyRouter.get(
     vocabularyController.getPartsOfSpeech, // Новый метод контроллера
 );
 
+/**
+ * НОВЫЙ РОУТ
+ * @route   GET /backendapi/vocabulary/suggested/:id
+ * @desc    Получение одного предложенного (не подтвержденного) слова по ID для рассмотрения
+ * @access  Private/Admin (т.к. используется authenticateToken и authorizeAdmin)
+ * @param   id - ID предложенного слова (из URL)
+ * @query   language - Обязательный параметр языка ('russian' или 'buryat')
+ */
+vocabularyRouter.get(
+    '/suggested/:id',
+    authenticateToken,
+    authorizeAdmin,
+    [
+        param('id')
+            .isMongoId()
+            .withMessage('Параметр id должен быть валидным ObjectId'),
+        query('language')
+            .notEmpty().withMessage('Query параметр language не может быть пустым')
+            .isString().withMessage('Query параметр language должен быть строкой')
+            .isIn(['russian', 'buryat']).withMessage("Query параметр language должен быть 'russian' или 'buryat'"),
+    ],
+    validate, // Middleware для обработки ошибок валидации
+    vocabularyController.getSuggestedWordById, // Новый метод контроллера
+);
 export default vocabularyRouter;
